@@ -64,10 +64,10 @@ export function routePacket(input, meta = {}) {
             ...decoded,
             connId,
             timestamp: ts,
-            device_id: meta.sourceIp || mapping?.device_id,
             fromNodeNum: decoded.fromNodeNum ?? value?.from ?? mapping?.num ?? null,
             toNodeNum: decoded.toNodeNum ?? value?.to ?? null,
-            sourcePacket: 'packet'
+            device_id: meta.sourceIp || mapping?.device_id,
+            sourcePacket: 'packet',
           });
         } else {
           console.warn('[IngestionRouter] Failed to decode MeshPacket');
