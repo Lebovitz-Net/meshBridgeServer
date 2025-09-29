@@ -3,9 +3,10 @@
 import db from './dbschema.js';
 
 export function insertFileInfo(data) {
+
   const {filename, size, fromNodeNum, timestamp, connId, mime_type, description} = data;
   if (!filename || !size || !fromNodeNum) {
-    console.warn('[insertFileInfo] Skipped insert: missing required fields', filename, size, num);
+    console.warn('[insertFileInfo] Skipped insert: missing required fields', filename, size, fromNodeNum);
     return;
   }
 

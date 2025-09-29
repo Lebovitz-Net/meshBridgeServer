@@ -8,7 +8,7 @@ const db = new Database(dbPath);
 
 export const buildUserInfoTables = () => {
   db.exec(`
-    -- myInfo table defines each of our nodes and their mappings
+    -- my_info table defines each of our nodes and their mappings
     CREATE TABLE IF NOT EXISTS my_info (
       myNodeNum INTEGER PRIMARY KEY,
       deviceId TEXT,
@@ -309,7 +309,7 @@ export const buildMetricsTables = () => {
       payload TEXT NOT NULL, -- JSON-encoded config object
       device_id TEXT,
       conn_Id TEXT,
-      FOREIGN KEY (num) REFERENCES nodes(num)
+      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
     );
 
     CREATE TABLE IF NOT EXISTS log_records (
@@ -320,6 +320,21 @@ export const buildMetricsTables = () => {
       connId TEXT,                           -- Optional: connection context
       decodeStatus TEXT DEFAULT 'pending'    -- 'pending', 'decoded', 'error'
     );
+
+    CREATE TABLE IF NOT EXISTS metadata (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,                          -- reference to myNoInfo record
+      firmwareVersion TEXT,                 -- Firmware version string
+      deviceStateVersion INTEGER,           -- Device state version
+      canShutdown BOOLEAN,                  -- Whether shutdown is supported
+      hasWifi BOOLEAN,                      -- Whether WiFi is available
+      hasBluetooth BOOLEAN,                 -- Whether Bluetooth is available
+      hwModel INTEGER,                      -- Hardware model ID
+      hasPKC BOOLEAN,                       -- Whether PKC is supported
+      excludedModules INTEGER,               -- Bitmask of excluded modules
+      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
+    );
+
 
   `);
 };

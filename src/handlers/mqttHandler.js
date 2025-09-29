@@ -66,9 +66,7 @@ export default function createMQTTHandler(sourceId, {
 
   const disconnect = () => {
     if (client) {
-     client.end(true, () => {
-        console.log(`[MQTT ${sourceId}] Disconnected forcefully`);
-     });
+     client.end();
      console.log(`[MQTT ${sourceId}] Disconnected`);
     }
   };

@@ -1,16 +1,8 @@
-// core/ingestionRouter.js
 import { decodeFromRadioPacket } from '../packets/decodeFromRadioPacket.js';
-import { decodeMeshPacket } from '../packets/decodeMeshPacket.js'; // ✅ renamed
 import { dispatchSubPacket } from './dispatchSubPacket.js';
-import { insertHandlers } from '../db/insertHandlers.js';
 import { decodeAndNormalize } from '../packets/packetDecoders.js';
 import { getMapping } from './connectionManager.js';
-import { decodeSubPacket } from '../packets/decodeSubPacket.js';
 
-const { upsertDeviceIpMap, getAllDeviceIpMappings } = insertHandlers;
-
-// Known oneofs/subtypes on FromRadio messages.
-// Keep this list in sync with your proto definitions.
 const FROM_RADIO_ONEOFS = new Set([
   'packet',
   'myInfo',
@@ -30,9 +22,25 @@ const FROM_RADIO_ONEOFS = new Set([
   'deviceuiConfig'
 ]);
 
+// --- Meta Enrichment ---
+
+function enrichMeta(value = {}, meta = {}) {
+  const ts = Number(Date.now());
+  const mapping = getMapping(meta.sourceIp);
+
+  return {
+    ...meta,
+    connId: meta.connId || meta.sourceIp | 'unknown',
+    timestamp: ts,
+    fromNodeNum: value.fromNodeNum || value.num || mapping?.num,
+    toNodeNum: value.toNodeNum,
+    device_id: meta.sourceIp || mapping?.device_id
+  };
+}
+
 /**
  * Main entry point for decoded packet ingestion.
- * Decomposes into subpackets, decodes MeshPacket/FromRadio,
+ * Decomposes into subpackets, delegates decoding,
  * enriches with context, and dispatches each to its handler.
  *
  * @param {Object|Buffer} input - Either a raw buffer or a pre-decoded FromRadio object
@@ -54,41 +62,19 @@ export function routePacket(input, meta = {}) {
     }
 
     for (const [key, value] of Object.entries(data)) {
-      if (value == null) continue;
-      if (!FROM_RADIO_ONEOFS.has(key)) continue; // ✅ only process known oneofs
+      if (value == null || !FROM_RADIO_ONEOFS.has(key)) {
+        continue;
+      }
 
-      if (key === 'packet') {
-        const decoded = decodeMeshPacket(value);
-        if (decoded) {
-          dispatchSubPacket({
-            ...decoded,
-            connId,
-            timestamp: ts,
-            fromNodeNum: decoded.fromNodeNum ?? value?.from ?? mapping?.num ?? null,
-            toNodeNum: decoded.toNodeNum ?? value?.to ?? null,
-            device_id: meta.sourceIp || mapping?.device_id,
-            sourcePacket: 'packet',
-          });
-        } else {
-          console.warn('[IngestionRouter] Failed to decode MeshPacket');
-        }
+      const effective = decodeFromRadioPacket(key, value, {
+        ...meta,
+        ...enrichMeta(value, meta),
+      });
+
+      if (effective) {
+        dispatchSubPacket(effective);
       } else {
-        const basePacket = {
-          type: key,
-          data: value,
-          connId,
-          timestamp: meta.timestamp || ts,
-          fromNodeNum: data.fromNodeNum || value?.num || meta.fromNodeNum || mapping?.num ||  null,
-          toNodeNum: data.toNodeNum || null,
-          device_id: meta.sourceIp || mapping?.device_id || meta.device_id || null,
-        };
-
-        const effective = decodeFromRadioPacket(basePacket);
-        if (effective) {
-          dispatchSubPacket(effective);
-        } else {
-          console.warn(`[IngestionRouter] Unhandled FromRadio subtype: ${key}`);
-        }
+        console.warn(`[IngestionRouter] Failed to decode subtype: ${key}`);
       }
     }
   } catch (err) {

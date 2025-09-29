@@ -1,55 +1,81 @@
-// src/bridge/packets/decodeFromRadioPacket.js
 import protobuf from 'protobufjs';
 import protoJson from '../assets/proto.json' with { type: 'json' };
+import { decodeMeshPacket } from './decodeMeshPacket.js';
+import { decompress } from '../utils/decompressUtils.js';
+import { getMapping } from '../core/connectionManager.js';
 
 const root = protobuf.Root.fromJSON(protoJson);
 const LogRecord = root.lookupType('meshtastic.LogRecord');
-const FileInfo = root.lookupType('meshtastic.FileInfo');
-const Channel = root.lookupType('meshtastic.Channel');
-const QueueStatus = root.lookupType('meshtastic.QueueStatus');
-// add others as needed
 
-function decodePayload(type, packet) {
-  if (!packet) return packet; // nothing to decode
-  try {
-    switch (type) {
-      case 'logRecord':
-        console.log('... decodpayload ', packet.message, Buffer.from(packet.message, 'binary'));
-        return { ...packet, decoded: LogRecord.decode(Buffer.from(packet.message, 'binary')) };
-      default:
-        return packet; // unknown type, leave payload as-is
+function tryDecodeLogRecord(rawSource) {
+  const sourceBuf = Buffer.from(rawSource, 'binary');
+
+  const nestedTypes = Object.values(root.nested)
+    .flatMap(ns => ns.nested ? Object.keys(ns.nested).map(k => `${ns.name}.${k}`) : [])
+    .filter(typeName => root.lookupTypeOrEnum(typeName)?.decode);
+
+  for (const typeName of nestedTypes) {
+    try {
+      const MessageType = root.lookupType(typeName);
+      const decoded = MessageType.decode(sourceBuf);
+      console.log(`✅ Decoded as ${typeName}:`, decoded);
+      return decoded;
+    } catch (_) {
+      // silently skip failed attempts
     }
-  } catch (err) {
-    console.warn(`[decodeFromRadioPacket] Failed to decode ${type}:`, err);
-    return packet;
+  }
+
+  console.log("❌ No matching nested type could decode the source buffer.");
+  console.log("📦 Raw source buffer (hex):", sourceBuf.toString('hex'));
+  console.log("📦 Raw source buffer (base64):", sourceBuf.toString('base64'));
+}
+
+
+
+// --- Payload Decoder ---
+function decodePayload(type, data) {
+  switch (type) {
+    case 'logRecord':
+      if (!data?.message) return data;
+        let buf = Buffer.from(data.message, 'binary');
+        if (buf[0] === 0x15) {
+          buf = buf.slice(4);
+        }
+      try {
+        return { ...data, decoded: LogRecord.decode(buf) };
+      } catch (err) {
+        console.warn(`[decodePayload] Failed to decode logRecord:`, buf, data?.message);
+        return data;
+      }
+
+    default:
+      return data;
   }
 }
 
-export function decodeFromRadioPacket(subPacket) {
-  const { type, data, connId, timestamp, fromNodeNum, toNodeNum, device_id } = subPacket;
-  const meta = { connId, timestamp, fromNodeNum, toNodeNum, device_id };
+// --- Unified Decode Entry Point ---
+export function decodeFromRadioPacket(type, value, meta = {}) {
 
   switch (type) {
-    case 'myInfo':
-    case 'nodeInfo':
-    case 'fileInfo':
-    case 'queueStatus':
-    case 'channel':
-    case 'config':
-    case 'moduleConfig':
-    case 'clientNotification':
-    case 'configComplete':
-    case 'configCompleteId':
-      // Already decoded upstream
-      return { type, data: data ?? {}, meta };
+    case 'packet': {
+      const decoded = decodeMeshPacket(value);
+      if (!decoded) {
+        console.warn('[decodeFromRadioPacket] Failed to decode MeshPacket');
+        return null;
+      }
+      return {
+        ...decoded,
+        meta, // re-enrich with decoded fields
+        sourcePacket: 'packet',
+      };
+    }
 
     case 'logRecord': {
-      const decodedPacket = decodePayload(type, data);
-      return { type, data: decodedPacket, meta };
+      const decodedData = decodePayload(type, value);
+      return { type, data: decodedData, meta };
     }
 
     default:
-      console.warn(`[decodeFromRadioPacket] Unknown FromRadio subtype: ${type}`);
-      return null;
+      return { type, data: value ?? {}, meta };
   }
 }

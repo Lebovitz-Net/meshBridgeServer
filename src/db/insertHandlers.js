@@ -16,6 +16,7 @@ import { insertFileInfo } from './insertFileInfo.js';
 import { insertPosition } from './insertPosition.js';   // <-- add this
 import { insertMyInfo } from './insertMyInfo.js';
 import { insertLogRecord } from './insertLogRecord..js';
+import { insertMetadata } from './insertMetadata.js';
 
 import { injectPacketLog, deleteNode } from './insertUtils.js';
 
@@ -145,6 +146,7 @@ export const insertHandlers = {
   insertFileInfo,
   insertLogRecord,
   insertQueueStatus,
+  insertMetadata,
   upsertNodeInfo,
 
   // New device-centric handlers

@@ -65,6 +65,8 @@ export function decodeMeshPacket(packet) {
             longitude: position.longitudeI / 1e7,
             altitude: position.altitude ?? null,
             batteryLevel: position.batteryLevel ?? null,
+            toNodeNum: baseMeta.toNodeNum,
+            fromNodeNum: baseMeta.fromNodeNum,
           },
           meta: baseMeta,
         };

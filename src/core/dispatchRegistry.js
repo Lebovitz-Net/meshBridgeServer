@@ -42,6 +42,11 @@ export const dispatchRegistry = {
     const { meta, data } = subPacket;
     const [key, value] = Object.entries(data)[0];
 
+    if (Object.keys(value).length === 0) {
+      console.log('[dispatchRouter] moduleConfig data is empty', value);
+      return;
+    }
+
     insertHandlers.insertModuleConfig({
       fromNodeNum: meta.fromNodeNum,
       key,
@@ -56,17 +61,18 @@ export const dispatchRegistry = {
   },
 
   position: (subPacket) => {
-    const { data, fromNodeNum, toNodeNum, device_id, connId, timestamp } = subPacket;
+    const { data, toNodeNum, fromNodeNum } = subPacket;
+    const { device_id, connId, timestamp } = subPacket.meta;
 
     insertHandlers.insertPosition({
-      fromNodeNum,
-      toNodeNum,
-      device_id,
+      fromNodeNum: data.fromNodeNum,
+      toNodeNum: data.toNodeNum,
       latitude: data.latitude,
       longitude: data.longitude,
       altitude: data.altitude || null,
       sats_in_view: data.satsInView || null,
       batteryLevel: data.batteryLevel || null,
+      device_id,
       conn_id: connId,
       timestamp,
     });
@@ -76,12 +82,13 @@ export const dispatchRegistry = {
   },
 
   myInfo: (subPacket) => {
+
       const { data, connId, timestamp, meta } = subPacket;
       const result = insertHandlers.insertMyInfo({
         ...data,
         connId,
         currentIP: meta.device_id,
-        timestamp
+        timestamp: timestamp || meta.timestamp,
       });
   },
 
@@ -116,7 +123,7 @@ export const dispatchRegistry = {
   },
 
   adminMessage: (subPacket) => {
-    console.debug('[dispatchRegistry] Ignoring AdminMessage', subPacket);
+    console.debug('[dispatchRegistry] Ignoring AdminMessage');
     emitOverlay('adminMessage', subPacket);
   },
 
@@ -125,6 +132,23 @@ export const dispatchRegistry = {
     const { data, meta } = subPacket;
     insertHandlers.insertLogRecord({ ...data, ...meta });
     emitOverlay('queueHealth', subPacket);
+  },
+
+  metadata: (subPacket) => {
+    const {data, meta } = subPacket;
+    if (Object.keys(data).length === 0) {
+      console.warn('[dispatchRegistery] metadata object is empty', data);
+      return;
+    }
+
+    insertHandlers.insertMetadata ({
+      ...data,
+      canShutdown: data.canShutdown ? 1 : 0,
+      hasWifi: data.hasWifi ? 1 : 0,
+      hasBluetooth: data.hasBluetooth ? 1 : 0,
+      hasPKC: data.hasPKC ? 1 : 0,
+      num: meta.fromNodeNum,
+    });
   },
 
   fileInfo: (subPacket) => {

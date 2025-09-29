@@ -1,4 +1,4 @@
-const DEFAULT_SKIP_KEYS = ['payload', 'data'];
+const DEFAULT_SKIP_KEYS = ['payload', 'data', 'message'];
 
 export function normalizeBuffers(obj, path = [], skipKeys = DEFAULT_SKIP_KEYS, encoding = 'hex') {
   if (Buffer.isBuffer(obj)) {
