@@ -16,7 +16,7 @@ import { insertFileInfo } from './insertFileInfo.js';
 import { insertPosition } from './insertPosition.js';   // <-- add this
 import { insertMyInfo } from './insertMyInfo.js';
 import { insertLogRecord } from './insertLogRecord..js';
-import { insertMetadata } from './insertMetadata.js';
+import { insertMetadata } from './insertMetaData.js';
 
 import { injectPacketLog, deleteNode } from './insertUtils.js';
 
