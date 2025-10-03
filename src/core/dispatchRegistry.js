@@ -1,20 +1,23 @@
 import { insertHandlers } from '../db/insertHandlers.js';
-import { insertMetricsHandler } from '../db/insertMetricsHandler.js';
 import { emitOverlay } from '../overlays/overlayEmitter.js';
 import { emitEvent } from '../events/eventEmitter.js';
 
 export const dispatchRegistry = {
   // MeshPacket-derived types
   message: (subPacket) => {
-    const { data, fromNodeNum, device_id, connId, timestamp, meta } = subPacket;
+
+    const { data, meta } = subPacket;
+    const { fromNodeNum, toNodeNum, device_id, timestamp, connId } = meta;
 
     insertHandlers.insertMessage({
-      text: data.text,
-      num: fromNodeNum,
+      message: data.message,
+      message_id: meta.packetId,
+      fromNodeNum,
+      toNodeNum,
       device_id,
-      conn_id: connId,
+      connId,
       timestamp,
-      channelInfo: meta?.channelInfo || null,
+      channel: meta.channel,
     });
 
     emitOverlay('message', subPacket);
@@ -93,12 +96,13 @@ export const dispatchRegistry = {
   },
 
   nodeInfo: (subPacket) => {
-    const { data, connId, timestamp, meta } = subPacket;
+    const { data, connId, timestamp, meta, device_id } = subPacket;
     const result = insertHandlers.upsertNodeInfo({
       ...data,
       num: data?.num || meta?.fromNodeNum,
       conn_id: connId,
       timestamp,
+      device_id: device_id || meta.device_id || null,
     });
 
     if (result?.num) subPacket.fromNodeNum = result.num;
@@ -111,7 +115,7 @@ export const dispatchRegistry = {
   telemetry: (subPacket) => {
     const { data, fromNodeNum, toNodeNum, connId, timestamp } = subPacket;
 
-    insertMetricsHandler({
+    insertHandlers.insertMetricsHandler({
       fromNodeNum,
       toNodeNum,
       conn_id: connId,

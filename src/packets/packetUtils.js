@@ -33,9 +33,20 @@ export function parsePlainMessage(buffer) {
   }
 }
 
+// Always return a top-level `channel` field, defaulting to 0 if missing
 export function extractChannelInfo(packet) {
-  const channel_id = packet?.decoded?.channel_id ?? packet?.channel?.id ?? null;
-  return channel_id ? { channel_id } : null;
+  let channel = null;
+
+  if (typeof packet?.channel === 'number') {
+    channel = packet.channel;
+  }
+
+  // Protobuf omits default values, so if it's absent, assume 0
+  if (channel == null) {
+    channel = 0;
+  }
+
+  return { channel };
 }
 
 /**

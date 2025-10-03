@@ -1,0 +1,496 @@
+import db from '../dbschema.js';
+
+export const insertChannel = (packet) => {
+
+  db.prepare(`
+    INSERT OR REPLACE INTO channels (
+      channel_num, num, "index", name, role, psk,
+      uplink_enabled, downlink_enabled, module_settings_json, timestamp
+    ) VALUES (@channel_num, @num, @index, @name, @role, @psk,
+      @uplink_enabled, @downlink_enabled, @module_settings_json, @timestamp)
+  `).run({
+    ...packet,
+  });
+};
+import db from '../dbschema.js';
+import { setMapping } from '../../core/connectionManager.js';
+
+export function insertConfig(subPacket) {
+  const { fromNodeNum, key, data, timestamp, device_id, connId } = subPacket;
+
+  db.prepare(`
+    INSERT INTO config (
+      num, type, payload, timestamp, device_id, conn_id
+    ) VALUES ( ?, ?, ?, ?, ?, ? )
+  `).run( fromNodeNum, key, data, timestamp, device_id, connId );
+}
+
+
+export function insertModuleConfig(subPacket) {
+  const { fromNodeNum, key, data, timestamp, device_id, connId } = subPacket;
+console.log('...insertModuleConfig ', data);
+  db.prepare(`
+    INSERT INTO module_config (
+      num, type, payload, timestamp, device_id, conn_id
+    ) VALUES ( ?, ?, ?, ?, ?, ? )
+  `).run( fromNodeNum, key, data, timestamp, device_id, connId );
+}
+
+// InsertMyInfo ==============================================================
+
+export async function insertMyInfo(packet) {
+
+  const { myNodeNum, deviceId, currentIP } = packet;
+
+  setMapping(currentIP, myNodeNum, deviceId);
+
+  if (!myNodeNum || !deviceId) {
+    console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, deviceId });
+    return;
+  }
+  try {
+    await db.prepare(
+      `INSERT INTO my_info (
+        myNodeNum, deviceId, rebootCount, minAppVersion, pioEnv, currentIP, connId, timestamp
+      ) VALUES (@myNodeNum, @deviceId, @rebootCount, @minAppVersion, @pioEnv, @currentIP, @connId, @timestamp)
+      ON CONFLICT(myNodeNum) DO UPDATE SET
+        deviceId = excluded.deviceId,
+        rebootCount = excluded.rebootCount,
+        minAppVersion = excluded.minAppVersion,
+        pioEnv = excluded.pioEnv,
+        currentIP = excluded.currentIP,
+        connId = excluded.connId,
+        timestamp = excluded.timestamp`
+    ).run({
+        ...packet,
+        timestamp: Date.now(),
+    })
+  } catch (err) {
+    console.error('[insertMyInfo] DB insert failed:', err);
+  }
+}
+
+// insertConnection ============================================================================
+
+export const insertConnection = (connection) => {
+  const stmt = db.prepare(`
+    INSERT INTO connections (connection_id, num, transport, status)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(connection.connection_id, connection.num, connection.transport, connection.status);
+};
+
+// =========================================================
+
+export function insertFileInfo(data) {
+
+  const {filename, size, fromNodeNum, timestamp, connId, mime_type, description} = data;
+  if (!filename || !size || !fromNodeNum) {
+    console.warn('[insertFileInfo] Skipped insert: missing required fields', filename, size, fromNodeNum);
+    return;
+  }
+
+  const stmt = db.prepare(`
+    INSERT INTO file_info (
+      filename, size, mime_type, description,
+      num, timestamp, conn_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  stmt.run( filename, size, mime_type || null, description || null, fromNodeNum, timestamp, connId || null );
+}
+
+// ==================================================================
+
+export function insertMetadata(subPacket) {
+  db.prepare(`
+    INSERT INTO metadata (
+      num, firmwareVersion, deviceStateVersion, canShutdown, hasWifi, hasBluetooth, hwModel, hasPKC, excludedModules
+    ) VALUES (
+     @num, @firmwareVersion, @deviceStateVersion, @canShutdown, @hasWifi, @hasBluetooth, @hwModel, @hasPKC, @excludedModules
+    )
+ `).run({
+    ...subPacket,
+  });
+}
+﻿// --- Device Inserts ---
+import db from '../dbschema.js';
+
+export const insertDevice = (device) => {
+  const stmt = db.prepare(`
+    INSERT INTO devices (device_id, label, last_seen)
+    VALUES (?, ?, ?)
+  `);
+  stmt.run(device.device_id, device.label, device.last_seen);
+};
+
+export const insertDeviceSetting = (setting) => {
+  const stmt = db.prepare(`
+    INSERT INTO device_settings (device_id, config_type, config_json, updated_at, conn_id)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+  stmt.run(setting.device_id, setting.config_type, setting.config_json, setting.updated_at, setting.conn_id);
+};
+
+export const insertDeviceMeta = (meta) => {
+  const stmt = db.prepare(`
+    INSERT INTO device_meta (device_id, firmware, hardware, region)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(meta.device_id, meta.firmware, meta.hardware, meta.region);
+};
+
+export const upsertDeviceIpMap = (device_id, ip) => {
+  const stmt = db.prepare(`
+    INSERT INTO device_ip_map (device_id, ip)
+    VALUES (?, ?)
+    ON CONFLICT(device_id) DO UPDATE SET ip = excluded.ip
+  `);
+  stmt.run(device_id, ip);
+};
+
+export const lookupDeviceIpMap = (device_id) => {
+  const stmt = db.prepare(`
+    SELECT ip FROM device_ip_map WHERE device_id = ?
+  `);
+  const row = stmt.get(device_id);
+  return row?.ip || null;
+};
+﻿// --- Diagnostic Inserts ---
+import db from '../dbschema.js';
+import { dbBoolean } from '../dbschema.js';
+
+
+export function insertLogRecord(data) {
+  const { message, fromNodeNum, timestamp, connId } = data;
+
+  if (!message || typeof fromNodeNum !== 'number') {
+    console.warn('[insertLogRecord] Skipped insert: missing required fields', {message,fromNodeNum,timestamp});
+    return;
+  }
+
+  const stmt = db.prepare(`
+    INSERT OR IGNORE INTO log_records (
+      num, packetType, message, timestamp, connId, decodeStatus
+    ) VALUES (?, ?, ?, ?, ?, ?)
+  `);
+
+  stmt.run( fromNodeNum, 'logRecord', message, timestamp, connId, dbBoolean(true));
+}
+
+export const insertPacketLog = (packet) => {
+  const stmt = db.prepare(`
+    INSERT INTO packet_logs (log_id, num, packet_type, raw_payload, timestamp)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+  stmt.run(packet.log_id, packet.num, packet.packet_type, packet.raw_payload, packet.timestamp);
+};
+
+export const injectPacketLog = (packet) => {
+  const stmt = db.prepare(`
+    INSERT INTO packet_logs (num, packet_type, raw_payload, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(packet.num, packet.packet_type, packet.raw_payload, packet.timestamp);
+};
+
+// Placeholder: overlay insert logic not yet implemented
+export const insertDiagnosticOverlay = (overlay) => {
+  throw new Error('insertDiagnosticOverlay not yet implemented');
+};
+
+export const insertOverlayPreview = (preview) => {
+  throw new Error('insertOverlayPreview not yet implemented');
+};
+
+export const insertConfigMutation = (mutation) => {
+  throw new Error('insertConfigMutation not yet implemented');
+};
+// --- Misc Inserts ---
+import db from '../dbschema.js';
+
+// --- Messages ---
+export const insertMessage = (msg) => {
+  db.prepare(`
+    INSERT INTO messages (message_id, channel_id, fromNodeNum, toNodeNum, message, timestamp)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(msg.message_id, msg.channel, msg.fromNodeNum, msg.toNodeNum, msg.message, msg.timestamp || Date.now());
+};
+﻿// --- Metric Inserts ---
+import db from '../dbschema.js';
+
+export const insertTelemetry = (telemetry) => {
+  const stmt = db.prepare(`
+    INSERT INTO telemetry (num, metric, value, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(telemetry.num, telemetry.metric, telemetry.value, telemetry.timestamp);
+};
+
+export const insertEventEmission = (event) => {
+  const stmt = db.prepare(`
+    INSERT INTO event_emissions (num, event_type, details, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(event.num, event.event_type, event.details, event.timestamp);
+};
+
+export const insertQueueStatus = (qs) => {
+  db.prepare(`
+    INSERT INTO queue_status (
+      num, res, free, maxlen, mesh_packet_id, timestamp, conn_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run( qs.num, qs.res, qs.free, qs.maxlen, qs.mesh_packet_id || null, qs.timestamp || Date.now(), qs.conn_id || null );
+};
+
+export const insertDeviceMetrics = (metrics) => {
+  const stmt = db.prepare(`
+    INSERT INTO device_metrics (device_id, voltage, temperature, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(metrics.device_id, metrics.voltage, metrics.temperature, metrics.timestamp);
+};
+
+export const insertEnvironmentMetrics = (metrics) => {
+  const stmt = db.prepare(`
+    INSERT INTO environment_metrics (num, humidity, temperature, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(metrics.num, metrics.humidity, metrics.temperature, metrics.timestamp);
+};
+
+export const insertAirQualityMetrics = (metrics) => {
+  const stmt = db.prepare(`
+    INSERT INTO air_quality_metrics (num, pm25, pm10, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(metrics.num, metrics.pm25, metrics.pm10, metrics.timestamp);
+};
+
+export const insertPowerMetrics = (metrics) => {
+  const stmt = db.prepare(`
+    INSERT INTO power_metrics (num, voltage, current, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(metrics.num, metrics.voltage, metrics.current, metrics.timestamp);
+};
+
+export const insertLocalStats = (stats) => {
+  const stmt = db.prepare(`
+    INSERT INTO local_stats (num, stat_type, value, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(stats.num, stats.stat_type, stats.value, stats.timestamp);
+};
+
+export const insertHealthMetrics = (metrics) => {
+  const stmt = db.prepare(`
+    INSERT INTO health_metrics (num, cpu_usage, memory_usage, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(metrics.num, metrics.cpu_usage, metrics.memory_usage, metrics.timestamp);
+};
+
+export const insertHostMetrics = (metrics) => {
+  const stmt = db.prepare(`
+    INSERT INTO host_metrics (host_id, cpu_load, disk_usage, timestamp)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(metrics.host_id, metrics.cpu_load, metrics.disk_usage, metrics.timestamp);
+};
+
+
+/**
+ * Accepts a structured telemetry object and inserts present metric groups.
+ *
+ * @param {Object} telemetry - Parsed telemetry object with lineage and metric groups
+ */
+export function insertMetricsHandler(telemetry) {
+  const { fromNodeNum, toNodeNum, time, ...metricGroups } = telemetry;
+  const timestamp = time * 1000;
+  
+  const knownMetricGroups = {
+    deviceMetrics: insertDeviceMetrics,
+    environmentMetrics: insertEnvironmentMetrics,
+    airQualityMetrics: insertAirQualityMetrics,
+    powerMetrics: insertPowerMetrics,
+    localStats: insertLocalStats,
+    healthMetrics: insertHealthMetrics,
+    hostMetrics: insertHostMetrics
+  };
+
+  for (const [groupName, insertFn] of Object.entries(knownMetricGroups)) {
+    const metrics = metricGroups[groupName];
+    if (metrics) {
+      try {
+        insertFn({ fromNodeNum, toNodeNum, timestamp, ...metrics });
+      } catch (err) {
+        console.warn(`[insertMetricsHandler] Failed to insert ${groupName}:`, err);
+      }
+    }
+  }
+}
+﻿// --- Node Inserts ---
+import db from '../dbschema.js';
+
+// insertNode ===========================================
+
+export const insertNode = (node, timestamp = Date.now()) => {
+  if (!node?.num) {
+    console.warn('[insertNode] Skipping insert: node.num is missing');
+    return;
+  }
+
+  db.prepare(`
+    INSERT INTO nodes (   num,   label,   last_seen,   viaMqtt,   hopsAway,   lastHeard,   device_id )
+    VALUES (   @num,   @label,   @last_seen,   @viaMqtt,   @hopsAway,   @lastHeard,   @device_id )
+    ON CONFLICT(num) DO UPDATE SET
+      label = excluded.label,
+      last_seen = excluded.last_seen,
+      viaMqtt = excluded.viaMqtt,
+      hopsAway = excluded.hopsAway,
+      lastHeard = excluded.lastHeard,
+      device_id = excluded.device_id
+  `).run({
+    num: node.num,
+    label: node.label ?? null,
+    last_seen: node.last_seen ?? timestamp,
+    viaMqtt: node.viaMqtt ? 1 : 0,
+    hopsAway: node.hopsAway ?? null,
+    lastHeard: node.lastHeard ?? null,
+    device_id: node.device_id ?? null
+  });
+};
+
+
+// insertNodeUsers ===========================================
+
+/**
+ * Inserts or updates a node's user identity into node_users.
+ *
+ * @param {Object} user - The user object from NodeInfo
+ * @param {number} nodeNum - The node's canonical identifier
+ */
+export function insertNodeUsers(user, nodeNum) {
+  db.prepare(`
+    INSERT INTO node_users (
+      nodeNum, userId, longName, shortName, macaddr,
+      hwModel, publicKey, isUnmessagable, updatedAt
+    ) VALUES (
+      @nodeNum, @userId, @longName, @shortName, @macaddr,
+      @hwModel, @publicKey, @isUnmessagable, @updatedAt
+    )
+    ON CONFLICT(nodeNum) DO UPDATE SET
+      userId = excluded.userId,
+      longName = excluded.longName,
+      shortName = excluded.shortName,
+      macaddr = excluded.macaddr,
+      hwModel = excluded.hwModel,
+      publicKey = excluded.publicKey,
+      isUnmessagable = excluded.isUnmessagable,
+      updatedAt = excluded.updatedAt
+  `).run({ nodeNum, userId: user.id, longName: user.longName, shortName: user.shortName, macaddr: user.macaddr, 
+           hwModel: user.hwModel, publicKey: user.publicKey, isUnmessagable: user.isUnmessagable ? 1 : 0, updatedAt: Date.now() });
+}
+
+
+// insertNodeMetrics ===========================================
+
+/**
+ * Inserts or updates a node's runtime metrics into node_metrics.
+ *
+ * @param {Object} deviceMetrics - The metrics object from NodeInfo
+ * @param {Object} options - { num: nodeNum, lastHeard?: number }
+ */
+export function insertNodeMetrics(deviceMetrics, { num, lastHeard = Date.now() }) {
+
+
+  db.prepare(`
+    INSERT INTO node_metrics (
+      nodeNum, lastHeard, metrics, updatedAt
+    ) VALUES (
+      @nodeNum, @lastHeard, @metrics, @updatedAt
+    )
+    ON CONFLICT(nodeNum) DO UPDATE SET
+      lastHeard = excluded.lastHeard,
+      metrics = excluded.metrics,
+      updatedAt = excluded.updatedAt
+  `).run({ nodeNum: num, lastHeard, metrics: JSON.stringify(deviceMetrics), updatedAt: Date.now() });
+}
+
+// UpsertNodeInfo ===========================================
+
+/**
+ * Upserts a full nodeInfo payload into nodes, node_users, and node_metrics.
+ * Runs in a single transaction for atomicity.
+ *
+ * @param {Object} nodeInfo - The decoded NodeInfo object
+ * @returns {Object} - { num } for downstream inserts
+ */
+export const upsertNodeInfo = (nodeInfo) => {
+  const num = nodeInfo?.num;
+
+  if (!num) {
+    console.warn('[upsertNodeInfo] Skipping: nodeInfo.num is missing', nodeInfo);
+    return null;
+  }
+
+  const tx = db.transaction(() => {
+    // Insert into nodes table
+    insertNode({
+      num,
+      label: nodeInfo.user?.longName ?? null,
+      last_seen: nodeInfo.lastHeard ?? Date.now(),
+      viaMqtt: nodeInfo.viaMqtt,
+      hopsAway: nodeInfo.hopsAway,
+      lastHeard: nodeInfo.lastHeard
+    });
+
+    // Insert into node_users table
+    if (nodeInfo.user) {
+      insertNodeUsers(nodeInfo.user, num);
+    }
+
+    // Insert into node_metrics table
+    if (nodeInfo.deviceMetrics) {
+     insertNodeMetrics(nodeInfo.deviceMetrics, {
+        num,
+        lastHeard: nodeInfo.lastHeard
+      });
+    }
+  });
+
+  tx();
+  return { num };
+};
+
+
+// insertUser ===========================================
+
+export const insertUser = (user) => {
+  const stmt = db.prepare(`
+    INSERT INTO users (user_id, name, role, joined_at)
+    VALUES (?, ?, ?, ?)
+  `);
+  stmt.run(user.user_id, user.name, user.role, user.joined_at);
+};
+
+
+// insertPosition ===========================================
+
+export function insertPosition(decoded) {
+  const { fromNodeNum, toNodeNum, latitude, longitude, altitude, timestamp } = decoded;
+  const ts = timestamp ?? Date.now();
+
+  db.prepare(`
+    INSERT INTO positions (fromNodeNum, toNodeNum, latitude, longitude, altitude, timestamp)
+    VALUES (@fromNodeNum, @toNodeNum, @latitude, @longitude, @altitude, @ts)
+  `).run({
+    fromNodeNum,
+    toNodeNum,
+    latitude: Number(latitude),
+    longitude: Number(longitude),
+    altitude: altitude != null ? Number(altitude) : null,
+    ts
+  });
+}

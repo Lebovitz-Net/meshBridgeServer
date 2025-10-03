@@ -28,16 +28,17 @@ export function decodeMeshPacket(packet) {
     packetId: packet.id,
     fromNodeNum: packet.from,
     toNodeNum: packet.to,
-    timestamp: packet.rxTime ? new Date(packet.rxTime * 1000) : Date.now(),
+    timestamp: packet.rxTime ? packet.rxTime * 1000 : Date.now(),
     viaMqtt: packet.viaMqtt,
     hopStart: packet.hopStart,
   };
 
   switch (port) {
     case 1: { // Plain text message
+      
       const message = parsePlainMessage(payload);
       return message
-        ? { type: 'message', data: { text: message }, meta: { ...baseMeta, channelInfo: extractChannelInfo(packet) } }
+        ? { type: 'message', data: { message }, meta: { ...baseMeta, ...extractChannelInfo(packet) } }
         : null;
     }
 
@@ -47,7 +48,7 @@ export function decodeMeshPacket(packet) {
         if (!decompressed) return null;
         const message = parsePlainMessage(decompressed);
         return message
-          ? { type: 'message', data: { text: message }, meta: { ...baseMeta, channelInfo: extractChannelInfo(packet) } }
+          ? { type: 'message', data: { text: message }, meta: { ...baseMeta, ...extractChannelInfo(packet) } }
           : null;
       } catch (err) {
         console.warn('[decodeMeshPacket] Port 7 decompression failed:', err);
@@ -67,6 +68,7 @@ export function decodeMeshPacket(packet) {
             batteryLevel: position.batteryLevel ?? null,
             toNodeNum: baseMeta.toNodeNum,
             fromNodeNum: baseMeta.fromNodeNum,
+            ...extractChannelInfo(packet),
           },
           meta: baseMeta,
         };
@@ -86,6 +88,7 @@ export function decodeMeshPacket(packet) {
             longName: user.longName,
             shortName: user.shortName,
             hwModel: user.hwModel,
+            ...extractChannelInfo(packet),
           },
           meta: baseMeta,
         };
@@ -109,7 +112,7 @@ export function decodeMeshPacket(packet) {
             channelUtilization: telemetry.channelUtilization,
             airUtilTx: telemetry.airUtilTx,
           },
-          meta: baseMeta,
+          meta: { ...baseMeta, ...extractChannelInfo(packet) }
         };
       } catch (err) {
         console.warn('[decodeMeshPacket] Failed to decode Telemetry:', err);

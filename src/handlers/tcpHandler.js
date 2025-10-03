@@ -56,6 +56,7 @@ export default function createTCPHandler(connId, host, port, handlers = {}) {
           transport: 'tcp',
           host,
           port,
+          timestamp: Date.now(),
         };
         onFrame(meta, frame);
       } catch (err) {

@@ -11,7 +11,7 @@ let currentIP = `${currentIPHost}:${currentIPPort}`;
 
 // === WebSocket server (UI <-> bridge) ===
 export const currentWSHost = process.env.WS_HOST || 'localhost';
-export const currentWSPort = parseInt(process.env.WS_PORT, 10) || 8080;
+export const currentWSPort = parseInt(process.env.WS_PORT, 10) || 3000;
 export const currentWsUrl = `ws://${currentWSHost}:${currentWSPort}`;
 
 // === Utility functions ===
@@ -42,7 +42,7 @@ export const config = {
   // API listener
   api: {
     host: process.env.API_HOST || '0.0.0.0',
-    port: parseInt(process.env.API_PORT, 10) || 3000
+    port: parseInt(process.env.API_PORT, 10) || 8080
   },
   // WebSocket listener
   websocket: {

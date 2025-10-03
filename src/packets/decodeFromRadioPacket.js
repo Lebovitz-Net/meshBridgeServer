@@ -54,28 +54,27 @@ function decodePayload(type, data) {
 }
 
 // --- Unified Decode Entry Point ---
-export function decodeFromRadioPacket(type, value, meta = {}) {
+export function decodeFromRadioPacket(type, value, enrichedMeta = {}) {
 
   switch (type) {
     case 'packet': {
       const decoded = decodeMeshPacket(value);
+
       if (!decoded) {
         console.warn('[decodeFromRadioPacket] Failed to decode MeshPacket');
         return null;
       }
+      const {type, data, meta} = decoded;
+
       return {
-        ...decoded,
-        meta, // re-enrich with decoded fields
+        type,
+        data,
+        meta: { ...enrichedMeta, ...meta }, // re-enrich with decoded fields
         sourcePacket: 'packet',
       };
     }
 
-    case 'logRecord': {
-      const decodedData = decodePayload(type, value);
-      return { type, data: decodedData, meta };
-    }
-
     default:
-      return { type, data: value ?? {}, meta };
+      return { type, data: value ?? {}, meta: enrichedMeta };
   }
 }
