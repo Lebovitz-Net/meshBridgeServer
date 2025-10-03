@@ -1,5 +1,5 @@
 import db from './dbschema.js';
-import { insertHandlers } from './insertHandlers.js'
+import { insertHandlers } from './depreciated/insertHandlers_old.js'
 
 /**
  * Upserts a full nodeInfo payload into nodes, node_users, and node_metrics.

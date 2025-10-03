@@ -1,37 +1,62 @@
-// --- Config Inserts ---
 import db from '../dbschema.js';
+import { setMapping } from '../../core/connectionManager.js';
 
-export const insertConfig = (config) => {
-  const stmt = db.prepare(`
-    INSERT INTO config (config_id, config_json, updated_at)
-    VALUES (?, ?, ?)
-  `);
-  stmt.run(config.config_id, config.config_json, config.updated_at);
-};
+export function insertConfig(subPacket) {
+  const { fromNodeNum, key, data, timestamp, device_id, connId } = subPacket;
 
-export const insertModuleConfig = (moduleConfig) => {
-  const stmt = db.prepare(`
-    INSERT INTO module_config (module_id, config_json, updated_at)
-    VALUES (?, ?, ?)
-  `);
-  stmt.run(moduleConfig.module_id, moduleConfig.config_json, moduleConfig.updated_at);
-};
+  db.prepare(`
+    INSERT INTO config (
+      num, type, payload, timestamp, device_id, conn_id
+    ) VALUES ( ?, ?, ?, ?, ?, ? )
+  `).run( fromNodeNum, key, data, timestamp, device_id, connId );
+}
 
-export const insertMyInfo = (info) => {
-  const stmt = db.prepare(`
-    INSERT INTO my_info (num, label, public_key, updated_at)
-    VALUES (?, ?, ?, ?)
-  `);
-  stmt.run(info.num, info.label, info.public_key, info.updated_at);
-};
 
-export const insertChannel = (channel) => {
-  const stmt = db.prepare(`
-    INSERT INTO channels (channel_id, name, num)
-    VALUES (?, ?, ?)
-  `);
-  stmt.run(channel.channel_id, channel.name, channel.num);
-};
+export function insertModuleConfig(subPacket) {
+  const { fromNodeNum, key, data, timestamp, device_id, connId } = subPacket;
+console.log('...insertModuleConfig ', data);
+  db.prepare(`
+    INSERT INTO module_config (
+      num, type, payload, timestamp, device_id, conn_id
+    ) VALUES ( ?, ?, ?, ?, ?, ? )
+  `).run( fromNodeNum, key, data, timestamp, device_id, connId );
+}
+
+// InsertMyInfo ==============================================================
+
+export async function insertMyInfo(packet) {
+
+  const { myNodeNum, deviceId, currentIP } = packet;
+
+  setMapping(currentIP, myNodeNum, deviceId);
+
+  if (!myNodeNum || !deviceId) {
+    console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, deviceId });
+    return;
+  }
+  try {
+    await db.prepare(
+      `INSERT INTO my_info (
+        myNodeNum, deviceId, rebootCount, minAppVersion, pioEnv, currentIP, connId, timestamp
+      ) VALUES (@myNodeNum, @deviceId, @rebootCount, @minAppVersion, @pioEnv, @currentIP, @connId, @timestamp)
+      ON CONFLICT(myNodeNum) DO UPDATE SET
+        deviceId = excluded.deviceId,
+        rebootCount = excluded.rebootCount,
+        minAppVersion = excluded.minAppVersion,
+        pioEnv = excluded.pioEnv,
+        currentIP = excluded.currentIP,
+        connId = excluded.connId,
+        timestamp = excluded.timestamp`
+    ).run({
+        ...packet,
+        timestamp: Date.now(),
+    })
+  } catch (err) {
+    console.error('[insertMyInfo] DB insert failed:', err);
+  }
+}
+
+// insertConnection ============================================================================
 
 export const insertConnection = (connection) => {
   const stmt = db.prepare(`
@@ -41,18 +66,36 @@ export const insertConnection = (connection) => {
   stmt.run(connection.connection_id, connection.num, connection.transport, connection.status);
 };
 
-export const insertFileInfo = (fileInfo) => {
-  const stmt = db.prepare(`
-    INSERT INTO file_info (file_id, filename, size, uploaded_at)
-    VALUES (?, ?, ?, ?)
-  `);
-  stmt.run(fileInfo.file_id, fileInfo.filename, fileInfo.size, fileInfo.uploaded_at);
-};
+// =========================================================
 
-export const insertMetadata = (metadata) => {
+export function insertFileInfo(data) {
+
+  const {filename, size, fromNodeNum, timestamp, connId, mime_type, description} = data;
+  if (!filename || !size || !fromNodeNum) {
+    console.warn('[insertFileInfo] Skipped insert: missing required fields', filename, size, fromNodeNum);
+    return;
+  }
+
   const stmt = db.prepare(`
-    INSERT INTO metadata (meta_id, key, value, updated_at)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO file_info (
+      filename, size, mime_type, description,
+      num, timestamp, conn_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
-  stmt.run(metadata.meta_id, metadata.key, metadata.value, metadata.updated_at);
-};
+
+  stmt.run( filename, size, mime_type || null, description || null, fromNodeNum, timestamp, connId || null );
+}
+
+// ==================================================================
+
+export function insertMetadata(subPacket) {
+  db.prepare(`
+    INSERT INTO metadata (
+      num, firmwareVersion, deviceStateVersion, canShutdown, hasWifi, hasBluetooth, hwModel, hasPKC, excludedModules
+    ) VALUES (
+     @num, @firmwareVersion, @deviceStateVersion, @canShutdown, @hasWifi, @hasBluetooth, @hwModel, @hasPKC, @excludedModules
+    )
+ `).run({
+    ...subPacket,
+  });
+}

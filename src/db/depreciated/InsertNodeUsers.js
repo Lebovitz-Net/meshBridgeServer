@@ -1,4 +1,4 @@
-import db from './dbschema.js';
+import db from '../dbschema.js';
 
 /**
  * Inserts or updates a node's user identity into node_users.

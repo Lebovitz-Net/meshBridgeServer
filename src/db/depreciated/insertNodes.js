@@ -13,7 +13,8 @@ export const insertNode = (node, timestamp = Date.now()) => {
       last_seen,
       viaMqtt,
       hopsAway,
-      lastHeard
+      lastHeard,
+      device_id
     )
     VALUES (
       @num,
@@ -21,20 +22,23 @@ export const insertNode = (node, timestamp = Date.now()) => {
       @last_seen,
       @viaMqtt,
       @hopsAway,
-      @lastHeard
+      @lastHeard,
+      @device_id
     )
     ON CONFLICT(num) DO UPDATE SET
       label = excluded.label,
       last_seen = excluded.last_seen,
       viaMqtt = excluded.viaMqtt,
       hopsAway = excluded.hopsAway,
-      lastHeard = excluded.lastHeard
+      lastHeard = excluded.lastHeard,
+      device_id = excluded.device_id
   `).run({
     num: node.num,
     label: node.label ?? null,
     last_seen: node.last_seen ?? timestamp,
     viaMqtt: node.viaMqtt ? 1 : 0,
     hopsAway: node.hopsAway ?? null,
-    lastHeard: node.lastHeard ?? null
+    lastHeard: node.lastHeard ?? null,
+    device_id: node.device_id ?? null
   });
 };

@@ -199,7 +199,7 @@ export function insertFileInfo(data) {
 }
 import db from './dbschema.js';
 import { insertNode } from './insertNodes.js';
-import { insertNodeUsers } from './InsertNodeUsers.js';
+import { insertNodeUsers } from './depreciated/InsertNodeUsers.js';
 import { insertNodeMetrics } from './insertNodeMetrics.js';
 import { insertUser } from './insertUsers.js';
 import { insertDeviceMetrics } from './insertMetrics.js';
@@ -403,7 +403,7 @@ export function insertMetadata(subPacket) {
     ...subPacket,
   });
 }
-import db from '../db/dbschema.js';
+import db from './dbschema.js';
 
 export function insertDeviceMetrics({
   fromNodeNum, toNodeNum, batteryLevel, txPower, uptime, cpuTemp, memoryUsage, timestamp
@@ -771,7 +771,7 @@ export const insertUser = (user, nodeNum = null, { dryRun = false } = {}) => {
   `).run(payload);
 };
 import db from './dbschema.js';
-import { insertHandlers } from './insertHandlers.js'
+import { insertHandlers } from './depreciated/insertHandlers_old.js'
 
 /**
  * Upserts a full nodeInfo payload into nodes, node_users, and node_metrics.
