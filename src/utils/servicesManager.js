@@ -2,7 +2,8 @@
 // Manages lifecycle of backend services: shutdown and restart.
 // Used by signal handlers and API endpoints.
 
-import { getFullConfig } from '../db/queryHandlers.js';
+import queryHandlers from '../db/queryHandlers.js';
+const { getFullConfig } = queryHandlers;
 
 // --- Teardown ---
 export const teardownServices = async () => {

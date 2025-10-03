@@ -5,6 +5,7 @@ import * as devices from './devices.js';
 import * as system from './system.js';
 import * as diagnostics from './diagnostics.js';
 import * as control from './control.js';
+import * as config  from './config.js';
 
 const apiHandlers = {
   ...nodes,
@@ -13,7 +14,8 @@ const apiHandlers = {
   ...devices,
   ...system,
   ...diagnostics,
-  ...control
+  ...control,
+  ...config,
 };
 
 export default apiHandlers;

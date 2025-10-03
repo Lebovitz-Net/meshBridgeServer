@@ -1,4 +1,4 @@
-import queryHandlers from '../db/queries/queryHandlers.js';
+import queryHandlers from '../db/queryHandlers.js';
 const { listMessagesForChannel } = queryHandlers;
 
 // Small helper to wrap sync handlers in try/catch

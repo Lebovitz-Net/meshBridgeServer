@@ -1,5 +1,5 @@
 ﻿// --- nodes.js ---
-import queryHandlers from '../db/queries/queryHandlers.js';
+import queryHandlers from '../db/queryHandlers.js';
 
 const {
   listNodes,
