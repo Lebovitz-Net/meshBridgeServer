@@ -1,5 +1,5 @@
 ﻿// --- Device Inserts ---
-import db from '../dbschema.js';
+import db from '../db.js';
 
 // Insert Device ==============================================================
 export function insertDevice({ device_id, num, conn_id, device_type = 'meshtastic' }) {

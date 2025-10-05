@@ -92,18 +92,21 @@ export const buildUserInfoTables = () => {
       uplink_enabled BOOLEAN,
       downlink_enabled BOOLEAN,
       module_settings_json TEXT,
-      timestamp INTEGER DEFAULT (strftime('%s','now')),
+      timestamp INTEGER DEFAULT (strftime('%d','now')),
       FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
     );
 
     CREATE TABLE IF NOT EXISTS messages (
-      message_id TEXT PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      messageId TEXT,
       fromNodeNum INTEGER,
       toNodeNum INTEGER,
-      channel_id TEXT,
+      channelId INtEGER,
       sender TEXT,
       message TEXT,
-      emoji INTEGER,
+      replyId INTEGER,
+      wantReply BOOLEAN,
+      wantAck BOOLEAN,
       viaMqtt BOOLEAN,
       timestamp INTEGER
       --FOREIGN KEY (channel_id) REFERENCES channels(channel_id)
@@ -124,6 +127,7 @@ export const buildUserInfoTables = () => {
       last_seen INTEGER NOT NULL           -- Unix timestamp (ms) of last packet seen from this IP
     );
  `);
+   console.log('[db] build user info tables complete');
 };
 
 export const buildMetricsTables = () => {
@@ -137,14 +141,6 @@ export const buildMetricsTables = () => {
       airUtilTx REAL,
       uptimeSeconds INTEGER,
       FOREIGN KEY (num) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS packet_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER,
-      packet_type TEXT NOT NULL,
-      timestamp INTEGER NOT NULL,
-      raw_payload TEXT
     );
 
     CREATE TABLE IF NOT EXISTS telemetry (
@@ -163,18 +159,6 @@ export const buildMetricsTables = () => {
       event_type TEXT,
       details TEXT,
       timestamp INTEGER,
-      FOREIGN KEY (num) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS file_info (
-      file_info_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER,
-      filename TEXT,
-      size INTEGER,
-      mime_type TEXT,
-      description TEXT,
-      timestamp INTEGER DEFAULT (strftime('%s','now')),
-      conn_id TEXT,
       FOREIGN KEY (num) REFERENCES nodes(num)
     );
     
@@ -286,6 +270,42 @@ export const buildMetricsTables = () => {
       timestamp INTEGER,
       FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
     );
+  `)
+  console.log('[db] build metrics tables complete');
+};
+
+export const buildDiagonsticTables = () => {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS log_records (
+      num INTEGER PRIMARY KEY,               -- Canonical packet number
+      packetType TEXT NOT NULL DEFAULT 'logRecord',
+      message TEXT NOT NULL,                 -- Binary payload, undecoded
+      timestamp INTEGER NOT NULL,            -- Epoch millis or seconds
+      connId TEXT,                           -- Optional: connection context
+      decodeStatus TEXT DEFAULT 'pending'    -- 'pending', 'decoded', 'error'
+    );
+
+    CREATE TABLE IF NOT EXISTS packet_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,
+      packet_type TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      raw_payload TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS metadata (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,                          -- reference to myNoInfo record
+      firmwareVersion TEXT,                 -- Firmware version string
+      deviceStateVersion INTEGER,           -- Device state version
+      canShutdown BOOLEAN,                  -- Whether shutdown is supported
+      hasWifi BOOLEAN,                      -- Whether WiFi is available
+      hasBluetooth BOOLEAN,                 -- Whether Bluetooth is available
+      hwModel INTEGER,                      -- Hardware model ID
+      hasPKC BOOLEAN,                       -- Whether PKC is supported
+      excludedModules INTEGER,               -- Bitmask of excluded modules
+      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
+    );
 
     CREATE TABLE IF NOT EXISTS config (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -309,31 +329,19 @@ export const buildMetricsTables = () => {
       FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
     );
 
-    CREATE TABLE IF NOT EXISTS log_records (
-      num INTEGER PRIMARY KEY,               -- Canonical packet number
-      packetType TEXT NOT NULL DEFAULT 'logRecord',
-      message TEXT NOT NULL,                 -- Binary payload, undecoded
-      timestamp INTEGER NOT NULL,            -- Epoch millis or seconds
-      connId TEXT,                           -- Optional: connection context
-      decodeStatus TEXT DEFAULT 'pending'    -- 'pending', 'decoded', 'error'
+    CREATE TABLE IF NOT EXISTS file_info (
+      file_info_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,
+      filename TEXT,
+      size INTEGER,
+      mime_type TEXT,
+      description TEXT,
+      timestamp INTEGER DEFAULT (strftime('%s','now')),
+      conn_id TEXT,
+      FOREIGN KEY (num) REFERENCES nodes(num)
     );
-
-    CREATE TABLE IF NOT EXISTS metadata (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER,                          -- reference to myNoInfo record
-      firmwareVersion TEXT,                 -- Firmware version string
-      deviceStateVersion INTEGER,           -- Device state version
-      canShutdown BOOLEAN,                  -- Whether shutdown is supported
-      hasWifi BOOLEAN,                      -- Whether WiFi is available
-      hasBluetooth BOOLEAN,                 -- Whether Bluetooth is available
-      hwModel INTEGER,                      -- Hardware model ID
-      hasPKC BOOLEAN,                       -- Whether PKC is supported
-      excludedModules INTEGER,               -- Bitmask of excluded modules
-      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
-    );
-
-
-  `);
+  `)
+    console.log('[db] build diagnostic tables complete');
 };
 
 export const buildDeviceConfigTables = () => {
@@ -371,6 +379,14 @@ export const buildDeviceConfigTables = () => {
       timestamp INTEGER DEFAULT (strftime('%s','now'))
     );
   `);
+    console.log('[db] build device configuration tables complete');
+};
+
+export const buildDatabase = () => {
+  buildUserInfoTables();
+  buildMetricsTables();
+  buildDiagonsticTables();
+  buildDeviceConfigTables();
 };
 
 export default db;

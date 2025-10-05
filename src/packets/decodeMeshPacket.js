@@ -19,10 +19,10 @@ const User = root.lookupType('meshtastic.User');
  * }
  */
 export function decodeMeshPacket(packet) {
-  const port = packet?.decoded?.portnum;
+  const portnum = packet?.decoded?.portnum;
   const payload = packet?.decoded?.payload;
 
-  if (!port || !payload) return null;
+  if (!portnum || !payload) return null;
 
   const baseMeta = {
     packetId: packet.id,
@@ -31,24 +31,36 @@ export function decodeMeshPacket(packet) {
     timestamp: packet.rxTime ? packet.rxTime * 1000 : Date.now(),
     viaMqtt: packet.viaMqtt,
     hopStart: packet.hopStart,
+    ...extractChannelInfo(packet)
   };
 
-  switch (port) {
+  const extractOptions = (packet) => {
+    const msg = packet.decode;
+
+    return {
+      "wantAck": msg?.wantAck || 0,
+      "wantReply": msg?.wantResponse || 0,
+      "replyId": msg?.replyId || 0
+    }
+  }
+
+  switch (portnum) {
     case 1: { // Plain text message
-      
+
       const message = parsePlainMessage(payload);
       return message
-        ? { type: 'message', data: { message }, meta: { ...baseMeta, ...extractChannelInfo(packet) } }
+        ? { type: 'message', data: { message, ...extractOptions(packet) }, meta: { ...baseMeta } }
         : null;
     }
 
     case 7: { // Compressed message
+
       try {
         const decompressed = decompress(payload);
         if (!decompressed) return null;
         const message = parsePlainMessage(decompressed);
         return message
-          ? { type: 'message', data: { text: message }, meta: { ...baseMeta, ...extractChannelInfo(packet) } }
+          ? { type: 'message', data: { message, ...extractOptions(packet)  }, meta: { ...baseMeta } }
           : null;
       } catch (err) {
         console.warn('[decodeMeshPacket] Port 7 decompression failed:', err);
@@ -68,7 +80,6 @@ export function decodeMeshPacket(packet) {
             batteryLevel: position.batteryLevel ?? null,
             toNodeNum: baseMeta.toNodeNum,
             fromNodeNum: baseMeta.fromNodeNum,
-            ...extractChannelInfo(packet),
           },
           meta: baseMeta,
         };
@@ -88,7 +99,6 @@ export function decodeMeshPacket(packet) {
             longName: user.longName,
             shortName: user.shortName,
             hwModel: user.hwModel,
-            ...extractChannelInfo(packet),
           },
           meta: baseMeta,
         };
@@ -112,7 +122,7 @@ export function decodeMeshPacket(packet) {
             channelUtilization: telemetry.channelUtilization,
             airUtilTx: telemetry.airUtilTx,
           },
-          meta: { ...baseMeta, ...extractChannelInfo(packet) }
+          meta: { ...baseMeta }
         };
       } catch (err) {
         console.warn('[decodeMeshPacket] Failed to decode Telemetry:', err);
@@ -121,7 +131,7 @@ export function decodeMeshPacket(packet) {
     }
 
     default:
-      console.warn(`[decodeMeshPacket] Unknown port ${port}, skipping`);
+      console.warn(`[decodeMeshPacket] Unknown port ${portnum} on channel ${extractChannelInfo(packet)}, skipping`);
       return null;
   }
 }

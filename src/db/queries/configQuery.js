@@ -1,4 +1,4 @@
-﻿import db from '../dbschema.js';
+﻿import db from '../db.js';
 
 export const getFullConfig = () => {
   return {

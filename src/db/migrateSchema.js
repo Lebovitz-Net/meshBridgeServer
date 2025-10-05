@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import db from './dbschema.js';
+import db from './db.js';
 
 const MIGRATIONS_DIR = path.resolve(__dirname, '../../../migrations');
 

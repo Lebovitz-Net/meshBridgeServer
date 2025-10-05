@@ -1,5 +1,7 @@
-import db from '../dbschema.js';
+import db from '../db.js';
 import { setMapping } from '../../core/connectionManager.js';
+
+// insertConfig ============================================================
 
 export function insertConfig(subPacket) {
   const { fromNodeNum, key, data, timestamp, device_id, connId } = subPacket;
@@ -11,10 +13,11 @@ export function insertConfig(subPacket) {
   `).run( fromNodeNum, key, data, timestamp, device_id, connId );
 }
 
+// insertModuleConfig =======================================================
 
 export function insertModuleConfig(subPacket) {
   const { fromNodeNum, key, data, timestamp, device_id, connId } = subPacket;
-console.log('...insertModuleConfig ', data);
+
   db.prepare(`
     INSERT INTO module_config (
       num, type, payload, timestamp, device_id, conn_id
@@ -28,12 +31,13 @@ export async function insertMyInfo(packet) {
 
   const { myNodeNum, deviceId, currentIP } = packet;
 
-  setMapping(currentIP, myNodeNum, deviceId);
-
   if (!myNodeNum || !deviceId) {
-    console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, deviceId });
+    console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, deviceId }, packet);
     return;
   }
+
+  setMapping(currentIP, myNodeNum, deviceId);
+
   try {
     await db.prepare(
       `INSERT INTO my_info (
@@ -66,7 +70,7 @@ export const insertConnection = (connection) => {
   stmt.run(connection.connection_id, connection.num, connection.transport, connection.status);
 };
 
-// =========================================================
+// insertFileInfo=========================================================
 
 export function insertFileInfo(data) {
 
@@ -86,7 +90,7 @@ export function insertFileInfo(data) {
   stmt.run( filename, size, mime_type || null, description || null, fromNodeNum, timestamp, connId || null );
 }
 
-// ==================================================================
+// insertMetadata==================================================================
 
 export function insertMetadata(subPacket) {
   db.prepare(`

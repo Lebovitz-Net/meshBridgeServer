@@ -1,5 +1,5 @@
 ﻿// --- Metric Inserts ---
-import db from '../dbschema.js';
+import db from '../db.js';
 
 // Telemetry ==========================================================
 export const insertTelemetry = (tel) => {

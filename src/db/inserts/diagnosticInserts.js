@@ -1,6 +1,6 @@
 ﻿// --- Diagnostic Inserts ---
-import db from '../dbschema.js';
-import { dbBoolean } from '../dbschema.js';
+import db from '../db.js';
+import { dbBoolean } from '../db.js';
 
 // Insert Log Record ==========================================================
 export function insertLogRecord(data) {

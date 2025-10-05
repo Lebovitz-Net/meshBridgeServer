@@ -26,6 +26,7 @@ const {
   listDevicesHandler,
   getDeviceHandler,
   getDeviceSettingHandler,
+  listMyInfoHandler,
 } = api;
 
 export function registerRoutes(app) {
@@ -52,9 +53,10 @@ export function registerRoutes(app) {
   app.get('/api/v1/nodes', listNodesHandler);
   app.get('/api/v1/nodes/:id', getNodeHandler);
   app.delete('/api/v1/nodes/:id', deleteNodeHandler);
-  app.get('/api/v1/nodes/:id/channels', listChannels);
+  app.get('/api/v1/channels/:id', listChannels);
   app.get('/api/v1/channels/:id/messages', listMessages);
   app.get('/api/v1/nodes/:id/connections', listConnections);
+  app.get('/api/v1/myinfo', listMyInfoHandler);
 
   // --- Packets ---
   app.get('/api/v1/packets', listPacketsHandler);

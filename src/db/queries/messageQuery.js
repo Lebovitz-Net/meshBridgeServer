@@ -1,12 +1,13 @@
-import db from '../dbschema.js';
+import db from '../db.js';
 
 // --- Message Queries ---
 export const listMessagesForChannel = (channel_id, limit = 50) => {
   return db.prepare(`
-    SELECT message_id, fromNodeNum, message, timestamp
+    SELECT messageId, channelId, fromNodeNum, toNodeNum, 
+           message, wantAck, wantReply, replyId, timestamp
     FROM messages
-    WHERE channel_id = ?
+    WHERE channelId = ?
     ORDER BY timestamp DESC
     LIMIT ?
-  `).all(channel_id, limit);
+  `).all(channelId, limit);
 };

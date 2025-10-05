@@ -8,7 +8,8 @@ const {
   listConnectionsForNode,
   listRecentPacketLogsForNode,
   listTelemetryForNode,
-  listEventsForNode
+  listEventsForNode,
+  getMyInfo,
 } = queryHandlers;
 
 import { insertHandlers } from '../db/insertHandlers.js';
@@ -40,6 +41,7 @@ export const deleteNodeHandler = safe((req, res) => {
 });
 
 export const listChannels = safe((req, res) => {
+  console.log("...ListChannels Handler");
   res.json(listChannelsForNode(req.params.id));
 });
 
@@ -60,3 +62,11 @@ export const getEvents = safe((req, res) => {
   const { type } = req.query;
   res.json(listEventsForNode(req.params.id, type || null));
 });
+
+// --- My Info Handler ---
+export const listMyInfoHandler = safe(async (req, res) => {
+  console.log('...MyInfo Handler');
+  const rows = await getMyInfo();
+  res.json(rows);
+});
+

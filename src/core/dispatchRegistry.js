@@ -18,6 +18,9 @@ export const dispatchRegistry = {
       connId,
       timestamp,
       channel: meta.channel,
+      replyId: data.replyId,
+      wantReply: data.wantReply,
+      wantAck: data.wantAck
     });
 
     emitOverlay('message', subPacket);
@@ -46,7 +49,6 @@ export const dispatchRegistry = {
     const [key, value] = Object.entries(data)[0];
 
     if (Object.keys(value).length === 0) {
-      console.log('[dispatchRouter] moduleConfig data is empty', value);
       return;
     }
 
@@ -85,7 +87,6 @@ export const dispatchRegistry = {
   },
 
   myInfo: (subPacket) => {
-
       const { data, connId, timestamp, meta } = subPacket;
       const result = insertHandlers.insertMyInfo({
         ...data,
@@ -205,7 +206,7 @@ export const dispatchRegistry = {
     });
   },
 
-  configCompleteId: (subPacket) => {
+    configCompleteId: (subPacket) => {
     emitEvent('configComplete', subPacket);
   },
 };

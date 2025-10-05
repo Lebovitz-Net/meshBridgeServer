@@ -1,10 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import {
-  buildUserInfoTables,
-  buildMetricsTables,
-  buildDeviceConfigTables
-} from '../db/dbschema.js';
+import { buildDatabase } from '../db/db.js';
 import Database from 'better-sqlite3';
 
 
@@ -12,7 +8,7 @@ import Database from 'better-sqlite3';
 const dbDir = path.resolve(process.cwd(), 'data');
 const dbFile = path.join(dbDir, 'meshmanager.db');
 
-function buildDatabase() {
+function buildMeshDatabase() {
   console.log('[buildDatabase] Initializing database...');
 
   if (!fs.existsSync(dbDir)) {
@@ -26,19 +22,11 @@ function buildDatabase() {
 
 
   try {
-    buildUserInfoTables(db);
-    console.log('[buildDatabase] User info tables created.');
-
-    buildMetricsTables(db);
-    console.log('[buildDatabase] Metrics tables created.');
-
-    buildDeviceConfigTables(db);
-    console.log('[buildDatabase] Device config tables created.');
-
+    buildDatabase(db);
     console.log('[buildDatabase] ✅ Database build complete.');
   } catch (err) {
     console.error('[buildDatabase] ❌ Failed to build database:', err);
   }
 }
 
-buildDatabase();
+buildMeshDatabase();

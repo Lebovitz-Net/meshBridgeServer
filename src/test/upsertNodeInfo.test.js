@@ -1,6 +1,8 @@
 // db/upsertNodeInfo.js
 // usage: upsertNodeInfo(db, nodeInfo)
 import Database from 'better-sqlite3';
+import fs from 'fs';
+import path from 'path';
 
 export function upsertNodeInfo(db, nodeInfo) {
   if (!nodeInfo?.num) {
@@ -94,5 +96,7 @@ const nodeInfo = {
   viaMqtt: true,
   hopsAway: 3
 };
-const db = new Database('meshmanager.db');
+const dbDir = path.resolve(process.cwd(), 'data');
+const dbFile = path.join(dbDir, 'meshmanager.db');
+const db = new Database(dbFile);
 upsertNodeInfo(db, nodeInfo);

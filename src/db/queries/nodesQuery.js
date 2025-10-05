@@ -1,4 +1,4 @@
-﻿import db from '../dbschema.js';
+﻿import db from '../db.js';
 
 // --- Node Queries ---
 export const listNodesOnly = () => {
@@ -76,7 +76,7 @@ export function listNodes() {
 
 export const listChannelsForNode = (num) => {
   return db.prepare(`
-    SELECT channel_id, name
+    SELECT channel_num, num, name, role
     FROM channels
     WHERE num = ?
     ORDER BY name ASC
@@ -96,3 +96,20 @@ export const listConnectionsForNode = (num) => {
 export const getNodeDetails = (num) => {
   throw new Error('getNodeDetails not yet implemented');
 };
+
+
+export async function getMyInfo() {
+  return await db.prepare(`
+    SELECT 
+      myNodeNum,
+      deviceId,
+      rebootCount,
+      minAppVersion,
+      pioEnv,
+      currentIP,
+      connId,
+      timestamp
+    FROM my_info
+    ORDER BY myNodeNum ASC
+  `).all();
+}

@@ -1,0 +1,15 @@
+./src/db/inserts/channelInserts.new.js
+./src/db/inserts/configInserts.new.js
+./src/db/inserts/deviceInserts.new.js
+./src/db/inserts/diagnosticInserts.new.js
+./src/db/inserts/messageInserts.new.js
+./src/db/inserts/metricInserts.new.js
+./src/db/inserts/nodeInserts.new.js
+./src/db/migrateSchema.new.js
+./src/db/queries/configQuery.new.js
+./src/db/queries/devicesQuery.new.js
+./src/db/queries/diagnosticsQuery.new.js
+./src/db/queries/messageQuery.new.js
+./src/db/queries/metricsQuery.new.js
+./src/db/queries/nodesQuery.new.js
+./src/scripts/buildSchema.new.js

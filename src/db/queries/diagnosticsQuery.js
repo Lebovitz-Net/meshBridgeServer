@@ -1,4 +1,4 @@
-﻿import db from '../dbschema.js';
+﻿import db from '../db.js';
 
 // --- Diagnostic Queries ---
 export const listLogs = (limit = 200) => {
