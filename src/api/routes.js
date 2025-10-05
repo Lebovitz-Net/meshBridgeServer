@@ -11,7 +11,7 @@ const {
   getNodeHandler,
   deleteNodeHandler,
   listChannels,
-  listMessages,
+  listMessagesForChannelHandler,
   listConnections,
   listPacketsHandler,
   getPacketHandler,
@@ -50,12 +50,13 @@ export function registerRoutes(app) {
   app.get('/api/v1/health', getHealth);
 
   // --- Nodes ---
-  app.get('/api/v1/nodes', listNodesHandler);
+  app.get('/api/v1/nodes/:id/connections', listConnections);
   app.get('/api/v1/nodes/:id', getNodeHandler);
   app.delete('/api/v1/nodes/:id', deleteNodeHandler);
+  app.get('/api/v1/nodes', listNodesHandler);
+  app.get('/api/v1/channels/:id/messages', listMessagesForChannelHandler);  
   app.get('/api/v1/channels/:id', listChannels);
-  app.get('/api/v1/channels/:id/messages', listMessages);
-  app.get('/api/v1/nodes/:id/connections', listConnections);
+
   app.get('/api/v1/myinfo', listMyInfoHandler);
 
   // --- Packets ---

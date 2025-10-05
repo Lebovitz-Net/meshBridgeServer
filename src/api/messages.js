@@ -12,6 +12,7 @@ const safe = (fn) => (req, res) => {
 };
 
 // --- Messages Handler ---
-export const listMessages = safe((req, res) => {
+export const listMessagesForChannelHandler = safe((req, res) => {
+  console.log('...listMessagesForChannel', req.params.id);
   res.json(listMessagesForChannel(req.params.id));
 });
