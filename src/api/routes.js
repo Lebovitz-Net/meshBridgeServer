@@ -12,6 +12,7 @@ const {
   deleteNodeHandler,
   listChannels,
   listMessagesForChannelHandler,
+  sendMessageHandler,
   listConnections,
   listPacketsHandler,
   getPacketHandler,
@@ -30,6 +31,7 @@ const {
 } = api;
 
 export function registerRoutes(app) {
+
   // --- Root ---
   app.get('/', health);
 
@@ -68,6 +70,8 @@ export function registerRoutes(app) {
   app.get('/api/v1/nodes/:id/packet-logs', getPacketLogs);
   app.get('/api/v1/nodes/:id/telemetry', getTelemetry);
   app.get('/api/v1/nodes/:id/events', getEvents);
+  app.post('/api/v1/sendMessage', sendMessageHandler);
+
 
   // --- Metrics (Global) ---
   app.get('/api/v1/metrics', getMetrics);
