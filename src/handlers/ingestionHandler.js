@@ -26,7 +26,8 @@ export default function createIngestionHandler({
       },
       onFrame: (meta, buffer) => {
         const enrichedMeta = { ...meta, ...metaOverrides, source: 'tcp' };
-        if (onFrame) {
+        if
+         (onFrame) {
           onFrame(enrichedMeta, buffer);
         } else {
           routePacket(buffer, enrichedMeta);
@@ -81,7 +82,7 @@ export default function createIngestionHandler({
     const tcp = entry?.tcp;
     if (!tcp || !tcp.write) return false;
     const ok = tcp.write(buf);
-    if (!ok) console.warn(`[Ingest ${connId}] Write buffer full`);
+    if (!ok) console.warn(`[Ingest ${connId}] Write failed`);
     return ok;
   };
 

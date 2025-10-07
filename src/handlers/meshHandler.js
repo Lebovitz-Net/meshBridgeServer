@@ -9,6 +9,8 @@ import {
 import createIngestionHandler from '../handlers/ingestionHandler.js';
 import { routePacket } from '../core/ingestionRouter.js';
 
+ 
+
 export default function createMeshHandler(connId, host, port, opts = {}) {
   const emitter = new EventEmitter();
 
@@ -32,27 +34,40 @@ export default function createMeshHandler(connId, host, port, opts = {}) {
     }
   });
 
-  function sendInit() {
-    try {
-      if (getConfigOnConnect) {
-        ingestionHandler.write(buildAdminGetConfigFrame());
-        ingestionHandler.write(buildWantConfigIDFrame());
-        ingestionHandler.write(buildWantTelemetryFrame());
-        emitter.emit('ready');
-      }
-    } catch (err) {
-      emitter.emit('error', err);
-      console.warn(`[Mesh ${connId}] Init send failed:`, err);
+function delay(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+async function sendInit() {
+  try {
+    if (getConfigOnConnect) {
+      ingestionHandler.write(buildAdminGetConfigFrame());
+      await delay(500);
+
+      ingestionHandler.write(buildWantConfigIDFrame());
+      await delay(500);
+
+      ingestionHandler.write(buildWantTelemetryFrame());
+
+      emitter.emit('ready');
     }
+  } catch (err) {
+    emitter.emit('error', err);
+    console.warn(`[Mesh ${connId}] Init send failed:`, err);
   }
+}
 
   ingestionHandler.start();
   sendInit();
 
   return {
     write(packet) {
-      const frame = encodeToRadio(packet);
-      ingestionHandler.write(frame);
+      if (!Buffer.isBuffer(packet)) {
+        const frame = encodeToRadio(packet);
+        ingestionHandler.write(frame);
+      } else {
+        ingestionHandler.write(packet);
+      }
     },
     end() {
       ingestionHandler.stop();

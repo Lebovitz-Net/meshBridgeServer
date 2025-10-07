@@ -92,8 +92,14 @@ export default function createTCPHandler(connId, host, port, handlers = {}) {
     connId,
     write: (data) => {
       const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
+      if (!connected) {
+        console.warn(`[TCP ${connId}] Write attempted with no active connection`);
+        return false;
+      }
       console.log(`[TCP ${connId}] SEND ${buf.length} bytes`, buf);
-      socket.write(buf);
+      const ok = socket.write(buf);
+      if (!ok) console.warn(`[TCP ${connId}] Write buffer full`);
+      return ok;
     },
     end: () => socket.end(),
     isConnected: () => connected,
