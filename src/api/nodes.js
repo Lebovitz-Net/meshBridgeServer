@@ -41,7 +41,6 @@ export const deleteNodeHandler = safe((req, res) => {
 });
 
 export const listChannels = safe((req, res) => {
-  console.log("...ListChannels Handler");
   res.json(listChannelsForNode(req.params.id));
 });
 
@@ -65,7 +64,6 @@ export const getEvents = safe((req, res) => {
 
 // --- My Info Handler ---
 export const listMyInfoHandler = safe(async (req, res) => {
-  console.log('...MyInfo Handler');
   const rows = await getMyInfo();
   res.json(rows);
 });

@@ -1,5 +1,4 @@
 ﻿// --- control.js ---
-export const placeholder = (req, res) => res.send('control.js ready');
 import { restartServices } from '../utils/servicesManager.js';
 
 const safe = (fn) => (req, res) => {
