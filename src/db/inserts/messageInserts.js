@@ -8,6 +8,7 @@ export const insertMessage = (msg) => {
     INSERT INTO messages (messageId, channelId, fromNodeNum, toNodeNum, 
                 message, wantAck, wantReply, replyId, timestamp)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(msg.message_id, msg.channel, msg.fromNodeNum, msg.toNodeNum, 
-         msg.message, msg.wantAck, msg.wantReply, msg.replyId, msg.timestamp);
+  `).run(msg.messageid, msg.channelNum, msg.fromNodeNum, msg.toNodeNum, 
+         msg.payload, msg.wantAck = msg.wantAct ?  1 : 0, msg.wantReply = msg.wantReply ? 1 : 0, 
+         msg.replyId, msg.timestamp);
 };

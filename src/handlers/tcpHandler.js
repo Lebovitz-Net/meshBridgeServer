@@ -1,4 +1,3 @@
-// bridge/tcpHandler.js
 import net from 'net';
 import { extractFrames } from '../core/frameParser.js';
 
@@ -24,20 +23,29 @@ export default function createTCPHandler(connId, host, port, handlers = {}) {
   let buffer = Buffer.alloc(0);
   let connected = false;
 
-  // Connect
-  socket.connect(port, host, () => {
-    connected = true;
+  // Promise that resolves when socket connects
+  const connectedPromise = new Promise((resolve, reject) => {
+    socket.connect(port, host, () => {
+      connected = true;
 
-    const meta = {
-      connId,
-      sourceIp: socket.remoteAddress,
-      sourcePort: socket.remotePort,
-      transport: 'tcp',
-      host,
-      port
-    };
+      const meta = {
+        connId,
+        sourceIp: socket.remoteAddress,
+        sourcePort: socket.remotePort,
+        transport: 'tcp',
+        host,
+        port
+      };
 
-    onConnect(meta);
+      onConnect(meta);
+      resolve(meta); // ✅ resolve when connected
+    });
+
+    socket.on('error', (err) => {
+      connected = false;
+      onError({ connId, sourceIp: socket.remoteAddress, transport: 'tcp' }, err);
+      reject(err); // ❌ reject if connection fails
+    });
   });
 
   // Frame parser
@@ -66,11 +74,6 @@ export default function createTCPHandler(connId, host, port, handlers = {}) {
   });
 
   // Lifecycle events
-  socket.on('error', (err) => {
-    connected = false;
-    onError({ connId, sourceIp: socket.remoteAddress, transport: 'tcp' }, err);
-  });
-
   socket.on('close', (hadError) => {
     connected = false;
     onClose({ connId, sourceIp: socket.remoteAddress, transport: 'tcp' }, hadError);
@@ -103,6 +106,7 @@ export default function createTCPHandler(connId, host, port, handlers = {}) {
     },
     end: () => socket.end(),
     isConnected: () => connected,
-    socket
+    socket,
+    connected: connectedPromise // ✅ expose for await
   };
 }

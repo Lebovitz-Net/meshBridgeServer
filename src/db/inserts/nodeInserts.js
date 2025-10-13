@@ -51,7 +51,7 @@ export function insertNodeUsers(user, nodeNum) {
   `).run({
     nodeNum,
     userId: user.id,
-    longName: user.longName,
+    longName: user.longName ?? `Meshtastic Node ${nodeNum}`,
     shortName: user.shortName,
     macaddr: user.macaddr,
     hwModel: user.hwModel,

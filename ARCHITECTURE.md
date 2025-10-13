@@ -333,3 +333,14 @@ Transport (TCP / WebSocket / MQTT)
 
 
 “The FromRadio oneof group includes diagnostic and config packets like config, moduleConfig, logRecord, and fileInfo. These are decoded and routed to specialized insert handlers or logged for debugging. Malformed or unsupported packets are annotated and skipped to preserve ingest stability.”
+
+## ✅ Route & Handler Architecture Checklist
+
+- All routes are defined centrally in `routes.js`
+- All handlers are exported from `handlers/*.js` as pure functions
+- All handlers are wrapped in `safe(...)` for dry-run safety and error isolation
+- No `express.Router()` usage in handler files
+- Handler names follow `{verb}{Entity}Handler` naming convention
+- Route paths are versioned (e.g., `/api/v1/...`) for future extensibility
+- Business logic lives in `db/queryHandlers.js` or `db/insertHandlers.js`, not in route or handler files
+- Each handler is dry-run safe, protocol-faithful, and contributor-friendly

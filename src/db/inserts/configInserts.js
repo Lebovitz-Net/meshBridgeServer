@@ -1,5 +1,5 @@
 import db from '../db.js';
-import { setMapping } from '../../core/connectionManager.js';
+import { setMapping, setChannelMapping } from '../../core/nodeMapping.js';
 
 // insertConfig ============================================================
 
@@ -28,8 +28,8 @@ export function insertModuleConfig(subPacket) {
 // InsertMyInfo ==============================================================
 
 export async function insertMyInfo(packet) {
-
-  const { myNodeNum, deviceId, currentIP } = packet;
+  
+  const { myNodeNum, deviceId, currentIP, channel} = packet;
 
   if (!myNodeNum || !deviceId) {
     console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, deviceId }, packet);
@@ -37,6 +37,7 @@ export async function insertMyInfo(packet) {
   }
 
   setMapping(currentIP, myNodeNum, deviceId);
+  setChannelMapping(channel ?? 0, myNodeNum);
 
   try {
     await db.prepare(
@@ -53,6 +54,8 @@ export async function insertMyInfo(packet) {
         timestamp = excluded.timestamp`
     ).run({
         ...packet,
+        deviceId: deviceId | currentIP,
+        connId: packet.connId ?? null,
         timestamp: Date.now(),
     })
   } catch (err) {

@@ -1,3 +1,4 @@
+// routes.js
 import api from './handlers.js';
 import { restartServices } from '../utils/servicesManager.js';
 import { getNodeIP, setNodeIP } from '../config/config.js';
@@ -12,6 +13,7 @@ const {
   deleteNodeHandler,
   listChannels,
   listMessagesForChannelHandler,
+  listExtendedMessagesForChannelHandler,
   sendMessageHandler,
   listConnections,
   listPacketsHandler,
@@ -28,6 +30,14 @@ const {
   getDeviceHandler,
   getDeviceSettingHandler,
   listMyInfoHandler,
+  getFullConfigHandler,
+  getConfigHandler,
+  listAllConfigsHandler,
+  getModuleConfigHandler,
+  listAllModuleConfigsHandler,
+  getMetadataByKeyHandler,
+  listAllMetadataHandler,
+  listFileInfoHandler
 } = api;
 
 export function registerRoutes(app) {
@@ -56,7 +66,7 @@ export function registerRoutes(app) {
   app.get('/api/v1/nodes/:id', getNodeHandler);
   app.delete('/api/v1/nodes/:id', deleteNodeHandler);
   app.get('/api/v1/nodes', listNodesHandler);
-  app.get('/api/v1/channels/:id/messages', listMessagesForChannelHandler);  
+  app.get('/api/v1/channels/:id/messages', listExtendedMessagesForChannelHandler);  
   app.get('/api/v1/channels/:id', listChannels);
 
   app.get('/api/v1/myinfo', listMyInfoHandler);
@@ -78,6 +88,22 @@ export function registerRoutes(app) {
 
   // --- Diagnostics & Logs ---
   app.get('/api/v1/logs', getLogsHandler);
+
+  // --- Config ---
+  app.get('/api/v1/config/full', getFullConfigHandler);
+  app.get('/api/v1/config/:id', getConfigHandler);
+  app.get('/api/v1/configs', listAllConfigsHandler);
+
+  // --- Module Config ---
+  app.get('/api/v1/module-config/:id', getModuleConfigHandler);
+  app.get('/api/v1/module-configs', listAllModuleConfigsHandler);
+
+  // --- Metadata ---
+  app.get('/api/v1/metadata/:key', getMetadataByKeyHandler);
+  app.get('/api/v1/metadata', listAllMetadataHandler);
+
+  // --- File Info ---
+  app.get('/api/v1/files', listFileInfoHandler);
 
   // --- Control ---
   app.post('/api/v1/restart', restartServicesHandler);

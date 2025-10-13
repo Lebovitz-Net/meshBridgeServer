@@ -2,7 +2,7 @@
 
 import protobuf from 'protobufjs';
 import protoJson from '../assets/proto.json' with { type: 'json' };
-import { decompress } from '../utils/decompressUtils.js';
+import { decompress } from './decompress.js';
 import { parsePlainMessage, extractChannelInfo } from './packetUtils.js';
 
 const root = protobuf.Root.fromJSON(protoJson);
@@ -108,8 +108,13 @@ export function decodeMeshPacket(packet) {
       }
     }
 
-    case 5: { // AdminMessage (placeholder)
-      return { type: 'adminMessage', data: { ignored: true }, meta: baseMeta };
+    case 5: { // Routining (placeholder)
+      return { type: 'routingMessage', data: { ignored: true }, meta: baseMeta };
+    }
+
+    case 6: {
+      console.log('[meshHandler] AdminMessage ignored', packet);
+      return { type: "adminMessage", data: { ignored: true }, meta: baseMeta }
     }
 
     case 67: { // Telemetry

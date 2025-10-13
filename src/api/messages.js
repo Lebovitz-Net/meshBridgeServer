@@ -2,13 +2,16 @@ import protobuf from 'protobufjs';
 import protoJson from '../assets/proto.json' with { type: 'json' };
 import fs from 'fs/promises';
 import queryHandlers from '../db/queryHandlers.js';
-const { listMessagesForChannel, insertMessage } = queryHandlers;
+import { insertHandlers } from '../db/insertHandlers.js';
+import { encodeTextMessage } from '../packets/packetCodecs.js';
+import { send } from 'vite';
 import { sendToMeshNode } from '../handlers/meshServiceHandler.js';
 
+
+const { listExtendedMessagesForChannel } = queryHandlers;
+const { insertMessage } = insertHandlers;
+
 // Load proto.json once and reuse
-const root = protobuf.Root.fromJSON(protoJson);
-const MeshPacket = root.lookupType('meshtastic.MeshPacket');
-const ToRadio = root.lookupType('meshtastic.ToRadio');
 
 // Small helper to wrap sync handlers in try/catch
 const safe = (fn) => (req, res) => {
@@ -25,67 +28,42 @@ export const listMessagesForChannelHandler = safe((req, res) => {
   res.json(listMessagesForChannel(req.params.id));
 });
 
+export const listExtendedMessagesForChannelHandler = safe((req, res) => {
+  res.json(listExtendedMessagesForChannel(req.params.id));
+});
+
 // --- Send Message Handler ---
 export async function sendMessageHandler(req, res) {
   try {
-    const {
-      messageId,
-      channelNum,
-      fromNodeNum,
-      toNodeNum,
-      payload,
-      wantAck = true,
-      wantReply = false,
-      replyId = null
-    } = req.body;
+    console.log('[sendMessageHandler] Preparing to send message:', req.body );
+    const body = req.body || {};
 
-    console.log('...messages payload', req.body);
 
-    if (!payload || typeof payload !== 'string') {
+    if (body.payload == null || typeof body.payload !== 'string') {
       console.warn('[sendMessageHandler] Invalid inputText');
       return res.status(400).json({ error: 'Missing or invalid payload' });
     }
 
-    const timestamp = Date.now();
-    const encodedText = Buffer.from(payload);
+    const sendBuf = {
+      messageId: body.messageId || null,
+      channelNum: body.channelNum,
+      fromNodeNum: body.fromNodeNum || null,
+      toNodeNum: body.toNodeNum || 4294967295, // Broadcast by default
+      payload: body.payload,
+      wantAck: true,
+      wantReply: false,
+      replyId: null,
+      timestamp: Date.now()
+    };
+    const encoded = encodeTextMessage(sendBuf);
+    sendToMeshNode(encoded);
 
-    const meshPacketPayload = MeshPacket.create({
-      from: fromNodeNum,
-      to: toNodeNum,
-      id: messageId,
-      channel: channelNum,
-      wantAck,
-      priority: 1,
-      decoded: {
-        portnum: 1,
-        payload: encodedText,
-        bitfield: 1,
-      }
-    });
-
-    sendToMeshNode({ packet: meshPacketPayload });
-
-    // ✅ Insert outbound message into DB for threading and history
-    insertMessage({
-      message_id: messageId,
-      channel: channelNum,
-      fromNodeNum,
-      toNodeNum,
-      message: payload,
-      wantAck,
-      wantReply,
-      replyId,
-      timestamp
-    });
+    // // ✅ Insert outbound message into DB for threading and history
+    insertMessage (sendBuf);
 
     return res.status(200).json({
       ok: true,
-      messageId,
-      fromNodeNum,
-      toNodeNum,
-      channelNum,
-      payload,
-      timestamp
+      ...sendBuf
     });
 
   } catch (err) {

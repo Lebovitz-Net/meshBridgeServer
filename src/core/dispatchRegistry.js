@@ -10,14 +10,14 @@ export const dispatchRegistry = {
     const { fromNodeNum, toNodeNum, device_id, timestamp, connId } = meta;
 
     insertHandlers.insertMessage({
-      message: data.message,
-      message_id: meta.packetId,
+      payload: data.message,
+      messageid: meta.packetId,
       fromNodeNum,
       toNodeNum,
       device_id,
       connId,
       timestamp,
-      channel: meta.channel,
+      channelNum: meta.channel,
       replyId: data.replyId,
       wantReply: data.wantReply,
       wantAck: data.wantAck
@@ -29,16 +29,18 @@ export const dispatchRegistry = {
 
   config: (subPacket)  => {
     const { meta, data } = subPacket;
-    const [key, value] = Object.entries(data)[0];
+    if (Object.keys(data).length) {
+      const [key, value] = Object.entries(data)[0];
 
-    insertHandlers.insertConfig({
-      fromNodeNum: meta.fromNodeNum,
-      key,
-      data: JSON.stringify(value),
-      timestamp: meta.fromNodeNum,
-      device_id: meta.device_id,
-      connId: meta.connId
-    });
+      insertHandlers.insertConfig({
+        fromNodeNum: meta.fromNodeNum,
+        key,
+        data: JSON.stringify(value),
+        timestamp: meta.fromNodeNum,
+        device_id: meta.device_id,
+        connId: meta.connId
+      });
+    }
 
     emitOverlay('config', subPacket);
     emitEvent('configSet', subPacket);
@@ -127,14 +129,25 @@ export const dispatchRegistry = {
     emitOverlay('telemetry', subPacket);
   },
 
+  deviceuiConfig: (subPacket) => {
+    console.debug('[dispatchRegistery] Ignoring deviceuiConfig');
+  },
+
   adminMessage: (subPacket) => {
     console.debug('[dispatchRegistry] Ignoring AdminMessage');
     emitOverlay('adminMessage', subPacket);
   },
 
+  routingMessage: (subPacket) => {
+    console.debug('[dispatchRegistry] Ignoring Routing');
+    emitOverlay('Routing', subPacket);
+  },
+
+
   // FromRadio oneofs
   logRecord: (subPacket) => {
     const { data, meta } = subPacket;
+    console.log('.../logRecord ', data);
     insertHandlers.insertLogRecord({ ...data, ...meta });
     emitOverlay('queueHealth', subPacket);
   },
@@ -206,7 +219,14 @@ export const dispatchRegistry = {
     });
   },
 
+  mqttClientProxyMessage: (subPacket) => {
+    console.log('...dispatchRegistery mqttCLientProxyMessage', subPacket);
+  },
+
     configCompleteId: (subPacket) => {
     emitEvent('configComplete', subPacket);
   },
+  default: (subPacket) => {
+    console.log('[dispatchRegister] no such packet type', subPacket);
+  }
 };

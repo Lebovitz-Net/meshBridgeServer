@@ -1,6 +1,6 @@
 import protobuf from 'protobufjs';
 import protoDef from '../assets/proto.json' with { type: 'json' }
-import { extractFramedPayloads } from './protoHelpers.js';
+import { extractFramedPayloads } from '../utils/protoUtils.js';
 
 const root = protobuf.Root.fromJSON(protoDef);
 

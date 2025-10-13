@@ -1,6 +1,7 @@
+// src/handlers/ingestionHandler.js
 import createTCPHandler from './tcpHandler.js';
 import { currentIPHost, currentIPPort } from '../config/config.js';
-import { routePacket } from '../core/ingestionRouter.js';
+import { routePacket } from '../core/routePacket.js';
 import { scheduleReconnect } from '../core/scheduleReconnect.js';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -26,8 +27,7 @@ export default function createIngestionHandler({
       },
       onFrame: (meta, buffer) => {
         const enrichedMeta = { ...meta, ...metaOverrides, source: 'tcp' };
-        if
-         (onFrame) {
+        if (onFrame) {
           onFrame(enrichedMeta, buffer);
         } else {
           routePacket(buffer, enrichedMeta);
@@ -62,10 +62,14 @@ export default function createIngestionHandler({
     });
 
     tcpConnections.set(id, { tcp, host, port, reconnectTimer: null });
+    return tcp; // ✅ return handler so we can await tcp.connected
   };
 
-  const start = () => {
-    openTCPConnection(connId);
+  const start = async () => {
+    const tcp = openTCPConnection(connId);
+    await tcp.connected; // ⏳ wait until the socket is truly connected
+    console.log(`[Ingest ${connId}] Startup complete`);
+    return tcp;
   };
 
   const stop = () => {

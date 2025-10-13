@@ -1,6 +1,6 @@
 import { dispatchRegistry } from './dispatchRegistry.js';
 
-export function dispatchSubPacket(subPacket) {
+export function dispatchPacket(subPacket) {
   if (!subPacket) return;
 
   const handler = dispatchRegistry[subPacket.type];

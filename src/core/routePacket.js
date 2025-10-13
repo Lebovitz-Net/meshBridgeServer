@@ -1,26 +1,14 @@
-import { decodeFromRadioPacket } from '../packets/decodeFromRadioPacket.js';
-import { dispatchSubPacket } from './dispatchSubPacket.js';
-import { decodeAndNormalize } from '../packets/packetDecoders.js';
-import { getMapping } from './connectionManager.js';
-
-const FROM_RADIO_ONEOFS = new Set([
-  'packet',
-  'myInfo',
-  'nodeInfo',
-  'config',
-  'logRecord',
-  'configCompleteId',
-  'rebooted',
-  'moduleConfig',
-  'channel',
-  'queueStatus',
-  'xmodemPacket',
-  'metadata',
-  'mqttClientProxyMessage',
-  'fileInfo',
-  'clientNotification',
-  'deviceuiConfig'
-]);
+import { processPacket } from '../packets/processPacket.js';
+import { dispatchPacket } from './dispatchPacket.js';
+import { decodeAndNormalize } from '../packets/packetCodecs.js';
+import { getMapping } from './nodeMapping.js';
+import { 
+  FROM_RADIO_ONEOFS, 
+  CONFIG_ONEOFS, 
+  MODULE_CONFIG_ONEOFS, 
+  ADMIN_MESSAGE_ONEOFS, 
+  CLIENT_NODIFICATION_ONEOFS 
+} from '../utils/oneofsUtil.js';
 
 // --- Meta Enrichment ---
 
@@ -61,18 +49,27 @@ export function routePacket(input, meta = {}) {
       return;
     }
 
+    if (Object)
     for (const [key, value] of Object.entries(data)) {
+
+      // if (value && key !== 'packet' && key !== 'nodeInfo' && (ADMIN_MESSAGE_ONEOFS.has(key)
+      //     || CONFIG_ONEOFS.has(key) || MODULE_CONFIG_ONEOFS.has(key)
+      //     || CLIENT_NODIFICATION_ONEOFS.has(key)
+      //     || FROM_RADIO_ONEOFS.has(key))) {
+      //   console.log('[routePacket', key, { value });
+      // }
+
       if (value == null || !FROM_RADIO_ONEOFS.has(key)) {
         continue;
       }
-      
-      const effective = decodeFromRadioPacket(key, value, {
+
+      const effective = processPacket(key, value, {
         ...meta,
         ...enrichMeta(value, meta),
       });
 
       if (effective) {
-        dispatchSubPacket(effective);
+        dispatchPacket(effective);
       } else {
         console.warn(`[IngestionRouter] Failed to decode subtype: ${key}`);
       }

@@ -1,8 +1,8 @@
 import protobuf from 'protobufjs';
 import protoJson from '../assets/proto.json' with { type: 'json' };
 import { decodeMeshPacket } from './decodeMeshPacket.js';
-import { decompress } from '../utils/decompressUtils.js';
-import { getMapping } from '../core/connectionManager.js';
+import { decompress } from './decompress.js';
+import { getMapping } from '../core/nodeMapping.js';
 
 const root = protobuf.Root.fromJSON(protoJson);
 const LogRecord = root.lookupType('meshtastic.LogRecord');
@@ -54,14 +54,14 @@ function decodePayload(type, data) {
 }
 
 // --- Unified Decode Entry Point ---
-export function decodeFromRadioPacket(type, value, enrichedMeta = {}) {
-
+export function processPacket(type, value, enrichedMeta = {}) {
+  const showType = type;
   switch (type) {
     case 'packet': {
       const decoded = decodeMeshPacket(value);
 
       if (!decoded) {
-        console.warn('[decodeFromRadioPacket] Failed to decode MeshPacket');
+        console.warn('[decodePacket] Failed to decode MeshPacket');
         return null;
       }
       const {type, data, meta} = decoded;

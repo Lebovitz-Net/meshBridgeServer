@@ -1,12 +1,12 @@
 // File: services/meshService.js
 
 import createMeshHandler from '../handlers/meshHandler.js';
-import { routePacket } from '../core/ingestionRouter.js';
+import { routePacket } from '../core/routePacket.js';
 
 let meshInstance = null;
 
-const createMeshService = (connId, host, port, opts = {}) => {
-  meshInstance = createMeshHandler(connId, host, port, opts);
+const createMeshService = async (connId, host, port, opts = {}) => {
+  meshInstance = await createMeshHandler(connId, host, port, opts);
   return meshInstance;
 };
 
@@ -14,6 +14,11 @@ export const sendToMeshNode = async (packet) => {
   if (!meshInstance) {
     throw new Error('Mesh handler not initialized');
   }
+  
+if (typeof meshInstance?.then === 'function') {
+  console.warn('meshInstance is a Promise—resolving now');
+  meshInstance = await meshInstance;
+}
 
   meshInstance.write(packet); // uses ingestionHandler.write(frame)
 

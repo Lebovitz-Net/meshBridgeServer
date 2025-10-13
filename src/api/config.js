@@ -1,4 +1,4 @@
-import express from 'express';
+// handlers/configHandlers.js
 import queryHandlers from '../db/queryHandlers.js';
 
 const {
@@ -12,48 +12,54 @@ const {
   listFileInfo
 } = queryHandlers;
 
-const router = express.Router();
+// Wrap sync handlers for dry-run safety
+const safe = (fn) => (req, res) => {
+  try {
+    fn(req, res);
+  } catch (err) {
+    console.error('[configHandlers] Error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
-// --- Config APIs ---
-router.get('/config/full', (req, res) => {
+// --- Config ---
+export const getFullConfigHandler = safe((req, res) => {
   res.json(getFullConfig());
 });
 
-router.get('/config/:id', (req, res) => {
+export const getConfigHandler = safe((req, res) => {
   const config = getConfig(req.params.id);
   if (!config) return res.status(404).json({ error: 'Config not found' });
   res.json(config);
 });
 
-router.get('/configs', (req, res) => {
+export const listAllConfigsHandler = safe((req, res) => {
   res.json(listAllConfigs());
 });
 
-// --- Module Config APIs ---
-router.get('/module-config/:id', (req, res) => {
+// --- Module Config ---
+export const getModuleConfigHandler = safe((req, res) => {
   const config = getModuleConfig(req.params.id);
   if (!config) return res.status(404).json({ error: 'Module config not found' });
   res.json(config);
 });
 
-router.get('/module-configs', (req, res) => {
+export const listAllModuleConfigsHandler = safe((req, res) => {
   res.json(listAllModuleConfigs());
 });
 
-// --- Metadata APIs ---
-router.get('/metadata/:key', (req, res) => {
+// --- Metadata ---
+export const getMetadataByKeyHandler = safe((req, res) => {
   const meta = getMetadataByKey(req.params.key);
   if (!meta) return res.status(404).json({ error: 'Metadata not found' });
   res.json(meta);
 });
 
-router.get('/metadata', (req, res) => {
+export const listAllMetadataHandler = safe((req, res) => {
   res.json(listAllMetadata());
 });
 
-// --- File Info APIs ---
-router.get('/files', (req, res) => {
+// --- File Info ---
+export const listFileInfoHandler = safe((req, res) => {
   res.json(listFileInfo());
 });
-
-export default router;

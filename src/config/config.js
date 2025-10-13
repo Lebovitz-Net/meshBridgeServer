@@ -35,8 +35,6 @@ export function getWSUrl(input) {
   return currentWsUrl;
 }
 
-export const debugLogger = (...args) => console.log(...args);
-
 // === Unified config object ===
 export const config = {
   // API listener

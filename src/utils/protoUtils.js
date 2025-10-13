@@ -1,21 +1,61 @@
 import protobuf from 'protobufjs';
 import protoDef from '../assets/proto.json' with { type: 'json' };
-import { decodeFrame } from './decodeFrame.js';
+import { decodeFrame } from '../packets/decodeFrame.js';
+import { getChannelMapping } from '../core/nodeMapping.js';
+import { getProtobufs, getProtobufTypes } from '../packets/packetCodecs.js';
+
+import crypto from 'crypto';
 
 const START1 = 0x94;
 const START2 = 0xc3;
 
 const root = protobuf.Root.fromJSON(protoDef);
 
-export const ToRadio = root.lookupType('meshtastic.ToRadio');
-export const AdminMessage = root.lookupType('meshtastic.AdminMessage');
-export const Data = root.lookupType('meshtastic.Data');
-export const MeshPacket = root.lookupType('meshtastic.MeshPacket');
-export const PortNum = root.lookupEnum('meshtastic.PortNum');
-export const FromRadio = root.lookupType('meshtastic.FromRadio');
+import os from 'os';
 
+function getMacAddresses() {
+  const interfaces = os.networkInterfaces();
+  const macs = [];
 
-export const ToRadioType = ToRadio.oneofs.payloadVariant.oneof;
+  for (const iface of Object.values(interfaces)) {
+    for (const config of iface) {
+      if (!config.internal && config.mac !== '00:00:00:00:00:00') {
+        macs.push(config.mac);
+      }
+    }
+  }
+
+  return macs;
+}
+
+/*
+ * Generate a Meshtastic-style nodeNum from a seed or MAC address.
+ * @param {Buffer|string} [seedInput] - Optional seed input. If omitted, uses first MAC from getMacAddresses().
+ * @returns {number} - 32-bit unsigned node number.
+ */
+export function generateNodeNum(seedInput) {
+  let seed;
+
+  if (seedInput) {
+    seed = Buffer.isBuffer(seedInput) ? seedInput : Buffer.from(seedInput, 'utf8');
+  } else {
+    const macList = getMacAddresses(); // Assume this returns array of MAC strings like ['A4:CF:12:34:56:78']
+    const validMac = macList.find(mac => mac && mac !== '00:00:00:00:00:00');
+
+    if (!validMac) {
+      throw new Error('No valid MAC address found for fallback seed.');
+    }
+
+    seed = Buffer.from(validMac.replace(/:/g, ''), 'hex');
+  }
+
+  const hash = crypto.createHash('sha256').update(seed).digest();
+  return hash.readUInt32BE(hash.length - 4);
+}
+
+// ----------------------------------------------------------------------------------------
+// Build and Encode
+// ----------------------------------------------------------------------------------------
 
 export function frame(bytes, opts = {}) {
   const { includeHeader = true } = opts;
@@ -29,27 +69,50 @@ export function frame(bytes, opts = {}) {
   return framed;
 }
 
-export function buildToRadioFrame(fieldName, value, opts = {}) {
-  if (!ToRadioType.includes(fieldName)) {
+export function createToRadioFrame(fieldName, value, opts = {}) {
+  if (!getProtobufTypes('ToRadio').includes(fieldName)) {
     console.warn(`Invalid fieldName: ${fieldName} not in ToRadio.oneof`);
     return null;
   }
-  // console.log("[buildToRadioFrame] fieldName is", fieldName, "value is", value);
+  const ToRadio = getProtobufs('ToRadio');
   const toRadioMsg = ToRadio.create({ [fieldName]: value });
   const encoded = ToRadio.encode(toRadioMsg).finish();
   return frame(encoded, opts);
 }
 
-export const buildGetConfigFrame = (opts = {}) => {
-  const tbuf = buildToRadioFrame('getConfig', true, opts);
-  return tbuf;
-};
+export function createMeshPacketFrame(type, payload, opts = {}) {
+  const decoded = Data.create({
+    portnum: PortNum.values[type],
+    payload,
+    bitfield: 1
+  });
 
-export const buildWantConfigIDFrame = () => {
-  const tbuf =  buildToRadioFrame('wantConfigId', true);
-  // console.log("[buildWantConfigIDFrame] tbuf is", tbuf);
-  return tbuf;
-};
+  const MeshPacket = getProtobufs('MeshPacket');
+  const mesh = MeshPacket.create({
+    from: opts.from ?? 0x1,
+    to: opts.to ?? getChannelMapping(0),
+    channel: opts.channel ?? 0,
+    id: opts.id ?? Math.floor(Math.random() * 0xffffffff),
+    rxTime: Number(Date.now()),
+    viaMqtt: 1,
+    hoptstart: 1,
+    decoded
+  });
+  const encoded = MeshPacket.encode(mesh).finish();
+  return frame(encoded, opts);
+}
+
+export function createAdmminMessageFrame(request, opts = {}) {
+  const AdminMessage = getProtobufs('AdminMessage');
+  const admin = AdminMessage.create(request);
+  const encoded = AdminMessage.encode(admin).finish();
+
+  return createMeshPacketFrame("ADMIN_APP", encoded, opts);
+}
+
+// ---------------------------------------------------------------------------------------
+// EXtraction
+// ---------------------------------------------------------------------------------------
 
 export function extractFramedPayloads(buffer, maxLen = 512) {
   const frames = [];
@@ -80,7 +143,7 @@ export function extractFramedPayloads(buffer, maxLen = 512) {
 }
 
 export const extractNodeInfoPackets = (buffer, maxLen = 512) => {
-  const NodeInfo = root.lookupType('meshtastic.NodeInfo');
+  const NodeInfo = getProtobufs('NodeInfo');
   const { frames, leftover } = extractFramedPayloads(buffer, maxLen);
   const packets = frames.flatMap(frame => decodeFrame(frame, 'tcp'));
 
@@ -124,6 +187,7 @@ export const extractNodeInfoPackets = (buffer, maxLen = 512) => {
 
 export function extractNodeList(buffer) {
   try {
+    const FromRadio = getProtobufs('FromRadio');
     const decoded = FromRadio.decode(buffer);
     const nodes = Array.isArray(decoded.nodeInfo) ? decoded.nodeInfo : [];
 
@@ -142,6 +206,7 @@ export function extractNodeList(buffer) {
 }
 
 export function buildAdminWantNodesFrame(opts = {}) {
+  const AdminMessage = getProtobufs('AdminMessage');
   const admin = AdminMessage.create({ wantNodes: { wantAll: true } });
   const adminBytes = AdminMessage.encode(admin).finish();
 
@@ -163,6 +228,7 @@ export function buildAdminWantNodesFrame(opts = {}) {
 
 export function buildAdminGetConfigFrame(opts = {}) {
   // Create an AdminMessage with the getConfigRequest variant
+  const AdminMessage = getProtobufs('AdminMessage');
   const admin = AdminMessage.create({ getConfigRequest: {} });
   const adminBytes = AdminMessage.encode(admin).finish();
 
@@ -187,6 +253,7 @@ export function buildAdminGetConfigFrame(opts = {}) {
 
 export function buildWantTelemetryFrame(opts = {}) {
   // Create an AdminMessage with the telemetry request variant
+  const AdminMessage = getProtobufs('AdminMessage');
   const admin = AdminMessage.create({ getTelemetryRequest: {} });
   const adminBytes = AdminMessage.encode(admin).finish();
 
