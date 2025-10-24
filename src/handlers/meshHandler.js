@@ -1,6 +1,6 @@
 // src/bridge/meshHandler.js
 import { EventEmitter } from 'node:events';
-import { encodeToRadio } from '../packets/packetCodecs.js';
+import { encodeToRadio } from '../packets/decodePacket.js';
 import { createToRadioFrame } from '../utils/protoUtils.js';
 import createIngestionHandler from '../handlers/ingestionHandler.js';
 import { routePacket } from '../core/routePacket.js';

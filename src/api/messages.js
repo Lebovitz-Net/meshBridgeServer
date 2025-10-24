@@ -3,12 +3,12 @@ import protoJson from '../assets/proto.json' with { type: 'json' };
 import fs from 'fs/promises';
 import queryHandlers from '../db/queryHandlers.js';
 import { insertHandlers } from '../db/insertHandlers.js';
-import { encodeTextMessage } from '../packets/packetCodecs.js';
+import { encodeTextMessage } from '../packets/decodePacket.js';
 import { send } from 'vite';
 import { sendToMeshNode } from '../handlers/meshServiceHandler.js';
 
 
-const { listExtendedMessagesForChannel } = queryHandlers;
+const { listExtendedMessagesForChannel, listMessagesForChannel } = queryHandlers;
 const { insertMessage } = insertHandlers;
 
 // Load proto.json once and reuse
@@ -35,21 +35,20 @@ export const listExtendedMessagesForChannelHandler = safe((req, res) => {
 // --- Send Message Handler ---
 export async function sendMessageHandler(req, res) {
   try {
-    console.log('[sendMessageHandler] Preparing to send message:', req.body );
     const body = req.body || {};
+    const message = body.message || '';
 
-
-    if (body.payload == null || typeof body.payload !== 'string') {
+    if (message == null || typeof message !== 'string') {
       console.warn('[sendMessageHandler] Invalid inputText');
       return res.status(400).json({ error: 'Missing or invalid payload' });
     }
 
     const sendBuf = {
       messageId: body.messageId || null,
-      channelNum: body.channelNum,
+      channelId: body.channelNum,
       fromNodeNum: body.fromNodeNum || null,
       toNodeNum: body.toNodeNum || 4294967295, // Broadcast by default
-      payload: body.payload,
+      message,
       wantAck: true,
       wantReply: false,
       replyId: null,

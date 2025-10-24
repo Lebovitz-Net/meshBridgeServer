@@ -98,7 +98,7 @@ export const buildUserInfoTables = () => {
 
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      messageId TEXT,
+      messageId INTEGER,
       fromNodeNum INTEGER,
       toNodeNum INTEGER,
       channelId INtEGER,
@@ -168,9 +168,9 @@ export const buildMetricsTables = () => {
       res INTEGER,
       free INTEGER,
       maxlen INTEGER,
-      mesh_packet_id INTEGER,
+      meshPacketId INTEGER,
       timestamp INTEGER DEFAULT (strftime('%s','now')),
-      conn_id TEXT,
+      connId TEXT,
       FOREIGN KEY (num) REFERENCES nodes(num)
     );
 

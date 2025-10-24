@@ -7,25 +7,30 @@ import ingestionRouter from '../core/routePacket.js';
 import ingestionHandler from '../handlers/ingestionHandler.js';
 import { registerRoutes } from '../api/routes.js';
 import createMeshService from '../handlers/meshServiceHandler.js';
-import { initProtoTypes } from '../packets/packetCodecs.js';
+import { initProtoTypes } from '../utils/protoUtils.js';
 import { shutdown } from '../utils/servicesManager.js';
 import cors from 'cors';
 import { sseRouter } from './sse.js';
-
+import websocketHandler from '../handlers/websocketHandler.js';
+import { WebSocketServer } from 'ws';
+import { sseHandler } from './sseHandlers.js';
 
 export async function startServer() {
   await initProtoTypes(); // sets up decode + encode logic
   // --- Express API ---
   const app = express();
-  app.use('/sse', sseRouter);
   app.use(cors({
     origin: 'http://localhost:5173', // or use '*' for dev
     methods: ['GET', 'POST'],
     credentials: true
   }));
+
   app.use(express.json());
+  app.use('/sse', sseRouter);
   app.use('/api/v1/config', runtimeConfigRoutes);
   app.get('/', (req, res) => res.send('MeshManager v2 is running'));
+  app.get('/sse/events', sseHandler);
+
   registerRoutes(app);
 
   // --- Unified HTTP Server ---
@@ -33,12 +38,16 @@ export async function startServer() {
   const apiServer = httpServer.listen(config.api.port, () => {
     console.log(`🛠 Express server listening on port ${config.api.port}`);
   });
+  
+  const wss = new WebSocketServer({ server: httpServer });
+  wss.on('connection', websocketHandler);
+
 
   // --- Mesh connection (outbound TCP client) ---
   const mesh = await createMeshService(
     'mesh-1',
-    process.env.DEVICE_IP || '192.168.1.52',
-    process.env.DEVICE_PORT || 4403,
+    process.env.NODE_IP_HOST || '192.168.1.52',
+    process.env.NODE_IP_PORT || 4403,
     ingestionRouter.routePacket
   );
 
@@ -49,7 +58,6 @@ export async function startServer() {
     pubOptions: config.mqtt.pubOptions
   });
   mqttHandler.connect();
-
 
   // --- Graceful Shutdown ---
   ['SIGINT', 'SIGTERM'].forEach(sig => {

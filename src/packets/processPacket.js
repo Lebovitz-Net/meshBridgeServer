@@ -54,27 +54,6 @@ function decodePayload(type, data) {
 }
 
 // --- Unified Decode Entry Point ---
-export function processPacket(type, value, enrichedMeta = {}) {
-  const showType = type;
-  switch (type) {
-    case 'packet': {
-      const decoded = decodeMeshPacket(value);
-
-      if (!decoded) {
-        console.warn('[decodePacket] Failed to decode MeshPacket');
-        return null;
-      }
-      const {type, data, meta} = decoded;
-
-      return {
-        type,
-        data,
-        meta: { ...enrichedMeta, ...meta }, // re-enrich with decoded fields
-        sourcePacket: 'packet',
-      };
-    }
-
-    default:
-      return { type, data: value ?? {}, meta: enrichedMeta };
-  }
+export function processPacket(type, data, enrichedMeta = {}) {
+    return { type, data, meta: enrichedMeta };
 }

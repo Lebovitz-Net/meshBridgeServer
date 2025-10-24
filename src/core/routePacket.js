@@ -1,14 +1,8 @@
 import { processPacket } from '../packets/processPacket.js';
 import { dispatchPacket } from './dispatchPacket.js';
-import { decodeAndNormalize } from '../packets/packetCodecs.js';
+import { decodePacket } from '../packets/decodePacket.js';
 import { getMapping } from './nodeMapping.js';
-import { 
-  FROM_RADIO_ONEOFS, 
-  CONFIG_ONEOFS, 
-  MODULE_CONFIG_ONEOFS, 
-  ADMIN_MESSAGE_ONEOFS, 
-  CLIENT_NODIFICATION_ONEOFS 
-} from '../utils/oneofsUtil.js';
+import { getProtobufSet } from '../utils/protoUtils.js';
 
 // --- Meta Enrichment ---
 
@@ -18,10 +12,9 @@ function enrichMeta(value = {}, meta = {}) {
 
   return {
     ...meta,
-    connId: meta.connId || meta.sourceIp | 'unknown',
     timestamp: ts,
-    fromNodeNum: value.fromNodeNum || value.num || mapping?.num,
-    toNodeNum: value.toNodeNum,
+    fromNodeNum: value.from || meta.fromNodeNum || value.fromNodeNum || mapping?.num,
+    toNodeNum: value.to || meta.toNodeNum || value.toNodeNum || 0xffffffff,
     device_id: meta.sourceIp || mapping?.device_id
   };
 }
@@ -35,47 +28,47 @@ function enrichMeta(value = {}, meta = {}) {
  * @param {Object} meta - Transport context (sourceIp, connId, device_id, etc.)
  */
 export function routePacket(input, meta = {}) {
+  let diagPacket = null;
   try {
     const ts = Number(Date.now());
-    const connId = meta.connId || meta.sourceIp || 'unknown';
+    const connId = meta.connId;
     const mapping = getMapping(meta.sourceIp);
 
     const data = Buffer.isBuffer(input)
-      ? decodeAndNormalize(input)
+      ? decodePacket(input, meta.source, meta.connId)
       : input;
 
-    if (!data) {
-      console.warn('[IngestionRouter] No decoded data object provided');
+    // if (data.type === 'User') {console.log([...input].map(b => b.toString(16).padStart(2,'0')).join(' '));}
+
+    const oneofs = getProtobufSet(data.type);
+
+    if (!data || data.type === 'Unknown') {
       return;
     }
+    if (oneofs) {
+      for (const [key, value] of Object.entries(data)) {
+        if (value == null) {
+          continue;
+        }
 
-    if (Object)
-    for (const [key, value] of Object.entries(data)) {
+        if (!oneofs.has(key))
+          continue;
 
-      // if (value && key !== 'packet' && key !== 'nodeInfo' && (ADMIN_MESSAGE_ONEOFS.has(key)
-      //     || CONFIG_ONEOFS.has(key) || MODULE_CONFIG_ONEOFS.has(key)
-      //     || CLIENT_NODIFICATION_ONEOFS.has(key)
-      //     || FROM_RADIO_ONEOFS.has(key))) {
-      //   console.log('[routePacket', key, { value });
-      // }
-
-      if (value == null || !FROM_RADIO_ONEOFS.has(key)) {
-        continue;
+        const effective = processPacket(key, data, enrichMeta(value, meta));
+        if (effective) {
+          diagPacket = effective.data;
+          dispatchPacket(effective);
+        } else {
+          console.warn(`[routePacket] Failed to decode subtype: ${key}`);
+        }
       }
-
-      const effective = processPacket(key, value, {
-        ...meta,
-        ...enrichMeta(value, meta),
-      });
-
-      if (effective) {
-        dispatchPacket(effective);
-      } else {
-        console.warn(`[IngestionRouter] Failed to decode subtype: ${key}`);
-      }
+    } else {
+      const effective = processPacket(data.type, data, enrichMeta(data, meta));
+      diagPacket = effective.data;
+      dispatchPacket(effective);
     }
   } catch (err) {
-    console.error('[IngestionRouter] Failed to route packet:', err);
+    console.error('[routePacket] Failed to route packet:', err, diagPacket);
   }
 }
 

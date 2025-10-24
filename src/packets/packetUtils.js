@@ -1,3 +1,5 @@
+import { getEnabledCategories } from "trace_events";
+
 const DEFAULT_SKIP_KEYS = ['payload', 'data', 'message'];
 
 export function normalizeBuffers(obj, path = [], skipKeys = DEFAULT_SKIP_KEYS, encoding = 'hex') {
@@ -34,20 +36,26 @@ export function parsePlainMessage(buffer) {
 }
 
 // Always return a top-level `channel` field, defaulting to 0 if missing
-export function extractChannelInfo(packet) {
-  let channel = null;
+export const getChannel = (packet) => {
+  let channel = 0;
 
   if (typeof packet?.channel === 'number') {
     channel = packet.channel;
   }
 
-  // Protobuf omits default values, so if it's absent, assume 0
-  if (channel == null) {
-    channel = 0;
-  }
-
   return { channel };
 }
+
+export const getBaseMeta = (packet) => {
+  return {
+    packetId: packet.id,
+    fromNodeNum: packet.from,
+    toNodeNum: packet.to,
+    timestamp: packet.rxTime ? packet.rxTime * 1000 : Date.now(),
+    viaMqtt: packet.viaMqtt,
+    hopStart: packet.hopStart,
+    ...getChannel(packet)
+  }}
 
 /**
  * Extracts valid oneof subtypes from a decoded packet entry.
@@ -154,6 +162,7 @@ function constructSubPacket(entry, subtype) {
  */
 function normalizeDecodedPacket(decoded, protoJson) {
   const entries = Array.isArray(decoded) ? decoded : [decoded];
+  console.log('[.../normalize] entries', entries);
   const subPackets = [];
 
   for (const entry of entries) {

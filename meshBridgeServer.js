@@ -1,5 +1,5 @@
 // main.js
-import { startServer } from './servers/server.js';
+import { startServer } from './src/servers/server.js';
 
 try {
   await startServer();

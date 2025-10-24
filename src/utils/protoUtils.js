@@ -1,17 +1,46 @@
 import protobuf from 'protobufjs';
-import protoDef from '../assets/proto.json' with { type: 'json' };
-import { decodeFrame } from '../packets/decodeFrame.js';
+import protoJson from '../assets/proto.json' with { type: 'json' };
 import { getChannelMapping } from '../core/nodeMapping.js';
-import { getProtobufs, getProtobufTypes } from '../packets/packetCodecs.js';
-
 import crypto from 'crypto';
+import os from 'os';
+import { meshProtoTypes, sortEntries } from './meshProtoTypes.js';
 
 const START1 = 0x94;
 const START2 = 0xc3;
 
-const root = protobuf.Root.fromJSON(protoDef);
+const root = protobuf.Root.fromJSON(protoJson);
+const meshMap = new Map;
 
-import os from 'os';
+function filterTopLevelTypes (meshTypes) {
+  return meshTypes.filter((type) => {
+    try { 
+      root.lookupType(`meshtastic.${type}`);
+      return true;
+    }
+    catch { console.log(type); return false; }
+  })
+}
+
+export async function initProtoTypes () {
+  const meshTypes = filterTopLevelTypes(sortEntries(meshProtoTypes));
+  // const meshTypes = [ 'FromRadio', 'MeshPacket', 'ToRadio',  'Data', 'Config', 'ModuleConfig', 'NodeInfo',
+  //                     'MyNodeInfo', 'Position', 'Telemetry', 'User', 'LogRecord', 
+  //                     'DeviceMetrics', ];
+
+  meshTypes.map((type) => {
+     meshMap.set(type, root.lookupType(`meshtastic.${type}`));
+  });
+}
+
+
+
+export const getProtobufs = (key) => meshMap.get(key);
+export const getProtobufTypes = (type) => getProtobufs(type)?.oneofs?.payloadVariant?.oneof ?? null;
+export const getProtobufSet = (type) => {
+  const oneofs = getProtobufTypes(type);
+  return oneofs ?  new Set (oneofs) : null;
+}
+export const getDecodeTypes = () => meshMap;
 
 function getMacAddresses() {
   const interfaces = os.networkInterfaces();
@@ -62,12 +91,17 @@ export function frame(bytes, opts = {}) {
   if (!includeHeader) return bytes;
 
   const len = bytes.length;
-  const header = new Uint8Array([START1, START2, (len >> 8) & 0xff, len & 0xff]);
-  const framed = new Uint8Array(header.length + len);
-  framed.set(header, 0);
-  framed.set(bytes, header.length);
-  return framed;
+  const header = [START1, START2, (len >> 8) & 0xff, len & 0xff];
+
+  // Use spread to merge header and bytes, then wrap in Uint8Array
+  return new Uint8Array([...header, ...bytes]);
 }
+
+
+export function unFrame(buf) {
+  return buf?.[0] === START1 && buf?.[1] === START2 ? buf.subarray(2) : buf;
+}
+
 
 export function createToRadioFrame(fieldName, value, opts = {}) {
   if (!getProtobufTypes('ToRadio').includes(fieldName)) {
@@ -110,189 +144,3 @@ export function createAdmminMessageFrame(request, opts = {}) {
   return createMeshPacketFrame("ADMIN_APP", encoded, opts);
 }
 
-// ---------------------------------------------------------------------------------------
-// EXtraction
-// ---------------------------------------------------------------------------------------
-
-export function extractFramedPayloads(buffer, maxLen = 512) {
-  const frames = [];
-  let offset = 0;
-
-  while (offset + 4 <= buffer.length) {
-    if (buffer[offset] !== START1 || buffer[offset + 1] !== START2) {
-      offset += 1;
-      continue;
-    }
-
-    const len = (buffer[offset + 2] << 8) | buffer[offset + 3];
-    if (len === 0 || len > maxLen) {
-      offset += 1;
-      continue;
-    }
-
-    if (offset + 4 + len > buffer.length) break;
-
-    const payload = buffer.slice(offset + 4, offset + 4 + len);
-    frames.push(payload);
-
-    offset += 4 + len;
-  }
-// console.log("[extractFramedPayloads] buffer is", buffer);
-  const leftover = buffer.slice(offset);
-  return { frames, leftover };
-}
-
-export const extractNodeInfoPackets = (buffer, maxLen = 512) => {
-  const NodeInfo = getProtobufs('NodeInfo');
-  const { frames, leftover } = extractFramedPayloads(buffer, maxLen);
-  const packets = frames.flatMap(frame => decodeFrame(frame, 'tcp'));
-
-  const nodes = {};
-  for (const packet of packets) {
-    if (packet.type === 'FromRadio' && packet.payload?.nodeInfo) {
-      let info = packet.payload.nodeInfo;
-
-      if (info instanceof Uint8Array) {
-        try {
-          info = NodeInfo.decode(info);
-        } catch (e) {
-          console.warn('[extractNodeInfoPackets] Failed to decode nodeInfo buffer:', e);
-          continue;
-        }
-      }
-
-      const nodeId = info.node_num ?? info.num;
-      if (nodeId != null) {
-        nodes[nodeId] = {
-          longName: info.user?.longName,
-          shortName: info.user?.shortName,
-          lat: info.user?.position?.latitude,
-          lon: info.user?.position?.longitude,
-          alt: info.user?.position?.altitude,
-          battery: info.user?.batteryLevel,
-          lastHeard: info.lastHeard,
-          hopsAway: info.hopsAway,
-          viaMqtt: info.viaMqtt,
-          hardwareModel: info.user?.hwModel,
-          id: info.user?.id
-        };
-      } else {
-        console.warn('[extractNodeInfoPackets] nodeInfo missing node identifier:', info);
-      }
-    }
-  }
-
-  return { nodes, leftover };
-};
-
-export function extractNodeList(buffer) {
-  try {
-    const FromRadio = getProtobufs('FromRadio');
-    const decoded = FromRadio.decode(buffer);
-    const nodes = Array.isArray(decoded.nodeInfo) ? decoded.nodeInfo : [];
-
-    return nodes.map((node) => ({
-      id: node.user?.id || 'unknown',
-      name: node.user?.longName || 'unnamed',
-      lat: node.position?.latitude ?? null,
-      lon: node.position?.longitude ?? null,
-      alt: node.position?.altitude ?? null,
-      timestamp: node.position?.time ?? null,
-    }));
-  } catch (err) {
-    console.warn('⚠️ Failed to decode meshtastic.FromRadio.nodeInfo:', err);
-    return [];
-  }
-}
-
-export function buildAdminWantNodesFrame(opts = {}) {
-  const AdminMessage = getProtobufs('AdminMessage');
-  const admin = AdminMessage.create({ wantNodes: { wantAll: true } });
-  const adminBytes = AdminMessage.encode(admin).finish();
-
-  const data = Data.create({
-    portnum: PortNum.values.ADMIN,
-    payload: adminBytes
-  });
-
-  const mesh = MeshPacket.create({
-    from: opts.from ?? 0,
-    to: opts.to ?? 0,
-    channel: opts.channel ?? 0,
-    id: opts.id ?? Math.floor(Math.random() * 0xffffffff),
-    data
-  });
-
-  return buildToRadioFrame('packet', mesh, opts);
-}
-
-export function buildAdminGetConfigFrame(opts = {}) {
-  // Create an AdminMessage with the getConfigRequest variant
-  const AdminMessage = getProtobufs('AdminMessage');
-  const admin = AdminMessage.create({ getConfigRequest: {} });
-  const adminBytes = AdminMessage.encode(admin).finish();
-
-  // Wrap in a Data message on the ADMIN port
-  const data = Data.create({
-    portnum: PortNum.values.ADMIN,
-    payload: adminBytes
-  });
-
-  // Wrap in a MeshPacket
-  const mesh = MeshPacket.create({
-    from: opts.from ?? 0,
-    to: opts.to ?? 0,
-    channel: opts.channel ?? 0,
-    id: opts.id ?? Math.floor(Math.random() * 0xffffffff),
-    data
-  });
-
-  // Wrap in a ToRadio.packet and frame it
-  return buildToRadioFrame('packet', mesh, opts);
-}
-
-export function buildWantTelemetryFrame(opts = {}) {
-  // Create an AdminMessage with the telemetry request variant
-  const AdminMessage = getProtobufs('AdminMessage');
-  const admin = AdminMessage.create({ getTelemetryRequest: {} });
-  const adminBytes = AdminMessage.encode(admin).finish();
-
-  // Wrap in a Data message on the ADMIN port
-  const data = Data.create({
-    portnum: PortNum.values.ADMIN,
-    payload: adminBytes
-  });
-
-  // Wrap in a MeshPacket
-  const mesh = MeshPacket.create({
-    from: opts.from ?? 0,
-    to: opts.to ?? 0,
-    channel: opts.channel ?? 0,
-    id: opts.id ?? Math.floor(Math.random() * 0xffffffff),
-    data
-  });
-
-  // Wrap in a ToRadio.packet and frame it
-  return buildToRadioFrame('packet', mesh, opts);
-}
-
-/**
- * Safely calls an event handler, with type checking and error logging.
- * @param {Function} fn - The handler to call.
- * @param {string} eventType - The event type (for logging).
- * @param {*} event - The event payload to pass to the handler.
- */
-function callHandler(fn, eventType, event) {
-  if (typeof fn === 'function') {
-    try {
-      fn(event);
-    } catch (err) {
-      console.error(`[SocketInterface] Listener error on ${eventType}:`, err);
-    }
-  } else {
-    console.warn(
-      `[SocketInterface] Skipping non-function listener for ${eventType}`,
-      fn
-    );
-  }
-}

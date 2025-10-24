@@ -36,7 +36,7 @@ export async function insertMyInfo(packet) {
     return;
   }
 
-  setMapping(currentIP, myNodeNum, deviceId);
+  setMapping(currentIP, myNodeNum, currentIP);
   setChannelMapping(channel ?? 0, myNodeNum);
 
   try {

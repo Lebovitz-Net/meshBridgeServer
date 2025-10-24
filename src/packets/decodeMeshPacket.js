@@ -3,7 +3,7 @@
 import protobuf from 'protobufjs';
 import protoJson from '../assets/proto.json' with { type: 'json' };
 import { decompress } from './decompress.js';
-import { parsePlainMessage, extractChannelInfo } from './packetUtils.js';
+import { parsePlainMessage, getChannel } from './packetUtils.js';
 
 const root = protobuf.Root.fromJSON(protoJson);
 const Position = root.lookupType('meshtastic.Position');
@@ -31,7 +31,7 @@ export function decodeMeshPacket(packet) {
     timestamp: packet.rxTime ? packet.rxTime * 1000 : Date.now(),
     viaMqtt: packet.viaMqtt,
     hopStart: packet.hopStart,
-    ...extractChannelInfo(packet)
+    ...getChannel(packet)
   };
 
   const extractOptions = (packet) => {

@@ -1,4 +1,4 @@
-channel_url: https://meshtastic.org/e/#CgsSAQEoATABOgIIDAozCAESIGtPdW42blM5eHVUYmFIZk5MTkR1UkxpWnJmQlBrMkxDGgVrZDFtdSgBMAE6AggMEg8IATgBQANIAVAeaAHIBgE
+﻿channel_url: https://meshtastic.org/e/#CgsSAQEoATABOgIIDAozCAESIGtPdW42blM5eHVUYmFIZk5MTkR1UkxpWnJmQlBrMkxDGgVrZDFtdSgBMAE6AggMEg8IATgBQANIAVAeaAHIBgE
 logging:
   level: debug          # options: error, warn, info, debug
   overlays:
@@ -30,7 +30,7 @@ config:
     ntpServer: meshtastic.pool.ntp.org
     wifiEnabled: true
     wifiPsk: IVM3D2GU52YLZ6C
-    wifiSsid: HOME69-5G
+    wifiSsid: HOME69-TM_EXT
   position:
     broadcastSmartMinimumDistance: 100
     broadcastSmartMinimumIntervalSecs: 30
@@ -47,9 +47,9 @@ config:
   security:
     privateKey: base64:WHXmSX1eEeSeKaxBx1ShSSwfRPHWTbyK65YcLAjnomE=
     publicKey: base64:SwS/tbMyzOhZcWJy/GCIj7BeW7tB8A40cbbv3RUE5yU=
-    admin_key: base64:SwS/tbMyzOhZcWJy/GCIj7BeW7tB8A40cbbv3RUE5yU=
-    admin_key2: base64:zWyILd3Sv9N5DdNoso+WA6giq4ozPimrS6vEG/rrUnQ=
-    admin_key3: base64:6VYeVqt4P5uLSFpK+BYESiJDk06DUUlzvZcUPJGk7VM=
+    admin_key: ""
+    admin_key2: ""
+    admin_key3: ""
     serialEnabled: true
 location:
   alt: 30

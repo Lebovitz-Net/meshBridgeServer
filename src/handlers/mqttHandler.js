@@ -1,6 +1,6 @@
 // bridge/mqttHandler.js
 import mqtt from 'mqtt';
-import { decodeAndNormalize } from '../packets/packetCodecs.js';
+import { decodePacket } from '../packets/decodePacket.js';
 import { routePacket } from '../core/routePacket.js';
 
 export default function createMQTTHandler(sourceId, {
@@ -26,7 +26,7 @@ export default function createMQTTHandler(sourceId, {
     });
 
     client.on('message', (topic, message) => {
-      const packet = decodeAndNormalize(message, 'mqtt', sourceId);
+      const packet = decodePacket(message, 'mqtt', sourceId);
       if (!packet || packet.type === 'Unknown') return;
 
       const meta = {

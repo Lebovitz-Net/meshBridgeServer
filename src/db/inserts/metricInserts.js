@@ -21,9 +21,9 @@ export const insertEventEmission = (event) => {
 export const insertQueueStatus = (qs) => {
   db.prepare(`
     INSERT INTO queue_status (
-      num, res, free, maxlen, mesh_packet_id, timestamp, conn_id
+      num, res, free, maxlen, meshPacketId, timestamp, connId
     ) VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(qs.num, qs.res, qs.free, qs.maxlen, qs.mesh_packet_id || null, qs.timestamp || Date.now(), qs.conn_id || null);
+  `).run(qs.num, qs.res, qs.free, qs.maxlen, qs.meshPacketId || null, qs.timestamp || Date.now(), qs.connId || null);
 };
 
 // Device Metrics =====================================================

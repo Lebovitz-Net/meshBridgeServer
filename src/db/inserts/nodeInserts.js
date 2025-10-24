@@ -1,5 +1,7 @@
 ﻿// --- Node Inserts ---
 import db from '../db.js';
+import { emitNodeUpdate } from '../../utils/sseEmitters.js';
+
 
 // insertNode ===========================================
 export const insertNode = (node, timestamp = Date.now()) => {
@@ -31,6 +33,10 @@ export const insertNode = (node, timestamp = Date.now()) => {
 
 // insertNodeUsers ===========================================
 export function insertNodeUsers(user, nodeNum) {
+  const longName = Buffer.isBuffer(user.longName) ? Buffer.toString(user.longName) : user.longName;
+  const shortName = Buffer.isBuffer(user.shortName) ? Buffer.toString(user.shortname) : user.shortName;
+  const macaddr = Buffer.isBuffer(user.macaddr) ? Buffer.toString(user.macaddr) : user.macaddr;
+
   db.prepare(`
     INSERT INTO node_users (
       nodeNum, userId, longName, shortName, macaddr,
@@ -50,13 +56,13 @@ export function insertNodeUsers(user, nodeNum) {
       updatedAt = excluded.updatedAt
   `).run({
     nodeNum,
-    userId: user.id,
-    longName: user.longName ?? `Meshtastic Node ${nodeNum}`,
-    shortName: user.shortName,
-    macaddr: user.macaddr,
-    hwModel: user.hwModel,
-    publicKey: user.publicKey,
-    isUnmessagable: user.isUnmessagable ? 1 : 0,
+    userId: user?.id ?? null,
+    longName: longName ?? `Meshtastic Node ${nodeNum}`,
+    shortName: shortName ?? null,
+    macaddr: macaddr ?? null,
+    hwModel: user?.hwModel ?? null,
+    publicKey: user?.publicKey ?? null,
+    isUnmessagable: user?.isUnmessagable ? 1 : 0,
     updatedAt: Date.now()
   });
 }
@@ -81,6 +87,25 @@ export function insertNodeMetrics(deviceMetrics, { num, lastHeard = Date.now() }
   });
 }
 
+// insertPosition ===========================================
+
+export function insertPosition(decoded) {
+  const { fromNodeNum, toNodeNum, latitude, longitude, altitude, timestamp } = decoded;
+  const ts = timestamp ?? Date.now();
+
+  db.prepare(`
+    INSERT INTO positions (fromNodeNum, toNodeNum, latitude, longitude, altitude, timestamp)
+    VALUES (@fromNodeNum, @toNodeNum, @latitude, @longitude, @altitude, @ts)
+  `).run({
+    fromNodeNum,
+    toNodeNum,
+    latitude: Number(latitude),
+    longitude: Number(longitude),
+    altitude: altitude != null ? Number(altitude) : null,
+    ts
+  });
+}
+
 // UpsertNodeInfo ===========================================
 export const upsertNodeInfo = (nodeInfo) => {
   const num = nodeInfo?.num;
@@ -91,28 +116,62 @@ export const upsertNodeInfo = (nodeInfo) => {
   }
 
   const tx = db.transaction(() => {
+    const user = nodeInfo.user ? nodeInfo.user : nodeInfo;
     insertNode({
       num,
-      label: nodeInfo.user?.longName ?? null,
+      label: user?.longName ??  null,
       last_seen: nodeInfo.lastHeard ?? Date.now(),
       viaMqtt: nodeInfo.viaMqtt,
       hopsAway: nodeInfo.hopsAway,
-      lastHeard: nodeInfo.lastHeard
+      lastHeard: nodeInfo.lastHeard ?? null
     });
 
-    if (nodeInfo.user) {
-      insertNodeUsers(nodeInfo.user, num);
+    if (user.id) {
+      insertNodeUsers(user, num);
+    } else {
+      // console.log('No user info to insert for node', nodeInfo, num);
     }
 
-    if (nodeInfo.deviceMetrics) {
-      insertNodeMetrics(nodeInfo.deviceMetrics, {
+    if (nodeInfo.deviceMetrics != null) {
+      insertNodeMetrics(nodeInfo, {
         num,
         lastHeard: nodeInfo.lastHeard
       });
     }
+
+    if (nodeInfo.postion) {
+       const data = node.position;
+       console.log('.../nodesInsert upsertNodes position');
+       insertPosition({
+        fromNodeNum: num,
+        toNodeNum: 0xffffffff,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        altitude: data.altitude || null,
+        sats_in_view: data.satsInView || null,
+        batteryLevel: data.batteryLevel || null,
+        device_id: nodeInfo.device_d,
+        conn_id: nodeInfo.connId,
+        timestamp: nodeInfo.timestamp,
+       })
+    }
   });
 
   tx();
+
+  // 🔥 Emit SSE update after successful insert/update
+  emitNodeUpdate({
+    num,
+    label: nodeInfo.user?.longName ?? nodeInfo.longName ?? null,
+    longName: nodeInfo.user?.longName ?? nodeInfo.longName ??  null,
+    shortName: nodeInfo.user?.shortName ?? nodeInfo.shortname ?? null,
+    lastheard: nodeInfo.lastHeard ?? Date.now(),
+    viaMqtt: nodeInfo.viaMqtt,
+    hopsAway: nodeInfo.hopsAway,
+    lastHeard: nodeInfo.lastHeard,
+    device_id: nodeInfo.device_id ?? null
+  });
+
   return { num };
 };
 
@@ -142,21 +201,3 @@ export const insertUser = (user) => {
     user.nodeNum
   );
 };
-
-// insertPosition ===========================================
-export function insertPosition(decoded) {
-  const { fromNodeNum, toNodeNum, latitude, longitude, altitude, timestamp } = decoded;
-  const ts = timestamp ?? Date.now();
-
-  db.prepare(`
-    INSERT INTO positions (fromNodeNum, toNodeNum, latitude, longitude, altitude, timestamp)
-    VALUES (@fromNodeNum, @toNodeNum, @latitude, @longitude, @altitude, @ts)
-  `).run({
-    fromNodeNum,
-    toNodeNum,
-    latitude: Number(latitude),
-    longitude: Number(longitude),
-    altitude: altitude != null ? Number(altitude) : null,
-    ts
-  });
-}

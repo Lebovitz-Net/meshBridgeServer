@@ -7,7 +7,7 @@ export function insertLogRecord(data) {
   const { message, fromNodeNum, timestamp, connId } = data;
 
   if (!message || typeof fromNodeNum !== 'number') {
-    console.warn('[insertLogRecord] Skipped insert: missing required fields', { message, fromNodeNum, timestamp });
+    console.warn('[insertLogRecord] Skipped insert: missing required fields', data);
     return;
   }
 

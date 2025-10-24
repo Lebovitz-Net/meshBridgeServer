@@ -12,7 +12,7 @@ function tryDecode(type, buffer) {
   }
 }
 
-export function decodePacket(parent, packet) {
+export function decodeSubPacket(parent, packet) {
     let result = {}
 
     const data = Buffer.isBuffer(packet)

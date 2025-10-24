@@ -13,7 +13,8 @@ export const listMessagesForChannel = (channelId, limit = 100) => {
 };
 
 export const listExtendedMessagesForChannel = (channelId, limit = 100) => {
-  return db.prepare(
+
+  const selected = db.prepare(
     `SELECT
       -- messages table
       m.messageId,
@@ -48,4 +49,6 @@ export const listExtendedMessagesForChannel = (channelId, limit = 100) => {
       m.timestamp DESC
     LIMIT ?`
   ).all(channelId, limit);
+
+  return selected;
 };

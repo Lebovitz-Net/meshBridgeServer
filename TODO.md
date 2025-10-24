@@ -47,3 +47,47 @@ useSSE((event) => {
 - [ ] Add styling to message cards
   - Improve layout, spacing, and hover effects
   - Consider color-coding by channel or node group
+
+### Break appart dispatchRegistry into domains.
+
+1. 🧱 Improve maintainability as packet types grow
+
+2.  📚 Make onboarding easier by isolating logic per domain
+
+3. 🔄 Enable dynamic handler injection or overrides for testing
+
+But holding off for now is wise. The current flat structure keeps everything visible and traceable, which is ideal while you're still refining emit behavior and packet coverage.
+
+```js
+// dispatchPacket.js
+import { dispatchMessages } from './registrydispatchMessage's;
+import { dispatchConfigs } from './registrydispatchConfigs';
+import { dispatchTelemetry } from './registrydispatchTelemetry';
+
+export const dispatchRegistry = {
+  ...dispatchMessages,
+  ...dispatchConfigs,
+  ...dispatchTelemetry,
+  // etc.
+};
+export function dispatchPacket(subPacket) {
+  if (!subPacket) return;
+  
+  const handler = dispatchRegistry[subPacket.type];
+  if (handler) {
+    handler(subPacket);
+  } else {
+    console.warn(`[dispatchSubPacket] No handler for type ${subPacket.type}`);
+  }
+}
+
+And each module can export a clean object of handlers:
+```
+
+```js
+// registry/dispatchMessages.js
+export const dispatchMessages = {
+  message: (subPacket) => { /* insert + emit */ },
+  reply: (subPacket) => { /* insert + emit */ }
+};
+```

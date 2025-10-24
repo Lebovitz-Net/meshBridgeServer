@@ -1,1535 +1,14 @@
 {
-  "options": {
-    "go_package": "github.com/meshtastic/go/generated",
-    "java_package": "fi.kapsi.koti.jpa.nanopb"
-  },
   "nested": {
     "meshtastic": {
       "options": {
         "csharp_namespace": "Meshtastic.Protobufs",
         "go_package": "github.com/meshtastic/go/generated",
-        "java_outer_classname": "StoreAndForwardProtos",
-        "java_package": "com.geeksville.mesh",
-        "swift_prefix": "",
-        "(nanopb_fileopt).include": "<vector>"
+        "java_outer_classname": "XmodemProtos",
+        "java_package": "org.meshtastic.proto",
+        "swift_prefix": ""
       },
       "nested": {
-        "WantNodes": {
-          "oneofs": {
-            "_wantAll": {
-              "oneof": [
-                "wantAll"
-              ]
-            }
-          },
-          "fields": {
-            "wantAll": {
-              "type": "bool",
-              "id": 1,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "nodeId": {
-              "rule": "repeated",
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "AdminMessage": {
-          "oneofs": {
-            "payloadVariant": {
-              "oneof": [
-                "getChannelRequest",
-                "getChannelResponse",
-                "getOwnerRequest",
-                "getOwnerResponse",
-                "getConfigRequest",
-                "getConfigResponse",
-                "getModuleConfigRequest",
-                "getModuleConfigResponse",
-                "getCannedMessageModuleMessagesRequest",
-                "getCannedMessageModuleMessagesResponse",
-                "getDeviceMetadataRequest",
-                "getDeviceMetadataResponse",
-                "getRingtoneRequest",
-                "getRingtoneResponse",
-                "getDeviceConnectionStatusRequest",
-                "getDeviceConnectionStatusResponse",
-                "setHamMode",
-                "getNodeRemoteHardwarePinsRequest",
-                "getNodeRemoteHardwarePinsResponse",
-                "enterDfuModeRequest",
-                "deleteFileRequest",
-                "setScale",
-                "backupPreferences",
-                "restorePreferences",
-                "removeBackupPreferences",
-                "sendInputEvent",
-                "setOwner",
-                "setChannel",
-                "setConfig",
-                "setModuleConfig",
-                "setCannedMessageModuleMessages",
-                "setRingtoneMessage",
-                "removeByNodenum",
-                "setFavoriteNode",
-                "removeFavoriteNode",
-                "setFixedPosition",
-                "removeFixedPosition",
-                "setTimeOnly",
-                "getUiConfigRequest",
-                "getUiConfigResponse",
-                "storeUiConfig",
-                "setIgnoredNode",
-                "removeIgnoredNode",
-                "beginEditSettings",
-                "commitEditSettings",
-                "addContact",
-                "keyVerification",
-                "factoryResetDevice",
-                "rebootOtaSeconds",
-                "exitSimulator",
-                "rebootSeconds",
-                "shutdownSeconds",
-                "factoryResetConfig",
-                "nodedbReset",
-                "wantNodes"
-              ]
-            }
-          },
-          "fields": {
-            "sessionPasskey": {
-              "type": "bytes",
-              "id": 101
-            },
-            "getChannelRequest": {
-              "type": "uint32",
-              "id": 1
-            },
-            "getChannelResponse": {
-              "type": "Channel",
-              "id": 2
-            },
-            "getOwnerRequest": {
-              "type": "bool",
-              "id": 3
-            },
-            "getOwnerResponse": {
-              "type": "User",
-              "id": 4
-            },
-            "getConfigRequest": {
-              "type": "ConfigType",
-              "id": 5
-            },
-            "getConfigResponse": {
-              "type": "Config",
-              "id": 6
-            },
-            "getModuleConfigRequest": {
-              "type": "ModuleConfigType",
-              "id": 7
-            },
-            "getModuleConfigResponse": {
-              "type": "ModuleConfig",
-              "id": 8
-            },
-            "getCannedMessageModuleMessagesRequest": {
-              "type": "bool",
-              "id": 10
-            },
-            "getCannedMessageModuleMessagesResponse": {
-              "type": "string",
-              "id": 11
-            },
-            "getDeviceMetadataRequest": {
-              "type": "bool",
-              "id": 12
-            },
-            "getDeviceMetadataResponse": {
-              "type": "DeviceMetadata",
-              "id": 13
-            },
-            "getRingtoneRequest": {
-              "type": "bool",
-              "id": 14
-            },
-            "getRingtoneResponse": {
-              "type": "string",
-              "id": 15
-            },
-            "getDeviceConnectionStatusRequest": {
-              "type": "bool",
-              "id": 16
-            },
-            "getDeviceConnectionStatusResponse": {
-              "type": "DeviceConnectionStatus",
-              "id": 17
-            },
-            "setHamMode": {
-              "type": "HamParameters",
-              "id": 18
-            },
-            "getNodeRemoteHardwarePinsRequest": {
-              "type": "bool",
-              "id": 19
-            },
-            "getNodeRemoteHardwarePinsResponse": {
-              "type": "NodeRemoteHardwarePinsResponse",
-              "id": 20
-            },
-            "enterDfuModeRequest": {
-              "type": "bool",
-              "id": 21
-            },
-            "deleteFileRequest": {
-              "type": "string",
-              "id": 22
-            },
-            "setScale": {
-              "type": "uint32",
-              "id": 23
-            },
-            "backupPreferences": {
-              "type": "BackupLocation",
-              "id": 24
-            },
-            "restorePreferences": {
-              "type": "BackupLocation",
-              "id": 25
-            },
-            "removeBackupPreferences": {
-              "type": "BackupLocation",
-              "id": 26
-            },
-            "sendInputEvent": {
-              "type": "InputEvent",
-              "id": 27
-            },
-            "setOwner": {
-              "type": "User",
-              "id": 32
-            },
-            "setChannel": {
-              "type": "Channel",
-              "id": 33
-            },
-            "setConfig": {
-              "type": "Config",
-              "id": 34
-            },
-            "setModuleConfig": {
-              "type": "ModuleConfig",
-              "id": 35
-            },
-            "setCannedMessageModuleMessages": {
-              "type": "string",
-              "id": 36
-            },
-            "setRingtoneMessage": {
-              "type": "string",
-              "id": 37
-            },
-            "removeByNodenum": {
-              "type": "uint32",
-              "id": 38
-            },
-            "setFavoriteNode": {
-              "type": "uint32",
-              "id": 39
-            },
-            "removeFavoriteNode": {
-              "type": "uint32",
-              "id": 40
-            },
-            "setFixedPosition": {
-              "type": "Position",
-              "id": 41
-            },
-            "removeFixedPosition": {
-              "type": "bool",
-              "id": 42
-            },
-            "setTimeOnly": {
-              "type": "fixed32",
-              "id": 43
-            },
-            "getUiConfigRequest": {
-              "type": "bool",
-              "id": 44
-            },
-            "getUiConfigResponse": {
-              "type": "DeviceUIConfig",
-              "id": 45
-            },
-            "storeUiConfig": {
-              "type": "DeviceUIConfig",
-              "id": 46
-            },
-            "setIgnoredNode": {
-              "type": "uint32",
-              "id": 47
-            },
-            "removeIgnoredNode": {
-              "type": "uint32",
-              "id": 48
-            },
-            "beginEditSettings": {
-              "type": "bool",
-              "id": 64
-            },
-            "commitEditSettings": {
-              "type": "bool",
-              "id": 65
-            },
-            "addContact": {
-              "type": "SharedContact",
-              "id": 66
-            },
-            "keyVerification": {
-              "type": "KeyVerificationAdmin",
-              "id": 67
-            },
-            "factoryResetDevice": {
-              "type": "int32",
-              "id": 94
-            },
-            "rebootOtaSeconds": {
-              "type": "int32",
-              "id": 95
-            },
-            "exitSimulator": {
-              "type": "bool",
-              "id": 96
-            },
-            "rebootSeconds": {
-              "type": "int32",
-              "id": 97
-            },
-            "shutdownSeconds": {
-              "type": "int32",
-              "id": 98
-            },
-            "factoryResetConfig": {
-              "type": "int32",
-              "id": 99
-            },
-            "nodedbReset": {
-              "type": "int32",
-              "id": 100
-            },
-            "wantNodes": {
-              "type": "WantNodes",
-              "id": 102
-            }
-          },
-          "nested": {
-            "ConfigType": {
-              "values": {
-                "DEVICE_CONFIG": 0,
-                "POSITION_CONFIG": 1,
-                "POWER_CONFIG": 2,
-                "NETWORK_CONFIG": 3,
-                "DISPLAY_CONFIG": 4,
-                "LORA_CONFIG": 5,
-                "BLUETOOTH_CONFIG": 6,
-                "SECURITY_CONFIG": 7,
-                "SESSIONKEY_CONFIG": 8,
-                "DEVICEUI_CONFIG": 9
-              }
-            },
-            "ModuleConfigType": {
-              "values": {
-                "MQTT_CONFIG": 0,
-                "SERIAL_CONFIG": 1,
-                "EXTNOTIF_CONFIG": 2,
-                "STOREFORWARD_CONFIG": 3,
-                "RANGETEST_CONFIG": 4,
-                "TELEMETRY_CONFIG": 5,
-                "CANNEDMSG_CONFIG": 6,
-                "AUDIO_CONFIG": 7,
-                "REMOTEHARDWARE_CONFIG": 8,
-                "NEIGHBORINFO_CONFIG": 9,
-                "AMBIENTLIGHTING_CONFIG": 10,
-                "DETECTIONSENSOR_CONFIG": 11,
-                "PAXCOUNTER_CONFIG": 12
-              }
-            },
-            "BackupLocation": {
-              "values": {
-                "FLASH": 0,
-                "SD": 1
-              }
-            },
-            "InputEvent": {
-              "fields": {
-                "eventCode": {
-                  "type": "uint32",
-                  "id": 1
-                },
-                "kbChar": {
-                  "type": "uint32",
-                  "id": 2
-                },
-                "touchX": {
-                  "type": "uint32",
-                  "id": 3
-                },
-                "touchY": {
-                  "type": "uint32",
-                  "id": 4
-                }
-              }
-            }
-          }
-        },
-        "HamParameters": {
-          "fields": {
-            "callSign": {
-              "type": "string",
-              "id": 1
-            },
-            "txPower": {
-              "type": "int32",
-              "id": 2
-            },
-            "frequency": {
-              "type": "float",
-              "id": 3
-            },
-            "shortName": {
-              "type": "string",
-              "id": 4
-            }
-          }
-        },
-        "NodeRemoteHardwarePinsResponse": {
-          "fields": {
-            "nodeRemoteHardwarePins": {
-              "rule": "repeated",
-              "type": "NodeRemoteHardwarePin",
-              "id": 1
-            }
-          }
-        },
-        "SharedContact": {
-          "fields": {
-            "nodeNum": {
-              "type": "uint32",
-              "id": 1
-            },
-            "user": {
-              "type": "User",
-              "id": 2
-            },
-            "shouldIgnore": {
-              "type": "bool",
-              "id": 3
-            }
-          }
-        },
-        "KeyVerificationAdmin": {
-          "oneofs": {
-            "_securityNumber": {
-              "oneof": [
-                "securityNumber"
-              ]
-            }
-          },
-          "fields": {
-            "messageType": {
-              "type": "MessageType",
-              "id": 1
-            },
-            "remoteNodenum": {
-              "type": "uint32",
-              "id": 2
-            },
-            "nonce": {
-              "type": "uint64",
-              "id": 3
-            },
-            "securityNumber": {
-              "type": "uint32",
-              "id": 4,
-              "options": {
-                "proto3_optional": true
-              }
-            }
-          },
-          "nested": {
-            "MessageType": {
-              "values": {
-                "INITIATE_VERIFICATION": 0,
-                "PROVIDE_SECURITY_NUMBER": 1,
-                "DO_VERIFY": 2,
-                "DO_NOT_VERIFY": 3
-              }
-            }
-          }
-        },
-        "ChannelSettings": {
-          "fields": {
-            "channelNum": {
-              "type": "uint32",
-              "id": 1,
-              "options": {
-                "deprecated": true
-              }
-            },
-            "psk": {
-              "type": "bytes",
-              "id": 2
-            },
-            "name": {
-              "type": "string",
-              "id": 3
-            },
-            "id": {
-              "type": "fixed32",
-              "id": 4
-            },
-            "uplinkEnabled": {
-              "type": "bool",
-              "id": 5
-            },
-            "downlinkEnabled": {
-              "type": "bool",
-              "id": 6
-            },
-            "moduleSettings": {
-              "type": "ModuleSettings",
-              "id": 7
-            }
-          }
-        },
-        "ModuleSettings": {
-          "fields": {
-            "positionPrecision": {
-              "type": "uint32",
-              "id": 1
-            },
-            "isClientMuted": {
-              "type": "bool",
-              "id": 2
-            }
-          }
-        },
-        "Channel": {
-          "fields": {
-            "index": {
-              "type": "int32",
-              "id": 1
-            },
-            "settings": {
-              "type": "ChannelSettings",
-              "id": 2
-            },
-            "role": {
-              "type": "Role",
-              "id": 3
-            }
-          },
-          "nested": {
-            "Role": {
-              "values": {
-                "DISABLED": 0,
-                "PRIMARY": 1,
-                "SECONDARY": 2
-              }
-            }
-          }
-        },
-        "Config": {
-          "oneofs": {
-            "payloadVariant": {
-              "oneof": [
-                "device",
-                "position",
-                "power",
-                "network",
-                "display",
-                "lora",
-                "bluetooth",
-                "security",
-                "sessionkey",
-                "deviceUi"
-              ]
-            }
-          },
-          "fields": {
-            "device": {
-              "type": "DeviceConfig",
-              "id": 1
-            },
-            "position": {
-              "type": "PositionConfig",
-              "id": 2
-            },
-            "power": {
-              "type": "PowerConfig",
-              "id": 3
-            },
-            "network": {
-              "type": "NetworkConfig",
-              "id": 4
-            },
-            "display": {
-              "type": "DisplayConfig",
-              "id": 5
-            },
-            "lora": {
-              "type": "LoRaConfig",
-              "id": 6
-            },
-            "bluetooth": {
-              "type": "BluetoothConfig",
-              "id": 7
-            },
-            "security": {
-              "type": "SecurityConfig",
-              "id": 8
-            },
-            "sessionkey": {
-              "type": "SessionkeyConfig",
-              "id": 9
-            },
-            "deviceUi": {
-              "type": "DeviceUIConfig",
-              "id": 10
-            }
-          },
-          "nested": {
-            "DeviceConfig": {
-              "fields": {
-                "role": {
-                  "type": "Role",
-                  "id": 1
-                },
-                "serialEnabled": {
-                  "type": "bool",
-                  "id": 2,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "buttonGpio": {
-                  "type": "uint32",
-                  "id": 4
-                },
-                "buzzerGpio": {
-                  "type": "uint32",
-                  "id": 5
-                },
-                "rebroadcastMode": {
-                  "type": "RebroadcastMode",
-                  "id": 6
-                },
-                "nodeInfoBroadcastSecs": {
-                  "type": "uint32",
-                  "id": 7
-                },
-                "doubleTapAsButtonPress": {
-                  "type": "bool",
-                  "id": 8
-                },
-                "isManaged": {
-                  "type": "bool",
-                  "id": 9,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "disableTripleClick": {
-                  "type": "bool",
-                  "id": 10
-                },
-                "tzdef": {
-                  "type": "string",
-                  "id": 11
-                },
-                "ledHeartbeatDisabled": {
-                  "type": "bool",
-                  "id": 12
-                },
-                "buzzerMode": {
-                  "type": "BuzzerMode",
-                  "id": 13
-                }
-              },
-              "nested": {
-                "Role": {
-                  "valuesOptions": {
-                    "ROUTER_CLIENT": {
-                      "deprecated": true
-                    }
-                  },
-                  "values": {
-                    "CLIENT": 0,
-                    "CLIENT_MUTE": 1,
-                    "ROUTER": 2,
-                    "ROUTER_CLIENT": 3,
-                    "REPEATER": 4,
-                    "TRACKER": 5,
-                    "SENSOR": 6,
-                    "TAK": 7,
-                    "CLIENT_HIDDEN": 8,
-                    "LOST_AND_FOUND": 9,
-                    "TAK_TRACKER": 10,
-                    "ROUTER_LATE": 11
-                  }
-                },
-                "RebroadcastMode": {
-                  "values": {
-                    "ALL": 0,
-                    "ALL_SKIP_DECODING": 1,
-                    "LOCAL_ONLY": 2,
-                    "KNOWN_ONLY": 3,
-                    "NONE": 4,
-                    "CORE_PORTNUMS_ONLY": 5
-                  }
-                },
-                "BuzzerMode": {
-                  "values": {
-                    "ALL_ENABLED": 0,
-                    "DISABLED": 1,
-                    "NOTIFICATIONS_ONLY": 2,
-                    "SYSTEM_ONLY": 3,
-                    "DIRECT_MSG_ONLY": 4
-                  }
-                }
-              }
-            },
-            "PositionConfig": {
-              "fields": {
-                "positionBroadcastSecs": {
-                  "type": "uint32",
-                  "id": 1
-                },
-                "positionBroadcastSmartEnabled": {
-                  "type": "bool",
-                  "id": 2
-                },
-                "fixedPosition": {
-                  "type": "bool",
-                  "id": 3
-                },
-                "gpsEnabled": {
-                  "type": "bool",
-                  "id": 4,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "gpsUpdateInterval": {
-                  "type": "uint32",
-                  "id": 5
-                },
-                "gpsAttemptTime": {
-                  "type": "uint32",
-                  "id": 6,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "positionFlags": {
-                  "type": "uint32",
-                  "id": 7
-                },
-                "rxGpio": {
-                  "type": "uint32",
-                  "id": 8
-                },
-                "txGpio": {
-                  "type": "uint32",
-                  "id": 9
-                },
-                "broadcastSmartMinimumDistance": {
-                  "type": "uint32",
-                  "id": 10
-                },
-                "broadcastSmartMinimumIntervalSecs": {
-                  "type": "uint32",
-                  "id": 11
-                },
-                "gpsEnGpio": {
-                  "type": "uint32",
-                  "id": 12
-                },
-                "gpsMode": {
-                  "type": "GpsMode",
-                  "id": 13
-                }
-              },
-              "nested": {
-                "PositionFlags": {
-                  "values": {
-                    "UNSET": 0,
-                    "ALTITUDE": 1,
-                    "ALTITUDE_MSL": 2,
-                    "GEOIDAL_SEPARATION": 4,
-                    "DOP": 8,
-                    "HVDOP": 16,
-                    "SATINVIEW": 32,
-                    "SEQ_NO": 64,
-                    "TIMESTAMP": 128,
-                    "HEADING": 256,
-                    "SPEED": 512
-                  }
-                },
-                "GpsMode": {
-                  "values": {
-                    "DISABLED": 0,
-                    "ENABLED": 1,
-                    "NOT_PRESENT": 2
-                  }
-                }
-              }
-            },
-            "PowerConfig": {
-              "fields": {
-                "isPowerSaving": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "onBatteryShutdownAfterSecs": {
-                  "type": "uint32",
-                  "id": 2
-                },
-                "adcMultiplierOverride": {
-                  "type": "float",
-                  "id": 3
-                },
-                "waitBluetoothSecs": {
-                  "type": "uint32",
-                  "id": 4
-                },
-                "sdsSecs": {
-                  "type": "uint32",
-                  "id": 6
-                },
-                "lsSecs": {
-                  "type": "uint32",
-                  "id": 7
-                },
-                "minWakeSecs": {
-                  "type": "uint32",
-                  "id": 8
-                },
-                "deviceBatteryInaAddress": {
-                  "type": "uint32",
-                  "id": 9
-                },
-                "powermonEnables": {
-                  "type": "uint64",
-                  "id": 32
-                }
-              }
-            },
-            "NetworkConfig": {
-              "fields": {
-                "wifiEnabled": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "wifiSsid": {
-                  "type": "string",
-                  "id": 3
-                },
-                "wifiPsk": {
-                  "type": "string",
-                  "id": 4
-                },
-                "ntpServer": {
-                  "type": "string",
-                  "id": 5
-                },
-                "ethEnabled": {
-                  "type": "bool",
-                  "id": 6
-                },
-                "addressMode": {
-                  "type": "AddressMode",
-                  "id": 7
-                },
-                "ipv4Config": {
-                  "type": "IpV4Config",
-                  "id": 8
-                },
-                "rsyslogServer": {
-                  "type": "string",
-                  "id": 9
-                },
-                "enabledProtocols": {
-                  "type": "uint32",
-                  "id": 10
-                },
-                "ipv6Enabled": {
-                  "type": "bool",
-                  "id": 11
-                }
-              },
-              "nested": {
-                "AddressMode": {
-                  "values": {
-                    "DHCP": 0,
-                    "STATIC": 1
-                  }
-                },
-                "IpV4Config": {
-                  "fields": {
-                    "ip": {
-                      "type": "fixed32",
-                      "id": 1
-                    },
-                    "gateway": {
-                      "type": "fixed32",
-                      "id": 2
-                    },
-                    "subnet": {
-                      "type": "fixed32",
-                      "id": 3
-                    },
-                    "dns": {
-                      "type": "fixed32",
-                      "id": 4
-                    }
-                  }
-                },
-                "ProtocolFlags": {
-                  "values": {
-                    "NO_BROADCAST": 0,
-                    "UDP_BROADCAST": 1
-                  }
-                }
-              }
-            },
-            "DisplayConfig": {
-              "fields": {
-                "screenOnSecs": {
-                  "type": "uint32",
-                  "id": 1
-                },
-                "gpsFormat": {
-                  "type": "GpsCoordinateFormat",
-                  "id": 2,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "autoScreenCarouselSecs": {
-                  "type": "uint32",
-                  "id": 3
-                },
-                "compassNorthTop": {
-                  "type": "bool",
-                  "id": 4,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "flipScreen": {
-                  "type": "bool",
-                  "id": 5
-                },
-                "units": {
-                  "type": "DisplayUnits",
-                  "id": 6
-                },
-                "oled": {
-                  "type": "OledType",
-                  "id": 7
-                },
-                "displaymode": {
-                  "type": "DisplayMode",
-                  "id": 8
-                },
-                "headingBold": {
-                  "type": "bool",
-                  "id": 9
-                },
-                "wakeOnTapOrMotion": {
-                  "type": "bool",
-                  "id": 10
-                },
-                "compassOrientation": {
-                  "type": "CompassOrientation",
-                  "id": 11
-                },
-                "use_12hClock": {
-                  "type": "bool",
-                  "id": 12
-                }
-              },
-              "nested": {
-                "GpsCoordinateFormat": {
-                  "values": {
-                    "DEC": 0,
-                    "DMS": 1,
-                    "UTM": 2,
-                    "MGRS": 3,
-                    "OLC": 4,
-                    "OSGR": 5
-                  }
-                },
-                "DisplayUnits": {
-                  "values": {
-                    "METRIC": 0,
-                    "IMPERIAL": 1
-                  }
-                },
-                "OledType": {
-                  "values": {
-                    "OLED_AUTO": 0,
-                    "OLED_SSD1306": 1,
-                    "OLED_SH1106": 2,
-                    "OLED_SH1107": 3,
-                    "OLED_SH1107_128_128": 4
-                  }
-                },
-                "DisplayMode": {
-                  "values": {
-                    "DEFAULT": 0,
-                    "TWOCOLOR": 1,
-                    "INVERTED": 2,
-                    "COLOR": 3
-                  }
-                },
-                "CompassOrientation": {
-                  "values": {
-                    "DEGREES_0": 0,
-                    "DEGREES_90": 1,
-                    "DEGREES_180": 2,
-                    "DEGREES_270": 3,
-                    "DEGREES_0_INVERTED": 4,
-                    "DEGREES_90_INVERTED": 5,
-                    "DEGREES_180_INVERTED": 6,
-                    "DEGREES_270_INVERTED": 7
-                  }
-                }
-              }
-            },
-            "LoRaConfig": {
-              "fields": {
-                "usePreset": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "modemPreset": {
-                  "type": "ModemPreset",
-                  "id": 2
-                },
-                "bandwidth": {
-                  "type": "uint32",
-                  "id": 3
-                },
-                "spreadFactor": {
-                  "type": "uint32",
-                  "id": 4
-                },
-                "codingRate": {
-                  "type": "uint32",
-                  "id": 5
-                },
-                "frequencyOffset": {
-                  "type": "float",
-                  "id": 6
-                },
-                "region": {
-                  "type": "RegionCode",
-                  "id": 7
-                },
-                "hopLimit": {
-                  "type": "uint32",
-                  "id": 8
-                },
-                "txEnabled": {
-                  "type": "bool",
-                  "id": 9
-                },
-                "txPower": {
-                  "type": "int32",
-                  "id": 10
-                },
-                "channelNum": {
-                  "type": "uint32",
-                  "id": 11
-                },
-                "overrideDutyCycle": {
-                  "type": "bool",
-                  "id": 12
-                },
-                "sx126xRxBoostedGain": {
-                  "type": "bool",
-                  "id": 13
-                },
-                "overrideFrequency": {
-                  "type": "float",
-                  "id": 14
-                },
-                "paFanDisabled": {
-                  "type": "bool",
-                  "id": 15
-                },
-                "ignoreIncoming": {
-                  "rule": "repeated",
-                  "type": "uint32",
-                  "id": 103
-                },
-                "ignoreMqtt": {
-                  "type": "bool",
-                  "id": 104
-                },
-                "configOkToMqtt": {
-                  "type": "bool",
-                  "id": 105
-                }
-              },
-              "nested": {
-                "RegionCode": {
-                  "values": {
-                    "UNSET": 0,
-                    "US": 1,
-                    "EU_433": 2,
-                    "EU_868": 3,
-                    "CN": 4,
-                    "JP": 5,
-                    "ANZ": 6,
-                    "KR": 7,
-                    "TW": 8,
-                    "RU": 9,
-                    "IN": 10,
-                    "NZ_865": 11,
-                    "TH": 12,
-                    "LORA_24": 13,
-                    "UA_433": 14,
-                    "UA_868": 15,
-                    "MY_433": 16,
-                    "MY_919": 17,
-                    "SG_923": 18,
-                    "PH_433": 19,
-                    "PH_868": 20,
-                    "PH_915": 21,
-                    "ANZ_433": 22,
-                    "KZ_433": 23,
-                    "KZ_863": 24,
-                    "NP_865": 25,
-                    "BR_902": 26
-                  }
-                },
-                "ModemPreset": {
-                  "valuesOptions": {
-                    "VERY_LONG_SLOW": {
-                      "deprecated": true
-                    }
-                  },
-                  "values": {
-                    "LONG_FAST": 0,
-                    "LONG_SLOW": 1,
-                    "VERY_LONG_SLOW": 2,
-                    "MEDIUM_SLOW": 3,
-                    "MEDIUM_FAST": 4,
-                    "SHORT_SLOW": 5,
-                    "SHORT_FAST": 6,
-                    "LONG_MODERATE": 7,
-                    "SHORT_TURBO": 8
-                  }
-                }
-              }
-            },
-            "BluetoothConfig": {
-              "fields": {
-                "enabled": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "mode": {
-                  "type": "PairingMode",
-                  "id": 2
-                },
-                "fixedPin": {
-                  "type": "uint32",
-                  "id": 3
-                }
-              },
-              "nested": {
-                "PairingMode": {
-                  "values": {
-                    "RANDOM_PIN": 0,
-                    "FIXED_PIN": 1,
-                    "NO_PIN": 2
-                  }
-                }
-              }
-            },
-            "SecurityConfig": {
-              "fields": {
-                "publicKey": {
-                  "type": "bytes",
-                  "id": 1
-                },
-                "privateKey": {
-                  "type": "bytes",
-                  "id": 2
-                },
-                "adminKey": {
-                  "rule": "repeated",
-                  "type": "bytes",
-                  "id": 3
-                },
-                "isManaged": {
-                  "type": "bool",
-                  "id": 4
-                },
-                "serialEnabled": {
-                  "type": "bool",
-                  "id": 5
-                },
-                "debugLogApiEnabled": {
-                  "type": "bool",
-                  "id": 6
-                },
-                "adminChannelEnabled": {
-                  "type": "bool",
-                  "id": 8
-                }
-              }
-            },
-            "SessionkeyConfig": {
-              "fields": {}
-            }
-          }
-        },
-        "DeviceUIConfig": {
-          "fields": {
-            "version": {
-              "type": "uint32",
-              "id": 1
-            },
-            "screenBrightness": {
-              "type": "uint32",
-              "id": 2
-            },
-            "screenTimeout": {
-              "type": "uint32",
-              "id": 3
-            },
-            "screenLock": {
-              "type": "bool",
-              "id": 4
-            },
-            "settingsLock": {
-              "type": "bool",
-              "id": 5
-            },
-            "pinCode": {
-              "type": "uint32",
-              "id": 6
-            },
-            "theme": {
-              "type": "Theme",
-              "id": 7
-            },
-            "alertEnabled": {
-              "type": "bool",
-              "id": 8
-            },
-            "bannerEnabled": {
-              "type": "bool",
-              "id": 9
-            },
-            "ringToneId": {
-              "type": "uint32",
-              "id": 10
-            },
-            "language": {
-              "type": "Language",
-              "id": 11
-            },
-            "nodeFilter": {
-              "type": "NodeFilter",
-              "id": 12
-            },
-            "nodeHighlight": {
-              "type": "NodeHighlight",
-              "id": 13
-            },
-            "calibrationData": {
-              "type": "bytes",
-              "id": 14
-            },
-            "mapData": {
-              "type": "Map",
-              "id": 15
-            },
-            "compassMode": {
-              "type": "CompassMode",
-              "id": 16
-            },
-            "screenRgbColor": {
-              "type": "uint32",
-              "id": 17
-            },
-            "isClockfaceAnalog": {
-              "type": "bool",
-              "id": 18
-            }
-          }
-        },
-        "NodeFilter": {
-          "fields": {
-            "unknownSwitch": {
-              "type": "bool",
-              "id": 1
-            },
-            "offlineSwitch": {
-              "type": "bool",
-              "id": 2
-            },
-            "publicKeySwitch": {
-              "type": "bool",
-              "id": 3
-            },
-            "hopsAway": {
-              "type": "int32",
-              "id": 4
-            },
-            "positionSwitch": {
-              "type": "bool",
-              "id": 5
-            },
-            "nodeName": {
-              "type": "string",
-              "id": 6
-            },
-            "channel": {
-              "type": "int32",
-              "id": 7
-            }
-          }
-        },
-        "NodeHighlight": {
-          "fields": {
-            "chatSwitch": {
-              "type": "bool",
-              "id": 1
-            },
-            "positionSwitch": {
-              "type": "bool",
-              "id": 2
-            },
-            "telemetrySwitch": {
-              "type": "bool",
-              "id": 3
-            },
-            "iaqSwitch": {
-              "type": "bool",
-              "id": 4
-            },
-            "nodeName": {
-              "type": "string",
-              "id": 5
-            }
-          }
-        },
-        "GeoPoint": {
-          "fields": {
-            "zoom": {
-              "type": "int32",
-              "id": 1
-            },
-            "latitude": {
-              "type": "int32",
-              "id": 2
-            },
-            "longitude": {
-              "type": "int32",
-              "id": 3
-            }
-          }
-        },
-        "Map": {
-          "fields": {
-            "home": {
-              "type": "GeoPoint",
-              "id": 1
-            },
-            "style": {
-              "type": "string",
-              "id": 2
-            },
-            "followGps": {
-              "type": "bool",
-              "id": 3
-            }
-          }
-        },
-        "CompassMode": {
-          "values": {
-            "DYNAMIC": 0,
-            "FIXED_RING": 1,
-            "FREEZE_HEADING": 2
-          }
-        },
-        "Theme": {
-          "values": {
-            "DARK": 0,
-            "LIGHT": 1,
-            "RED": 2
-          }
-        },
-        "Language": {
-          "values": {
-            "ENGLISH": 0,
-            "FRENCH": 1,
-            "GERMAN": 2,
-            "ITALIAN": 3,
-            "PORTUGUESE": 4,
-            "SPANISH": 5,
-            "SWEDISH": 6,
-            "FINNISH": 7,
-            "POLISH": 8,
-            "TURKISH": 9,
-            "SERBIAN": 10,
-            "RUSSIAN": 11,
-            "DUTCH": 12,
-            "GREEK": 13,
-            "NORWEGIAN": 14,
-            "SLOVENIAN": 15,
-            "UKRAINIAN": 16,
-            "BULGARIAN": 17,
-            "SIMPLIFIED_CHINESE": 30,
-            "TRADITIONAL_CHINESE": 31
-          }
-        },
-        "DeviceConnectionStatus": {
-          "oneofs": {
-            "_wifi": {
-              "oneof": [
-                "wifi"
-              ]
-            },
-            "_ethernet": {
-              "oneof": [
-                "ethernet"
-              ]
-            },
-            "_bluetooth": {
-              "oneof": [
-                "bluetooth"
-              ]
-            },
-            "_serial": {
-              "oneof": [
-                "serial"
-              ]
-            }
-          },
-          "fields": {
-            "wifi": {
-              "type": "WifiConnectionStatus",
-              "id": 1,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "ethernet": {
-              "type": "EthernetConnectionStatus",
-              "id": 2,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "bluetooth": {
-              "type": "BluetoothConnectionStatus",
-              "id": 3,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "serial": {
-              "type": "SerialConnectionStatus",
-              "id": 4,
-              "options": {
-                "proto3_optional": true
-              }
-            }
-          }
-        },
-        "WifiConnectionStatus": {
-          "fields": {
-            "status": {
-              "type": "NetworkConnectionStatus",
-              "id": 1
-            },
-            "ssid": {
-              "type": "string",
-              "id": 2
-            },
-            "rssi": {
-              "type": "int32",
-              "id": 3
-            }
-          }
-        },
-        "EthernetConnectionStatus": {
-          "fields": {
-            "status": {
-              "type": "NetworkConnectionStatus",
-              "id": 1
-            }
-          }
-        },
-        "NetworkConnectionStatus": {
-          "fields": {
-            "ipAddress": {
-              "type": "fixed32",
-              "id": 1
-            },
-            "isConnected": {
-              "type": "bool",
-              "id": 2
-            },
-            "isMqttConnected": {
-              "type": "bool",
-              "id": 3
-            },
-            "isSyslogConnected": {
-              "type": "bool",
-              "id": 4
-            }
-          }
-        },
-        "BluetoothConnectionStatus": {
-          "fields": {
-            "pin": {
-              "type": "uint32",
-              "id": 1
-            },
-            "rssi": {
-              "type": "int32",
-              "id": 2
-            },
-            "isConnected": {
-              "type": "bool",
-              "id": 3
-            }
-          }
-        },
-        "SerialConnectionStatus": {
-          "fields": {
-            "baud": {
-              "type": "uint32",
-              "id": 1
-            },
-            "isConnected": {
-              "type": "bool",
-              "id": 2
-            }
-          }
-        },
         "Position": {
           "oneofs": {
             "_latitudeI": {
@@ -1806,15 +285,21 @@
             "LINK_32": 98,
             "SEEED_WIO_TRACKER_L1": 99,
             "SEEED_WIO_TRACKER_L1_EINK": 100,
-            "QWANTZ_TINY_ARMS": 101,
+            "MUZI_R1_NEO": 101,
             "T_DECK_PRO": 102,
             "T_LORA_PAGER": 103,
-            "GAT562_MESH_TRIAL_TRACKER": 104,
+            "M5STACK_RESERVED": 104,
             "WISMESH_TAG": 105,
             "RAK3312": 106,
             "THINKNODE_M5": 107,
             "HELTEC_MESH_SOLAR": 108,
             "T_ECHO_LITE": 109,
+            "HELTEC_V4": 110,
+            "M5STACK_C6L": 111,
+            "M5STACK_CARDPUTER_ADV": 112,
+            "HELTEC_WIRELESS_TRACKER_V2": 113,
+            "T_WATCH_ULTRA": 114,
+            "THINKNODE_M3": 115,
             "PRIVATE_HW": 255
           }
         },
@@ -1828,19 +313,23 @@
           },
           "fields": {
             "id": {
-              "type": "string",
+              "type": "bytes",
+              "_orig_type": "string",
               "id": 1
             },
             "longName": {
-              "type": "string",
+              "type": "bytes",
+              "_orig_type": "string",
               "id": 2
             },
             "shortName": {
-              "type": "string",
+              "type": "bytes",
+              "_orig_type": "string",
               "id": 3
             },
             "macaddr": {
               "type": "bytes",
+              "_orig_type": "string",
               "id": 4,
               "options": {
                 "deprecated": true
@@ -2074,7 +563,8 @@
           },
           "fields": {
             "topic": {
-              "type": "string",
+              "type": "bytes",
+              "_orig_type": "string",
               "id": 1
             },
             "data": {
@@ -2082,7 +572,8 @@
               "id": 2
             },
             "text": {
-              "type": "string",
+              "type": "bytes",
+              "_orig_type": "string",
               "id": 3
             },
             "retained": {
@@ -2357,7 +848,8 @@
         "LogRecord": {
           "fields": {
             "message": {
-              "type": "string",
+              "type": "bytes",
+              "_orig_type": "string",
               "id": 1
             },
             "time": {
@@ -2869,6 +1361,964 @@
             }
           }
         },
+        "ChannelSettings": {
+          "fields": {
+            "channelNum": {
+              "type": "uint32",
+              "id": 1,
+              "options": {
+                "deprecated": true
+              }
+            },
+            "psk": {
+              "type": "bytes",
+              "id": 2
+            },
+            "name": {
+              "type": "string",
+              "id": 3
+            },
+            "id": {
+              "type": "fixed32",
+              "id": 4
+            },
+            "uplinkEnabled": {
+              "type": "bool",
+              "id": 5
+            },
+            "downlinkEnabled": {
+              "type": "bool",
+              "id": 6
+            },
+            "moduleSettings": {
+              "type": "ModuleSettings",
+              "id": 7
+            }
+          }
+        },
+        "ModuleSettings": {
+          "fields": {
+            "positionPrecision": {
+              "type": "uint32",
+              "id": 1
+            },
+            "isMuted": {
+              "type": "bool",
+              "id": 2
+            }
+          }
+        },
+        "Channel": {
+          "fields": {
+            "index": {
+              "type": "int32",
+              "id": 1
+            },
+            "settings": {
+              "type": "ChannelSettings",
+              "id": 2
+            },
+            "role": {
+              "type": "Role",
+              "id": 3
+            }
+          },
+          "nested": {
+            "Role": {
+              "values": {
+                "DISABLED": 0,
+                "PRIMARY": 1,
+                "SECONDARY": 2
+              }
+            }
+          }
+        },
+        "Config": {
+          "oneofs": {
+            "payloadVariant": {
+              "oneof": [
+                "device",
+                "position",
+                "power",
+                "network",
+                "display",
+                "lora",
+                "bluetooth",
+                "security",
+                "sessionkey",
+                "deviceUi"
+              ]
+            }
+          },
+          "fields": {
+            "device": {
+              "type": "DeviceConfig",
+              "id": 1
+            },
+            "position": {
+              "type": "PositionConfig",
+              "id": 2
+            },
+            "power": {
+              "type": "PowerConfig",
+              "id": 3
+            },
+            "network": {
+              "type": "NetworkConfig",
+              "id": 4
+            },
+            "display": {
+              "type": "DisplayConfig",
+              "id": 5
+            },
+            "lora": {
+              "type": "LoRaConfig",
+              "id": 6
+            },
+            "bluetooth": {
+              "type": "BluetoothConfig",
+              "id": 7
+            },
+            "security": {
+              "type": "SecurityConfig",
+              "id": 8
+            },
+            "sessionkey": {
+              "type": "SessionkeyConfig",
+              "id": 9
+            },
+            "deviceUi": {
+              "type": "DeviceUIConfig",
+              "id": 10
+            }
+          },
+          "nested": {
+            "DeviceConfig": {
+              "fields": {
+                "role": {
+                  "type": "Role",
+                  "id": 1
+                },
+                "serialEnabled": {
+                  "type": "bool",
+                  "id": 2,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "buttonGpio": {
+                  "type": "uint32",
+                  "id": 4
+                },
+                "buzzerGpio": {
+                  "type": "uint32",
+                  "id": 5
+                },
+                "rebroadcastMode": {
+                  "type": "RebroadcastMode",
+                  "id": 6
+                },
+                "nodeInfoBroadcastSecs": {
+                  "type": "uint32",
+                  "id": 7
+                },
+                "doubleTapAsButtonPress": {
+                  "type": "bool",
+                  "id": 8
+                },
+                "isManaged": {
+                  "type": "bool",
+                  "id": 9,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "disableTripleClick": {
+                  "type": "bool",
+                  "id": 10
+                },
+                "tzdef": {
+                  "type": "string",
+                  "id": 11
+                },
+                "ledHeartbeatDisabled": {
+                  "type": "bool",
+                  "id": 12
+                },
+                "buzzerMode": {
+                  "type": "BuzzerMode",
+                  "id": 13
+                }
+              },
+              "nested": {
+                "Role": {
+                  "valuesOptions": {
+                    "ROUTER_CLIENT": {
+                      "deprecated": true
+                    },
+                    "REPEATER": {
+                      "deprecated": true
+                    }
+                  },
+                  "values": {
+                    "CLIENT": 0,
+                    "CLIENT_MUTE": 1,
+                    "ROUTER": 2,
+                    "ROUTER_CLIENT": 3,
+                    "REPEATER": 4,
+                    "TRACKER": 5,
+                    "SENSOR": 6,
+                    "TAK": 7,
+                    "CLIENT_HIDDEN": 8,
+                    "LOST_AND_FOUND": 9,
+                    "TAK_TRACKER": 10,
+                    "ROUTER_LATE": 11,
+                    "CLIENT_BASE": 12
+                  }
+                },
+                "RebroadcastMode": {
+                  "values": {
+                    "ALL": 0,
+                    "ALL_SKIP_DECODING": 1,
+                    "LOCAL_ONLY": 2,
+                    "KNOWN_ONLY": 3,
+                    "NONE": 4,
+                    "CORE_PORTNUMS_ONLY": 5
+                  }
+                },
+                "BuzzerMode": {
+                  "values": {
+                    "ALL_ENABLED": 0,
+                    "DISABLED": 1,
+                    "NOTIFICATIONS_ONLY": 2,
+                    "SYSTEM_ONLY": 3,
+                    "DIRECT_MSG_ONLY": 4
+                  }
+                }
+              }
+            },
+            "PositionConfig": {
+              "fields": {
+                "positionBroadcastSecs": {
+                  "type": "uint32",
+                  "id": 1
+                },
+                "positionBroadcastSmartEnabled": {
+                  "type": "bool",
+                  "id": 2
+                },
+                "fixedPosition": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "gpsEnabled": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "gpsUpdateInterval": {
+                  "type": "uint32",
+                  "id": 5
+                },
+                "gpsAttemptTime": {
+                  "type": "uint32",
+                  "id": 6,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "positionFlags": {
+                  "type": "uint32",
+                  "id": 7
+                },
+                "rxGpio": {
+                  "type": "uint32",
+                  "id": 8
+                },
+                "txGpio": {
+                  "type": "uint32",
+                  "id": 9
+                },
+                "broadcastSmartMinimumDistance": {
+                  "type": "uint32",
+                  "id": 10
+                },
+                "broadcastSmartMinimumIntervalSecs": {
+                  "type": "uint32",
+                  "id": 11
+                },
+                "gpsEnGpio": {
+                  "type": "uint32",
+                  "id": 12
+                },
+                "gpsMode": {
+                  "type": "GpsMode",
+                  "id": 13
+                }
+              },
+              "nested": {
+                "PositionFlags": {
+                  "values": {
+                    "UNSET": 0,
+                    "ALTITUDE": 1,
+                    "ALTITUDE_MSL": 2,
+                    "GEOIDAL_SEPARATION": 4,
+                    "DOP": 8,
+                    "HVDOP": 16,
+                    "SATINVIEW": 32,
+                    "SEQ_NO": 64,
+                    "TIMESTAMP": 128,
+                    "HEADING": 256,
+                    "SPEED": 512
+                  }
+                },
+                "GpsMode": {
+                  "values": {
+                    "DISABLED": 0,
+                    "ENABLED": 1,
+                    "NOT_PRESENT": 2
+                  }
+                }
+              }
+            },
+            "PowerConfig": {
+              "fields": {
+                "isPowerSaving": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "onBatteryShutdownAfterSecs": {
+                  "type": "uint32",
+                  "id": 2
+                },
+                "adcMultiplierOverride": {
+                  "type": "float",
+                  "id": 3
+                },
+                "waitBluetoothSecs": {
+                  "type": "uint32",
+                  "id": 4
+                },
+                "sdsSecs": {
+                  "type": "uint32",
+                  "id": 6
+                },
+                "lsSecs": {
+                  "type": "uint32",
+                  "id": 7
+                },
+                "minWakeSecs": {
+                  "type": "uint32",
+                  "id": 8
+                },
+                "deviceBatteryInaAddress": {
+                  "type": "uint32",
+                  "id": 9
+                },
+                "powermonEnables": {
+                  "type": "uint64",
+                  "id": 32
+                }
+              }
+            },
+            "NetworkConfig": {
+              "fields": {
+                "wifiEnabled": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "wifiSsid": {
+                  "type": "string",
+                  "id": 3
+                },
+                "wifiPsk": {
+                  "type": "string",
+                  "id": 4
+                },
+                "ntpServer": {
+                  "type": "string",
+                  "id": 5
+                },
+                "ethEnabled": {
+                  "type": "bool",
+                  "id": 6
+                },
+                "addressMode": {
+                  "type": "AddressMode",
+                  "id": 7
+                },
+                "ipv4Config": {
+                  "type": "IpV4Config",
+                  "id": 8
+                },
+                "rsyslogServer": {
+                  "type": "string",
+                  "id": 9
+                },
+                "enabledProtocols": {
+                  "type": "uint32",
+                  "id": 10
+                },
+                "ipv6Enabled": {
+                  "type": "bool",
+                  "id": 11
+                }
+              },
+              "nested": {
+                "AddressMode": {
+                  "values": {
+                    "DHCP": 0,
+                    "STATIC": 1
+                  }
+                },
+                "IpV4Config": {
+                  "fields": {
+                    "ip": {
+                      "type": "fixed32",
+                      "id": 1
+                    },
+                    "gateway": {
+                      "type": "fixed32",
+                      "id": 2
+                    },
+                    "subnet": {
+                      "type": "fixed32",
+                      "id": 3
+                    },
+                    "dns": {
+                      "type": "fixed32",
+                      "id": 4
+                    }
+                  }
+                },
+                "ProtocolFlags": {
+                  "values": {
+                    "NO_BROADCAST": 0,
+                    "UDP_BROADCAST": 1
+                  }
+                }
+              }
+            },
+            "DisplayConfig": {
+              "fields": {
+                "screenOnSecs": {
+                  "type": "uint32",
+                  "id": 1
+                },
+                "gpsFormat": {
+                  "type": "DeprecatedGpsCoordinateFormat",
+                  "id": 2,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "autoScreenCarouselSecs": {
+                  "type": "uint32",
+                  "id": 3
+                },
+                "compassNorthTop": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "flipScreen": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "units": {
+                  "type": "DisplayUnits",
+                  "id": 6
+                },
+                "oled": {
+                  "type": "OledType",
+                  "id": 7
+                },
+                "displaymode": {
+                  "type": "DisplayMode",
+                  "id": 8
+                },
+                "headingBold": {
+                  "type": "bool",
+                  "id": 9
+                },
+                "wakeOnTapOrMotion": {
+                  "type": "bool",
+                  "id": 10
+                },
+                "compassOrientation": {
+                  "type": "CompassOrientation",
+                  "id": 11
+                },
+                "use_12hClock": {
+                  "type": "bool",
+                  "id": 12
+                },
+                "useLongNodeName": {
+                  "type": "bool",
+                  "id": 13
+                }
+              },
+              "nested": {
+                "DeprecatedGpsCoordinateFormat": {
+                  "values": {
+                    "UNUSED": 0
+                  }
+                },
+                "DisplayUnits": {
+                  "values": {
+                    "METRIC": 0,
+                    "IMPERIAL": 1
+                  }
+                },
+                "OledType": {
+                  "values": {
+                    "OLED_AUTO": 0,
+                    "OLED_SSD1306": 1,
+                    "OLED_SH1106": 2,
+                    "OLED_SH1107": 3,
+                    "OLED_SH1107_128_128": 4
+                  }
+                },
+                "DisplayMode": {
+                  "values": {
+                    "DEFAULT": 0,
+                    "TWOCOLOR": 1,
+                    "INVERTED": 2,
+                    "COLOR": 3
+                  }
+                },
+                "CompassOrientation": {
+                  "values": {
+                    "DEGREES_0": 0,
+                    "DEGREES_90": 1,
+                    "DEGREES_180": 2,
+                    "DEGREES_270": 3,
+                    "DEGREES_0_INVERTED": 4,
+                    "DEGREES_90_INVERTED": 5,
+                    "DEGREES_180_INVERTED": 6,
+                    "DEGREES_270_INVERTED": 7
+                  }
+                }
+              }
+            },
+            "LoRaConfig": {
+              "fields": {
+                "usePreset": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "modemPreset": {
+                  "type": "ModemPreset",
+                  "id": 2
+                },
+                "bandwidth": {
+                  "type": "uint32",
+                  "id": 3
+                },
+                "spreadFactor": {
+                  "type": "uint32",
+                  "id": 4
+                },
+                "codingRate": {
+                  "type": "uint32",
+                  "id": 5
+                },
+                "frequencyOffset": {
+                  "type": "float",
+                  "id": 6
+                },
+                "region": {
+                  "type": "RegionCode",
+                  "id": 7
+                },
+                "hopLimit": {
+                  "type": "uint32",
+                  "id": 8
+                },
+                "txEnabled": {
+                  "type": "bool",
+                  "id": 9
+                },
+                "txPower": {
+                  "type": "int32",
+                  "id": 10
+                },
+                "channelNum": {
+                  "type": "uint32",
+                  "id": 11
+                },
+                "overrideDutyCycle": {
+                  "type": "bool",
+                  "id": 12
+                },
+                "sx126xRxBoostedGain": {
+                  "type": "bool",
+                  "id": 13
+                },
+                "overrideFrequency": {
+                  "type": "float",
+                  "id": 14
+                },
+                "paFanDisabled": {
+                  "type": "bool",
+                  "id": 15
+                },
+                "ignoreIncoming": {
+                  "rule": "repeated",
+                  "type": "uint32",
+                  "id": 103
+                },
+                "ignoreMqtt": {
+                  "type": "bool",
+                  "id": 104
+                },
+                "configOkToMqtt": {
+                  "type": "bool",
+                  "id": 105
+                }
+              },
+              "nested": {
+                "RegionCode": {
+                  "values": {
+                    "UNSET": 0,
+                    "US": 1,
+                    "EU_433": 2,
+                    "EU_868": 3,
+                    "CN": 4,
+                    "JP": 5,
+                    "ANZ": 6,
+                    "KR": 7,
+                    "TW": 8,
+                    "RU": 9,
+                    "IN": 10,
+                    "NZ_865": 11,
+                    "TH": 12,
+                    "LORA_24": 13,
+                    "UA_433": 14,
+                    "UA_868": 15,
+                    "MY_433": 16,
+                    "MY_919": 17,
+                    "SG_923": 18,
+                    "PH_433": 19,
+                    "PH_868": 20,
+                    "PH_915": 21,
+                    "ANZ_433": 22,
+                    "KZ_433": 23,
+                    "KZ_863": 24,
+                    "NP_865": 25,
+                    "BR_902": 26
+                  }
+                },
+                "ModemPreset": {
+                  "valuesOptions": {
+                    "VERY_LONG_SLOW": {
+                      "deprecated": true
+                    }
+                  },
+                  "values": {
+                    "LONG_FAST": 0,
+                    "LONG_SLOW": 1,
+                    "VERY_LONG_SLOW": 2,
+                    "MEDIUM_SLOW": 3,
+                    "MEDIUM_FAST": 4,
+                    "SHORT_SLOW": 5,
+                    "SHORT_FAST": 6,
+                    "LONG_MODERATE": 7,
+                    "SHORT_TURBO": 8
+                  }
+                }
+              }
+            },
+            "BluetoothConfig": {
+              "fields": {
+                "enabled": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "mode": {
+                  "type": "PairingMode",
+                  "id": 2
+                },
+                "fixedPin": {
+                  "type": "uint32",
+                  "id": 3
+                }
+              },
+              "nested": {
+                "PairingMode": {
+                  "values": {
+                    "RANDOM_PIN": 0,
+                    "FIXED_PIN": 1,
+                    "NO_PIN": 2
+                  }
+                }
+              }
+            },
+            "SecurityConfig": {
+              "fields": {
+                "publicKey": {
+                  "type": "bytes",
+                  "id": 1
+                },
+                "privateKey": {
+                  "type": "bytes",
+                  "id": 2
+                },
+                "adminKey": {
+                  "rule": "repeated",
+                  "type": "bytes",
+                  "id": 3
+                },
+                "isManaged": {
+                  "type": "bool",
+                  "id": 4
+                },
+                "serialEnabled": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "debugLogApiEnabled": {
+                  "type": "bool",
+                  "id": 6
+                },
+                "adminChannelEnabled": {
+                  "type": "bool",
+                  "id": 8
+                }
+              }
+            },
+            "SessionkeyConfig": {
+              "fields": {}
+            }
+          }
+        },
+        "DeviceUIConfig": {
+          "fields": {
+            "version": {
+              "type": "uint32",
+              "id": 1
+            },
+            "screenBrightness": {
+              "type": "uint32",
+              "id": 2
+            },
+            "screenTimeout": {
+              "type": "uint32",
+              "id": 3
+            },
+            "screenLock": {
+              "type": "bool",
+              "id": 4
+            },
+            "settingsLock": {
+              "type": "bool",
+              "id": 5
+            },
+            "pinCode": {
+              "type": "uint32",
+              "id": 6
+            },
+            "theme": {
+              "type": "Theme",
+              "id": 7
+            },
+            "alertEnabled": {
+              "type": "bool",
+              "id": 8
+            },
+            "bannerEnabled": {
+              "type": "bool",
+              "id": 9
+            },
+            "ringToneId": {
+              "type": "uint32",
+              "id": 10
+            },
+            "language": {
+              "type": "Language",
+              "id": 11
+            },
+            "nodeFilter": {
+              "type": "NodeFilter",
+              "id": 12
+            },
+            "nodeHighlight": {
+              "type": "NodeHighlight",
+              "id": 13
+            },
+            "calibrationData": {
+              "type": "bytes",
+              "id": 14
+            },
+            "mapData": {
+              "type": "Map",
+              "id": 15
+            },
+            "compassMode": {
+              "type": "CompassMode",
+              "id": 16
+            },
+            "screenRgbColor": {
+              "type": "uint32",
+              "id": 17
+            },
+            "isClockfaceAnalog": {
+              "type": "bool",
+              "id": 18
+            },
+            "gpsFormat": {
+              "type": "GpsCoordinateFormat",
+              "id": 19
+            }
+          },
+          "nested": {
+            "GpsCoordinateFormat": {
+              "values": {
+                "DEC": 0,
+                "DMS": 1,
+                "UTM": 2,
+                "MGRS": 3,
+                "OLC": 4,
+                "OSGR": 5,
+                "MLS": 6
+              }
+            }
+          }
+        },
+        "NodeFilter": {
+          "fields": {
+            "unknownSwitch": {
+              "type": "bool",
+              "id": 1
+            },
+            "offlineSwitch": {
+              "type": "bool",
+              "id": 2
+            },
+            "publicKeySwitch": {
+              "type": "bool",
+              "id": 3
+            },
+            "hopsAway": {
+              "type": "int32",
+              "id": 4
+            },
+            "positionSwitch": {
+              "type": "bool",
+              "id": 5
+            },
+            "nodeName": {
+              "type": "bytes",
+              "_orig_type": "string",
+              "id": 6
+            },
+            "channel": {
+              "type": "int32",
+              "id": 7
+            }
+          }
+        },
+        "NodeHighlight": {
+          "fields": {
+            "chatSwitch": {
+              "type": "bool",
+              "id": 1
+            },
+            "positionSwitch": {
+              "type": "bool",
+              "id": 2
+            },
+            "telemetrySwitch": {
+              "type": "bool",
+              "id": 3
+            },
+            "iaqSwitch": {
+              "type": "bool",
+              "id": 4
+            },
+            "nodeName": {
+              "type": "bytes",
+              "_orig_type": "string",
+              "id": 5
+            }
+          }
+        },
+        "GeoPoint": {
+          "fields": {
+            "zoom": {
+              "type": "int32",
+              "id": 1
+            },
+            "latitude": {
+              "type": "int32",
+              "id": 2
+            },
+            "longitude": {
+              "type": "int32",
+              "id": 3
+            }
+          }
+        },
+        "Map": {
+          "fields": {
+            "home": {
+              "type": "GeoPoint",
+              "id": 1
+            },
+            "style": {
+              "type": "string",
+              "id": 2
+            },
+            "followGps": {
+              "type": "bool",
+              "id": 3
+            }
+          }
+        },
+        "CompassMode": {
+          "values": {
+            "DYNAMIC": 0,
+            "FIXED_RING": 1,
+            "FREEZE_HEADING": 2
+          }
+        },
+        "Theme": {
+          "values": {
+            "DARK": 0,
+            "LIGHT": 1,
+            "RED": 2
+          }
+        },
+        "Language": {
+          "values": {
+            "ENGLISH": 0,
+            "FRENCH": 1,
+            "GERMAN": 2,
+            "ITALIAN": 3,
+            "PORTUGUESE": 4,
+            "SPANISH": 5,
+            "SWEDISH": 6,
+            "FINNISH": 7,
+            "POLISH": 8,
+            "TURKISH": 9,
+            "SERBIAN": 10,
+            "RUSSIAN": 11,
+            "DUTCH": 12,
+            "GREEK": 13,
+            "NORWEGIAN": 14,
+            "SLOVENIAN": 15,
+            "UKRAINIAN": 16,
+            "BULGARIAN": 17,
+            "CZECH": 18,
+            "DANISH": 19,
+            "SIMPLIFIED_CHINESE": 30,
+            "TRADITIONAL_CHINESE": 31
+          }
+        },
         "ModuleConfig": {
           "oneofs": {
             "payloadVariant": {
@@ -2951,7 +2401,8 @@
                   "id": 1
                 },
                 "address": {
-                  "type": "string",
+                  "type": "bytes",
+                  "_orig_type": "string",
                   "id": 2
                 },
                 "username": {
@@ -3332,6 +2783,10 @@
                 "save": {
                   "type": "bool",
                   "id": 3
+                },
+                "clearOnReboot": {
+                  "type": "bool",
+                  "id": 4
                 }
               }
             },
@@ -3388,6 +2843,10 @@
                 "healthScreenEnabled": {
                   "type": "bool",
                   "id": 13
+                },
+                "deviceTelemetryEnabled": {
+                  "type": "bool",
+                  "id": 14
                 }
               }
             },
@@ -4437,6 +3896,10 @@
             "heapFreeBytes": {
               "type": "uint32",
               "id": 13
+            },
+            "numTxDropped": {
+              "type": "uint32",
+              "id": 14
             }
           }
         },
@@ -4643,7 +4106,8 @@
             "ADS1X15_ALT": 41,
             "SFA30": 42,
             "SEN5X": 43,
-            "TSL2561": 44
+            "TSL2561": 44,
+            "BH1750": 45
           }
         },
         "Nau7802Config": {
@@ -4688,2636 +4152,6 @@
                 "NAK": 21,
                 "CAN": 24,
                 "CTRLZ": 26
-              }
-            }
-          }
-        },
-        "ChannelSet": {
-          "fields": {
-            "settings": {
-              "rule": "repeated",
-              "type": "ChannelSettings",
-              "id": 1
-            },
-            "loraConfig": {
-              "type": "Config.LoRaConfig",
-              "id": 2
-            }
-          }
-        },
-        "TAKPacket": {
-          "oneofs": {
-            "payloadVariant": {
-              "oneof": [
-                "pli",
-                "chat",
-                "detail"
-              ]
-            }
-          },
-          "fields": {
-            "isCompressed": {
-              "type": "bool",
-              "id": 1
-            },
-            "contact": {
-              "type": "Contact",
-              "id": 2
-            },
-            "group": {
-              "type": "Group",
-              "id": 3
-            },
-            "status": {
-              "type": "Status",
-              "id": 4
-            },
-            "pli": {
-              "type": "PLI",
-              "id": 5
-            },
-            "chat": {
-              "type": "GeoChat",
-              "id": 6
-            },
-            "detail": {
-              "type": "bytes",
-              "id": 7
-            }
-          }
-        },
-        "GeoChat": {
-          "oneofs": {
-            "_to": {
-              "oneof": [
-                "to"
-              ]
-            },
-            "_toCallsign": {
-              "oneof": [
-                "toCallsign"
-              ]
-            }
-          },
-          "fields": {
-            "message": {
-              "type": "string",
-              "id": 1
-            },
-            "to": {
-              "type": "string",
-              "id": 2,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "toCallsign": {
-              "type": "string",
-              "id": 3,
-              "options": {
-                "proto3_optional": true
-              }
-            }
-          }
-        },
-        "Group": {
-          "fields": {
-            "role": {
-              "type": "MemberRole",
-              "id": 1
-            },
-            "team": {
-              "type": "Team",
-              "id": 2
-            }
-          }
-        },
-        "Team": {
-          "values": {
-            "Unspecifed_Color": 0,
-            "White": 1,
-            "Yellow": 2,
-            "Orange": 3,
-            "Magenta": 4,
-            "Red": 5,
-            "Maroon": 6,
-            "Purple": 7,
-            "Dark_Blue": 8,
-            "Blue": 9,
-            "Cyan": 10,
-            "Teal": 11,
-            "Green": 12,
-            "Dark_Green": 13,
-            "Brown": 14
-          }
-        },
-        "MemberRole": {
-          "values": {
-            "Unspecifed": 0,
-            "TeamMember": 1,
-            "TeamLead": 2,
-            "HQ": 3,
-            "Sniper": 4,
-            "Medic": 5,
-            "ForwardObserver": 6,
-            "RTO": 7,
-            "K9": 8
-          }
-        },
-        "Status": {
-          "fields": {
-            "battery": {
-              "type": "uint32",
-              "id": 1
-            }
-          }
-        },
-        "Contact": {
-          "fields": {
-            "callsign": {
-              "type": "string",
-              "id": 1
-            },
-            "deviceCallsign": {
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
-        "PLI": {
-          "fields": {
-            "latitudeI": {
-              "type": "sfixed32",
-              "id": 1
-            },
-            "longitudeI": {
-              "type": "sfixed32",
-              "id": 2
-            },
-            "altitude": {
-              "type": "int32",
-              "id": 3
-            },
-            "speed": {
-              "type": "uint32",
-              "id": 4
-            },
-            "course": {
-              "type": "uint32",
-              "id": 5
-            }
-          }
-        },
-        "CannedMessageModuleConfig": {
-          "fields": {
-            "messages": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
-        "DeviceProfile": {
-          "oneofs": {
-            "_longName": {
-              "oneof": [
-                "longName"
-              ]
-            },
-            "_shortName": {
-              "oneof": [
-                "shortName"
-              ]
-            },
-            "_channelUrl": {
-              "oneof": [
-                "channelUrl"
-              ]
-            },
-            "_config": {
-              "oneof": [
-                "config"
-              ]
-            },
-            "_moduleConfig": {
-              "oneof": [
-                "moduleConfig"
-              ]
-            },
-            "_fixedPosition": {
-              "oneof": [
-                "fixedPosition"
-              ]
-            },
-            "_ringtone": {
-              "oneof": [
-                "ringtone"
-              ]
-            },
-            "_cannedMessages": {
-              "oneof": [
-                "cannedMessages"
-              ]
-            }
-          },
-          "fields": {
-            "longName": {
-              "type": "string",
-              "id": 1,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "shortName": {
-              "type": "string",
-              "id": 2,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "channelUrl": {
-              "type": "string",
-              "id": 3,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "config": {
-              "type": "LocalConfig",
-              "id": 4,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "moduleConfig": {
-              "type": "LocalModuleConfig",
-              "id": 5,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "fixedPosition": {
-              "type": "Position",
-              "id": 6,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "ringtone": {
-              "type": "string",
-              "id": 7,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "cannedMessages": {
-              "type": "string",
-              "id": 8,
-              "options": {
-                "proto3_optional": true
-              }
-            }
-          }
-        },
-        "LocalConfig": {
-          "fields": {
-            "device": {
-              "type": "Config.DeviceConfig",
-              "id": 1
-            },
-            "position": {
-              "type": "Config.PositionConfig",
-              "id": 2
-            },
-            "power": {
-              "type": "Config.PowerConfig",
-              "id": 3
-            },
-            "network": {
-              "type": "Config.NetworkConfig",
-              "id": 4
-            },
-            "display": {
-              "type": "Config.DisplayConfig",
-              "id": 5
-            },
-            "lora": {
-              "type": "Config.LoRaConfig",
-              "id": 6
-            },
-            "bluetooth": {
-              "type": "Config.BluetoothConfig",
-              "id": 7
-            },
-            "version": {
-              "type": "uint32",
-              "id": 8
-            },
-            "security": {
-              "type": "Config.SecurityConfig",
-              "id": 9
-            }
-          }
-        },
-        "LocalModuleConfig": {
-          "fields": {
-            "mqtt": {
-              "type": "ModuleConfig.MQTTConfig",
-              "id": 1
-            },
-            "serial": {
-              "type": "ModuleConfig.SerialConfig",
-              "id": 2
-            },
-            "externalNotification": {
-              "type": "ModuleConfig.ExternalNotificationConfig",
-              "id": 3
-            },
-            "storeForward": {
-              "type": "ModuleConfig.StoreForwardConfig",
-              "id": 4
-            },
-            "rangeTest": {
-              "type": "ModuleConfig.RangeTestConfig",
-              "id": 5
-            },
-            "telemetry": {
-              "type": "ModuleConfig.TelemetryConfig",
-              "id": 6
-            },
-            "cannedMessage": {
-              "type": "ModuleConfig.CannedMessageConfig",
-              "id": 7
-            },
-            "audio": {
-              "type": "ModuleConfig.AudioConfig",
-              "id": 9
-            },
-            "remoteHardware": {
-              "type": "ModuleConfig.RemoteHardwareConfig",
-              "id": 10
-            },
-            "neighborInfo": {
-              "type": "ModuleConfig.NeighborInfoConfig",
-              "id": 11
-            },
-            "ambientLighting": {
-              "type": "ModuleConfig.AmbientLightingConfig",
-              "id": 12
-            },
-            "detectionSensor": {
-              "type": "ModuleConfig.DetectionSensorConfig",
-              "id": 13
-            },
-            "paxcounter": {
-              "type": "ModuleConfig.PaxcounterConfig",
-              "id": 14
-            },
-            "version": {
-              "type": "uint32",
-              "id": 8
-            }
-          }
-        },
-        "PositionLite": {
-          "fields": {
-            "latitudeI": {
-              "type": "sfixed32",
-              "id": 1
-            },
-            "longitudeI": {
-              "type": "sfixed32",
-              "id": 2
-            },
-            "altitude": {
-              "type": "int32",
-              "id": 3
-            },
-            "time": {
-              "type": "fixed32",
-              "id": 4
-            },
-            "locationSource": {
-              "type": "Position.LocSource",
-              "id": 5
-            }
-          }
-        },
-        "UserLite": {
-          "oneofs": {
-            "_isUnmessagable": {
-              "oneof": [
-                "isUnmessagable"
-              ]
-            }
-          },
-          "fields": {
-            "macaddr": {
-              "type": "bytes",
-              "id": 1,
-              "options": {
-                "deprecated": true
-              }
-            },
-            "longName": {
-              "type": "string",
-              "id": 2
-            },
-            "shortName": {
-              "type": "string",
-              "id": 3
-            },
-            "hwModel": {
-              "type": "HardwareModel",
-              "id": 4
-            },
-            "isLicensed": {
-              "type": "bool",
-              "id": 5
-            },
-            "role": {
-              "type": "Config.DeviceConfig.Role",
-              "id": 6
-            },
-            "publicKey": {
-              "type": "bytes",
-              "id": 7
-            },
-            "isUnmessagable": {
-              "type": "bool",
-              "id": 9,
-              "options": {
-                "proto3_optional": true
-              }
-            }
-          }
-        },
-        "NodeInfoLite": {
-          "oneofs": {
-            "_hopsAway": {
-              "oneof": [
-                "hopsAway"
-              ]
-            }
-          },
-          "fields": {
-            "num": {
-              "type": "uint32",
-              "id": 1
-            },
-            "user": {
-              "type": "UserLite",
-              "id": 2
-            },
-            "position": {
-              "type": "PositionLite",
-              "id": 3
-            },
-            "snr": {
-              "type": "float",
-              "id": 4
-            },
-            "lastHeard": {
-              "type": "fixed32",
-              "id": 5
-            },
-            "deviceMetrics": {
-              "type": "DeviceMetrics",
-              "id": 6
-            },
-            "channel": {
-              "type": "uint32",
-              "id": 7
-            },
-            "viaMqtt": {
-              "type": "bool",
-              "id": 8
-            },
-            "hopsAway": {
-              "type": "uint32",
-              "id": 9,
-              "options": {
-                "proto3_optional": true
-              }
-            },
-            "isFavorite": {
-              "type": "bool",
-              "id": 10
-            },
-            "isIgnored": {
-              "type": "bool",
-              "id": 11
-            },
-            "nextHop": {
-              "type": "uint32",
-              "id": 12
-            },
-            "bitfield": {
-              "type": "uint32",
-              "id": 13
-            }
-          }
-        },
-        "DeviceState": {
-          "fields": {
-            "myNode": {
-              "type": "MyNodeInfo",
-              "id": 2
-            },
-            "owner": {
-              "type": "User",
-              "id": 3
-            },
-            "receiveQueue": {
-              "rule": "repeated",
-              "type": "MeshPacket",
-              "id": 5
-            },
-            "version": {
-              "type": "uint32",
-              "id": 8
-            },
-            "rxTextMessage": {
-              "type": "MeshPacket",
-              "id": 7
-            },
-            "noSave": {
-              "type": "bool",
-              "id": 9,
-              "options": {
-                "deprecated": true
-              }
-            },
-            "didGpsReset": {
-              "type": "bool",
-              "id": 11,
-              "options": {
-                "deprecated": true
-              }
-            },
-            "rxWaypoint": {
-              "type": "MeshPacket",
-              "id": 12
-            },
-            "nodeRemoteHardwarePins": {
-              "rule": "repeated",
-              "type": "NodeRemoteHardwarePin",
-              "id": 13
-            }
-          }
-        },
-        "NodeDatabase": {
-          "fields": {
-            "version": {
-              "type": "uint32",
-              "id": 1
-            },
-            "nodes": {
-              "rule": "repeated",
-              "type": "NodeInfoLite",
-              "id": 2,
-              "options": {
-                "(nanopb).callback_datatype": "std::vector<meshtastic_NodeInfoLite>"
-              }
-            }
-          }
-        },
-        "ChannelFile": {
-          "fields": {
-            "channels": {
-              "rule": "repeated",
-              "type": "Channel",
-              "id": 1
-            },
-            "version": {
-              "type": "uint32",
-              "id": 2
-            }
-          }
-        },
-        "BackupPreferences": {
-          "fields": {
-            "version": {
-              "type": "uint32",
-              "id": 1
-            },
-            "timestamp": {
-              "type": "fixed32",
-              "id": 2
-            },
-            "config": {
-              "type": "LocalConfig",
-              "id": 3
-            },
-            "moduleConfig": {
-              "type": "LocalModuleConfig",
-              "id": 4
-            },
-            "channels": {
-              "type": "ChannelFile",
-              "id": 5
-            },
-            "owner": {
-              "type": "User",
-              "id": 6
-            }
-          }
-        },
-        "MessageType": {
-          "values": {
-            "ACK": 0,
-            "COLLECT_INTERVAL": 160,
-            "BEEP_ON": 161,
-            "BEEP_OFF": 162,
-            "SHUTDOWN": 163,
-            "POWER_ON": 164,
-            "SCD41_TEMP": 176,
-            "SCD41_HUMIDITY": 177,
-            "SCD41_CO2": 178,
-            "AHT20_TEMP": 179,
-            "AHT20_HUMIDITY": 180,
-            "TVOC_INDEX": 181
-          }
-        },
-        "SensorData": {
-          "oneofs": {
-            "data": {
-              "oneof": [
-                "floatValue",
-                "uint32Value"
-              ]
-            }
-          },
-          "fields": {
-            "type": {
-              "type": "MessageType",
-              "id": 1
-            },
-            "floatValue": {
-              "type": "float",
-              "id": 2
-            },
-            "uint32Value": {
-              "type": "uint32",
-              "id": 3
-            }
-          }
-        },
-        "InterdeviceMessage": {
-          "oneofs": {
-            "data": {
-              "oneof": [
-                "nmea",
-                "sensor"
-              ]
-            }
-          },
-          "fields": {
-            "nmea": {
-              "type": "string",
-              "id": 1
-            },
-            "sensor": {
-              "type": "SensorData",
-              "id": 2
-            }
-          }
-        },
-        "ServiceEnvelope": {
-          "fields": {
-            "packet": {
-              "type": "MeshPacket",
-              "id": 1
-            },
-            "channelId": {
-              "type": "string",
-              "id": 2
-            },
-            "gatewayId": {
-              "type": "string",
-              "id": 3
-            }
-          }
-        },
-        "MapReport": {
-          "fields": {
-            "longName": {
-              "type": "string",
-              "id": 1
-            },
-            "shortName": {
-              "type": "string",
-              "id": 2
-            },
-            "role": {
-              "type": "Config.DeviceConfig.Role",
-              "id": 3
-            },
-            "hwModel": {
-              "type": "HardwareModel",
-              "id": 4
-            },
-            "firmwareVersion": {
-              "type": "string",
-              "id": 5
-            },
-            "region": {
-              "type": "Config.LoRaConfig.RegionCode",
-              "id": 6
-            },
-            "modemPreset": {
-              "type": "Config.LoRaConfig.ModemPreset",
-              "id": 7
-            },
-            "hasDefaultChannel": {
-              "type": "bool",
-              "id": 8
-            },
-            "latitudeI": {
-              "type": "sfixed32",
-              "id": 9
-            },
-            "longitudeI": {
-              "type": "sfixed32",
-              "id": 10
-            },
-            "altitude": {
-              "type": "int32",
-              "id": 11
-            },
-            "positionPrecision": {
-              "type": "uint32",
-              "id": 12
-            },
-            "numOnlineLocalNodes": {
-              "type": "uint32",
-              "id": 13
-            },
-            "hasOptedReportLocation": {
-              "type": "bool",
-              "id": 14
-            }
-          }
-        },
-        "Paxcount": {
-          "fields": {
-            "wifi": {
-              "type": "uint32",
-              "id": 1
-            },
-            "ble": {
-              "type": "uint32",
-              "id": 2
-            },
-            "uptime": {
-              "type": "uint32",
-              "id": 3
-            }
-          }
-        },
-        "PowerMon": {
-          "fields": {},
-          "nested": {
-            "State": {
-              "values": {
-                "None": 0,
-                "CPU_DeepSleep": 1,
-                "CPU_LightSleep": 2,
-                "Vext1_On": 4,
-                "Lora_RXOn": 8,
-                "Lora_TXOn": 16,
-                "Lora_RXActive": 32,
-                "BT_On": 64,
-                "LED_On": 128,
-                "Screen_On": 256,
-                "Screen_Drawing": 512,
-                "Wifi_On": 1024,
-                "GPS_Active": 2048
-              }
-            }
-          }
-        },
-        "PowerStressMessage": {
-          "fields": {
-            "cmd": {
-              "type": "Opcode",
-              "id": 1
-            },
-            "numSeconds": {
-              "type": "float",
-              "id": 2
-            }
-          },
-          "nested": {
-            "Opcode": {
-              "values": {
-                "UNSET": 0,
-                "PRINT_INFO": 1,
-                "FORCE_QUIET": 2,
-                "END_QUIET": 3,
-                "SCREEN_ON": 16,
-                "SCREEN_OFF": 17,
-                "CPU_IDLE": 32,
-                "CPU_DEEPSLEEP": 33,
-                "CPU_FULLON": 34,
-                "LED_ON": 48,
-                "LED_OFF": 49,
-                "LORA_OFF": 64,
-                "LORA_TX": 65,
-                "LORA_RX": 66,
-                "BT_OFF": 80,
-                "BT_ON": 81,
-                "WIFI_OFF": 96,
-                "WIFI_ON": 97,
-                "GPS_OFF": 112,
-                "GPS_ON": 113
-              }
-            }
-          }
-        },
-        "HardwareMessage": {
-          "fields": {
-            "type": {
-              "type": "Type",
-              "id": 1
-            },
-            "gpioMask": {
-              "type": "uint64",
-              "id": 2
-            },
-            "gpioValue": {
-              "type": "uint64",
-              "id": 3
-            }
-          },
-          "nested": {
-            "Type": {
-              "values": {
-                "UNSET": 0,
-                "WRITE_GPIOS": 1,
-                "WATCH_GPIOS": 2,
-                "GPIOS_CHANGED": 3,
-                "READ_GPIOS": 4,
-                "READ_GPIOS_REPLY": 5
-              }
-            }
-          }
-        },
-        "RTTTLConfig": {
-          "fields": {
-            "ringtone": {
-              "type": "string",
-              "id": 1
-            }
-          }
-        },
-        "StoreAndForward": {
-          "oneofs": {
-            "variant": {
-              "oneof": [
-                "stats",
-                "history",
-                "heartbeat",
-                "text"
-              ]
-            }
-          },
-          "fields": {
-            "rr": {
-              "type": "RequestResponse",
-              "id": 1
-            },
-            "stats": {
-              "type": "Statistics",
-              "id": 2
-            },
-            "history": {
-              "type": "History",
-              "id": 3
-            },
-            "heartbeat": {
-              "type": "Heartbeat",
-              "id": 4
-            },
-            "text": {
-              "type": "bytes",
-              "id": 5
-            }
-          },
-          "nested": {
-            "RequestResponse": {
-              "values": {
-                "UNSET": 0,
-                "ROUTER_ERROR": 1,
-                "ROUTER_HEARTBEAT": 2,
-                "ROUTER_PING": 3,
-                "ROUTER_PONG": 4,
-                "ROUTER_BUSY": 5,
-                "ROUTER_HISTORY": 6,
-                "ROUTER_STATS": 7,
-                "ROUTER_TEXT_DIRECT": 8,
-                "ROUTER_TEXT_BROADCAST": 9,
-                "CLIENT_ERROR": 64,
-                "CLIENT_HISTORY": 65,
-                "CLIENT_STATS": 66,
-                "CLIENT_PING": 67,
-                "CLIENT_PONG": 68,
-                "CLIENT_ABORT": 106
-              }
-            },
-            "Statistics": {
-              "fields": {
-                "messagesTotal": {
-                  "type": "uint32",
-                  "id": 1
-                },
-                "messagesSaved": {
-                  "type": "uint32",
-                  "id": 2
-                },
-                "messagesMax": {
-                  "type": "uint32",
-                  "id": 3
-                },
-                "upTime": {
-                  "type": "uint32",
-                  "id": 4
-                },
-                "requests": {
-                  "type": "uint32",
-                  "id": 5
-                },
-                "requestsHistory": {
-                  "type": "uint32",
-                  "id": 6
-                },
-                "heartbeat": {
-                  "type": "bool",
-                  "id": 7
-                },
-                "returnMax": {
-                  "type": "uint32",
-                  "id": 8
-                },
-                "returnWindow": {
-                  "type": "uint32",
-                  "id": 9
-                }
-              }
-            },
-            "History": {
-              "fields": {
-                "historyMessages": {
-                  "type": "uint32",
-                  "id": 1
-                },
-                "window": {
-                  "type": "uint32",
-                  "id": 2
-                },
-                "lastRequest": {
-                  "type": "uint32",
-                  "id": 3
-                }
-              }
-            },
-            "Heartbeat": {
-              "fields": {
-                "period": {
-                  "type": "uint32",
-                  "id": 1
-                },
-                "secondary": {
-                  "type": "uint32",
-                  "id": 2
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "FieldType": {
-      "edition": "proto2",
-      "values": {
-        "FT_DEFAULT": 0,
-        "FT_CALLBACK": 1,
-        "FT_POINTER": 4,
-        "FT_STATIC": 2,
-        "FT_IGNORE": 3,
-        "FT_INLINE": 5
-      }
-    },
-    "IntSize": {
-      "edition": "proto2",
-      "values": {
-        "IS_DEFAULT": 0,
-        "IS_8": 8,
-        "IS_16": 16,
-        "IS_32": 32,
-        "IS_64": 64
-      }
-    },
-    "TypenameMangling": {
-      "edition": "proto2",
-      "values": {
-        "M_NONE": 0,
-        "M_STRIP_PACKAGE": 1,
-        "M_FLATTEN": 2,
-        "M_PACKAGE_INITIALS": 3
-      }
-    },
-    "DescriptorSize": {
-      "edition": "proto2",
-      "values": {
-        "DS_AUTO": 0,
-        "DS_1": 1,
-        "DS_2": 2,
-        "DS_4": 4,
-        "DS_8": 8
-      }
-    },
-    "NanoPBOptions": {
-      "edition": "proto2",
-      "fields": {
-        "maxSize": {
-          "type": "int32",
-          "id": 1
-        },
-        "maxLength": {
-          "type": "int32",
-          "id": 14
-        },
-        "maxCount": {
-          "type": "int32",
-          "id": 2
-        },
-        "intSize": {
-          "type": "IntSize",
-          "id": 7,
-          "options": {
-            "default": "IS_DEFAULT"
-          }
-        },
-        "type": {
-          "type": "FieldType",
-          "id": 3,
-          "options": {
-            "default": "FT_DEFAULT"
-          }
-        },
-        "longNames": {
-          "type": "bool",
-          "id": 4,
-          "options": {
-            "default": true
-          }
-        },
-        "packedStruct": {
-          "type": "bool",
-          "id": 5,
-          "options": {
-            "default": false
-          }
-        },
-        "packedEnum": {
-          "type": "bool",
-          "id": 10,
-          "options": {
-            "default": false
-          }
-        },
-        "skipMessage": {
-          "type": "bool",
-          "id": 6,
-          "options": {
-            "default": false
-          }
-        },
-        "noUnions": {
-          "type": "bool",
-          "id": 8,
-          "options": {
-            "default": false
-          }
-        },
-        "msgid": {
-          "type": "uint32",
-          "id": 9
-        },
-        "anonymousOneof": {
-          "type": "bool",
-          "id": 11,
-          "options": {
-            "default": false
-          }
-        },
-        "proto3": {
-          "type": "bool",
-          "id": 12,
-          "options": {
-            "default": false
-          }
-        },
-        "proto3SingularMsgs": {
-          "type": "bool",
-          "id": 21,
-          "options": {
-            "default": false
-          }
-        },
-        "enumToString": {
-          "type": "bool",
-          "id": 13,
-          "options": {
-            "default": false
-          }
-        },
-        "fixedLength": {
-          "type": "bool",
-          "id": 15,
-          "options": {
-            "default": false
-          }
-        },
-        "fixedCount": {
-          "type": "bool",
-          "id": 16,
-          "options": {
-            "default": false
-          }
-        },
-        "submsgCallback": {
-          "type": "bool",
-          "id": 22,
-          "options": {
-            "default": false
-          }
-        },
-        "mangleNames": {
-          "type": "TypenameMangling",
-          "id": 17,
-          "options": {
-            "default": "M_NONE"
-          }
-        },
-        "callbackDatatype": {
-          "type": "string",
-          "id": 18,
-          "options": {
-            "default": "pb_callback_t"
-          }
-        },
-        "callbackFunction": {
-          "type": "string",
-          "id": 19,
-          "options": {
-            "default": "pb_default_field_callback"
-          }
-        },
-        "descriptorsize": {
-          "type": "DescriptorSize",
-          "id": 20,
-          "options": {
-            "default": "DS_AUTO"
-          }
-        },
-        "defaultHas": {
-          "type": "bool",
-          "id": 23,
-          "options": {
-            "default": false
-          }
-        },
-        "include": {
-          "rule": "repeated",
-          "type": "string",
-          "id": 24
-        },
-        "exclude": {
-          "rule": "repeated",
-          "type": "string",
-          "id": 26
-        },
-        "package": {
-          "type": "string",
-          "id": 25
-        },
-        "typeOverride": {
-          "type": "google.protobuf.FieldDescriptorProto.Type",
-          "id": 27
-        },
-        "sortByTag": {
-          "type": "bool",
-          "id": 28,
-          "options": {
-            "default": true
-          }
-        },
-        "fallbackType": {
-          "type": "FieldType",
-          "id": 29,
-          "options": {
-            "default": "FT_CALLBACK"
-          }
-        }
-      }
-    },
-    "nanopbFileopt": {
-      "edition": "proto2",
-      "type": "NanoPBOptions",
-      "id": 1010,
-      "extend": "google.protobuf.FileOptions"
-    },
-    "nanopbMsgopt": {
-      "edition": "proto2",
-      "type": "NanoPBOptions",
-      "id": 1010,
-      "extend": "google.protobuf.MessageOptions"
-    },
-    "nanopbEnumopt": {
-      "edition": "proto2",
-      "type": "NanoPBOptions",
-      "id": 1010,
-      "extend": "google.protobuf.EnumOptions"
-    },
-    "nanopb": {
-      "edition": "proto2",
-      "type": "NanoPBOptions",
-      "id": 1010,
-      "extend": "google.protobuf.FieldOptions"
-    },
-    "google": {
-      "nested": {
-        "protobuf": {
-          "options": {
-            "go_package": "google.golang.org/protobuf/types/descriptorpb",
-            "java_package": "com.google.protobuf",
-            "java_outer_classname": "DescriptorProtos",
-            "csharp_namespace": "Google.Protobuf.Reflection",
-            "objc_class_prefix": "GPB",
-            "cc_enable_arenas": true,
-            "optimize_for": "SPEED"
-          },
-          "nested": {
-            "FileDescriptorSet": {
-              "edition": "proto2",
-              "fields": {
-                "file": {
-                  "rule": "repeated",
-                  "type": "FileDescriptorProto",
-                  "id": 1
-                }
-              },
-              "extensions": [
-                [
-                  536000000,
-                  536000000
-                ]
-              ]
-            },
-            "Edition": {
-              "edition": "proto2",
-              "values": {
-                "EDITION_UNKNOWN": 0,
-                "EDITION_LEGACY": 900,
-                "EDITION_PROTO2": 998,
-                "EDITION_PROTO3": 999,
-                "EDITION_2023": 1000,
-                "EDITION_2024": 1001,
-                "EDITION_1_TEST_ONLY": 1,
-                "EDITION_2_TEST_ONLY": 2,
-                "EDITION_99997_TEST_ONLY": 99997,
-                "EDITION_99998_TEST_ONLY": 99998,
-                "EDITION_99999_TEST_ONLY": 99999,
-                "EDITION_MAX": 2147483647
-              }
-            },
-            "FileDescriptorProto": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "package": {
-                  "type": "string",
-                  "id": 2
-                },
-                "dependency": {
-                  "rule": "repeated",
-                  "type": "string",
-                  "id": 3
-                },
-                "publicDependency": {
-                  "rule": "repeated",
-                  "type": "int32",
-                  "id": 10
-                },
-                "weakDependency": {
-                  "rule": "repeated",
-                  "type": "int32",
-                  "id": 11
-                },
-                "optionDependency": {
-                  "rule": "repeated",
-                  "type": "string",
-                  "id": 15
-                },
-                "messageType": {
-                  "rule": "repeated",
-                  "type": "DescriptorProto",
-                  "id": 4
-                },
-                "enumType": {
-                  "rule": "repeated",
-                  "type": "EnumDescriptorProto",
-                  "id": 5
-                },
-                "service": {
-                  "rule": "repeated",
-                  "type": "ServiceDescriptorProto",
-                  "id": 6
-                },
-                "extension": {
-                  "rule": "repeated",
-                  "type": "FieldDescriptorProto",
-                  "id": 7
-                },
-                "options": {
-                  "type": "FileOptions",
-                  "id": 8
-                },
-                "sourceCodeInfo": {
-                  "type": "SourceCodeInfo",
-                  "id": 9
-                },
-                "syntax": {
-                  "type": "string",
-                  "id": 12
-                },
-                "edition": {
-                  "type": "Edition",
-                  "id": 14
-                }
-              }
-            },
-            "DescriptorProto": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "field": {
-                  "rule": "repeated",
-                  "type": "FieldDescriptorProto",
-                  "id": 2
-                },
-                "extension": {
-                  "rule": "repeated",
-                  "type": "FieldDescriptorProto",
-                  "id": 6
-                },
-                "nestedType": {
-                  "rule": "repeated",
-                  "type": "DescriptorProto",
-                  "id": 3
-                },
-                "enumType": {
-                  "rule": "repeated",
-                  "type": "EnumDescriptorProto",
-                  "id": 4
-                },
-                "extensionRange": {
-                  "rule": "repeated",
-                  "type": "ExtensionRange",
-                  "id": 5
-                },
-                "oneofDecl": {
-                  "rule": "repeated",
-                  "type": "OneofDescriptorProto",
-                  "id": 8
-                },
-                "options": {
-                  "type": "MessageOptions",
-                  "id": 7
-                },
-                "reservedRange": {
-                  "rule": "repeated",
-                  "type": "ReservedRange",
-                  "id": 9
-                },
-                "reservedName": {
-                  "rule": "repeated",
-                  "type": "string",
-                  "id": 10
-                },
-                "visibility": {
-                  "type": "SymbolVisibility",
-                  "id": 11
-                }
-              },
-              "nested": {
-                "ExtensionRange": {
-                  "fields": {
-                    "start": {
-                      "type": "int32",
-                      "id": 1
-                    },
-                    "end": {
-                      "type": "int32",
-                      "id": 2
-                    },
-                    "options": {
-                      "type": "ExtensionRangeOptions",
-                      "id": 3
-                    }
-                  }
-                },
-                "ReservedRange": {
-                  "fields": {
-                    "start": {
-                      "type": "int32",
-                      "id": 1
-                    },
-                    "end": {
-                      "type": "int32",
-                      "id": 2
-                    }
-                  }
-                }
-              }
-            },
-            "ExtensionRangeOptions": {
-              "edition": "proto2",
-              "fields": {
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                },
-                "declaration": {
-                  "rule": "repeated",
-                  "type": "Declaration",
-                  "id": 2,
-                  "options": {
-                    "retention": "RETENTION_SOURCE"
-                  }
-                },
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 50
-                },
-                "verification": {
-                  "type": "VerificationState",
-                  "id": 3,
-                  "options": {
-                    "default": "UNVERIFIED",
-                    "retention": "RETENTION_SOURCE"
-                  }
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ],
-              "nested": {
-                "Declaration": {
-                  "fields": {
-                    "number": {
-                      "type": "int32",
-                      "id": 1
-                    },
-                    "fullName": {
-                      "type": "string",
-                      "id": 2
-                    },
-                    "type": {
-                      "type": "string",
-                      "id": 3
-                    },
-                    "reserved": {
-                      "type": "bool",
-                      "id": 5
-                    },
-                    "repeated": {
-                      "type": "bool",
-                      "id": 6
-                    }
-                  },
-                  "reserved": [
-                    [
-                      4,
-                      4
-                    ]
-                  ]
-                },
-                "VerificationState": {
-                  "values": {
-                    "DECLARATION": 0,
-                    "UNVERIFIED": 1
-                  }
-                }
-              }
-            },
-            "FieldDescriptorProto": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "number": {
-                  "type": "int32",
-                  "id": 3
-                },
-                "label": {
-                  "type": "Label",
-                  "id": 4
-                },
-                "type": {
-                  "type": "Type",
-                  "id": 5
-                },
-                "typeName": {
-                  "type": "string",
-                  "id": 6
-                },
-                "extendee": {
-                  "type": "string",
-                  "id": 2
-                },
-                "defaultValue": {
-                  "type": "string",
-                  "id": 7
-                },
-                "oneofIndex": {
-                  "type": "int32",
-                  "id": 9
-                },
-                "jsonName": {
-                  "type": "string",
-                  "id": 10
-                },
-                "options": {
-                  "type": "FieldOptions",
-                  "id": 8
-                },
-                "proto3Optional": {
-                  "type": "bool",
-                  "id": 17
-                }
-              },
-              "nested": {
-                "Type": {
-                  "values": {
-                    "TYPE_DOUBLE": 1,
-                    "TYPE_FLOAT": 2,
-                    "TYPE_INT64": 3,
-                    "TYPE_UINT64": 4,
-                    "TYPE_INT32": 5,
-                    "TYPE_FIXED64": 6,
-                    "TYPE_FIXED32": 7,
-                    "TYPE_BOOL": 8,
-                    "TYPE_STRING": 9,
-                    "TYPE_GROUP": 10,
-                    "TYPE_MESSAGE": 11,
-                    "TYPE_BYTES": 12,
-                    "TYPE_UINT32": 13,
-                    "TYPE_ENUM": 14,
-                    "TYPE_SFIXED32": 15,
-                    "TYPE_SFIXED64": 16,
-                    "TYPE_SINT32": 17,
-                    "TYPE_SINT64": 18
-                  }
-                },
-                "Label": {
-                  "values": {
-                    "LABEL_OPTIONAL": 1,
-                    "LABEL_REPEATED": 3,
-                    "LABEL_REQUIRED": 2
-                  }
-                }
-              }
-            },
-            "OneofDescriptorProto": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "options": {
-                  "type": "OneofOptions",
-                  "id": 2
-                }
-              }
-            },
-            "EnumDescriptorProto": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "value": {
-                  "rule": "repeated",
-                  "type": "EnumValueDescriptorProto",
-                  "id": 2
-                },
-                "options": {
-                  "type": "EnumOptions",
-                  "id": 3
-                },
-                "reservedRange": {
-                  "rule": "repeated",
-                  "type": "EnumReservedRange",
-                  "id": 4
-                },
-                "reservedName": {
-                  "rule": "repeated",
-                  "type": "string",
-                  "id": 5
-                },
-                "visibility": {
-                  "type": "SymbolVisibility",
-                  "id": 6
-                }
-              },
-              "nested": {
-                "EnumReservedRange": {
-                  "fields": {
-                    "start": {
-                      "type": "int32",
-                      "id": 1
-                    },
-                    "end": {
-                      "type": "int32",
-                      "id": 2
-                    }
-                  }
-                }
-              }
-            },
-            "EnumValueDescriptorProto": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "number": {
-                  "type": "int32",
-                  "id": 2
-                },
-                "options": {
-                  "type": "EnumValueOptions",
-                  "id": 3
-                }
-              }
-            },
-            "ServiceDescriptorProto": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "method": {
-                  "rule": "repeated",
-                  "type": "MethodDescriptorProto",
-                  "id": 2
-                },
-                "options": {
-                  "type": "ServiceOptions",
-                  "id": 3
-                }
-              }
-            },
-            "MethodDescriptorProto": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "type": "string",
-                  "id": 1
-                },
-                "inputType": {
-                  "type": "string",
-                  "id": 2
-                },
-                "outputType": {
-                  "type": "string",
-                  "id": 3
-                },
-                "options": {
-                  "type": "MethodOptions",
-                  "id": 4
-                },
-                "clientStreaming": {
-                  "type": "bool",
-                  "id": 5
-                },
-                "serverStreaming": {
-                  "type": "bool",
-                  "id": 6
-                }
-              }
-            },
-            "FileOptions": {
-              "edition": "proto2",
-              "fields": {
-                "javaPackage": {
-                  "type": "string",
-                  "id": 1
-                },
-                "javaOuterClassname": {
-                  "type": "string",
-                  "id": 8
-                },
-                "javaMultipleFiles": {
-                  "type": "bool",
-                  "id": 10
-                },
-                "javaGenerateEqualsAndHash": {
-                  "type": "bool",
-                  "id": 20,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "javaStringCheckUtf8": {
-                  "type": "bool",
-                  "id": 27
-                },
-                "optimizeFor": {
-                  "type": "OptimizeMode",
-                  "id": 9,
-                  "options": {
-                    "default": "SPEED"
-                  }
-                },
-                "goPackage": {
-                  "type": "string",
-                  "id": 11
-                },
-                "ccGenericServices": {
-                  "type": "bool",
-                  "id": 16
-                },
-                "javaGenericServices": {
-                  "type": "bool",
-                  "id": 17
-                },
-                "pyGenericServices": {
-                  "type": "bool",
-                  "id": 18
-                },
-                "deprecated": {
-                  "type": "bool",
-                  "id": 23
-                },
-                "ccEnableArenas": {
-                  "type": "bool",
-                  "id": 31,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "objcClassPrefix": {
-                  "type": "string",
-                  "id": 36
-                },
-                "csharpNamespace": {
-                  "type": "string",
-                  "id": 37
-                },
-                "swiftPrefix": {
-                  "type": "string",
-                  "id": 39
-                },
-                "phpClassPrefix": {
-                  "type": "string",
-                  "id": 40
-                },
-                "phpNamespace": {
-                  "type": "string",
-                  "id": 41
-                },
-                "phpMetadataNamespace": {
-                  "type": "string",
-                  "id": 44
-                },
-                "rubyPackage": {
-                  "type": "string",
-                  "id": 45
-                },
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 50
-                },
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ],
-              "reserved": [
-                [
-                  42,
-                  42
-                ],
-                [
-                  38,
-                  38
-                ],
-                "php_generic_services"
-              ],
-              "nested": {
-                "OptimizeMode": {
-                  "values": {
-                    "SPEED": 1,
-                    "CODE_SIZE": 2,
-                    "LITE_RUNTIME": 3
-                  }
-                }
-              }
-            },
-            "MessageOptions": {
-              "edition": "proto2",
-              "fields": {
-                "messageSetWireFormat": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "noStandardDescriptorAccessor": {
-                  "type": "bool",
-                  "id": 2
-                },
-                "deprecated": {
-                  "type": "bool",
-                  "id": 3
-                },
-                "mapEntry": {
-                  "type": "bool",
-                  "id": 7
-                },
-                "deprecatedLegacyJsonFieldConflicts": {
-                  "type": "bool",
-                  "id": 11,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 12
-                },
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ],
-              "reserved": [
-                [
-                  4,
-                  4
-                ],
-                [
-                  5,
-                  5
-                ],
-                [
-                  6,
-                  6
-                ],
-                [
-                  8,
-                  8
-                ],
-                [
-                  9,
-                  9
-                ]
-              ]
-            },
-            "FieldOptions": {
-              "edition": "proto2",
-              "fields": {
-                "ctype": {
-                  "type": "CType",
-                  "id": 1,
-                  "options": {
-                    "default": "STRING"
-                  }
-                },
-                "packed": {
-                  "type": "bool",
-                  "id": 2
-                },
-                "jstype": {
-                  "type": "JSType",
-                  "id": 6,
-                  "options": {
-                    "default": "JS_NORMAL"
-                  }
-                },
-                "lazy": {
-                  "type": "bool",
-                  "id": 5
-                },
-                "unverifiedLazy": {
-                  "type": "bool",
-                  "id": 15
-                },
-                "deprecated": {
-                  "type": "bool",
-                  "id": 3
-                },
-                "weak": {
-                  "type": "bool",
-                  "id": 10,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "debugRedact": {
-                  "type": "bool",
-                  "id": 16
-                },
-                "retention": {
-                  "type": "OptionRetention",
-                  "id": 17
-                },
-                "targets": {
-                  "rule": "repeated",
-                  "type": "OptionTargetType",
-                  "id": 19
-                },
-                "editionDefaults": {
-                  "rule": "repeated",
-                  "type": "EditionDefault",
-                  "id": 20
-                },
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 21
-                },
-                "featureSupport": {
-                  "type": "FeatureSupport",
-                  "id": 22
-                },
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ],
-              "reserved": [
-                [
-                  4,
-                  4
-                ],
-                [
-                  18,
-                  18
-                ]
-              ],
-              "nested": {
-                "CType": {
-                  "values": {
-                    "STRING": 0,
-                    "CORD": 1,
-                    "STRING_PIECE": 2
-                  }
-                },
-                "JSType": {
-                  "values": {
-                    "JS_NORMAL": 0,
-                    "JS_STRING": 1,
-                    "JS_NUMBER": 2
-                  }
-                },
-                "OptionRetention": {
-                  "values": {
-                    "RETENTION_UNKNOWN": 0,
-                    "RETENTION_RUNTIME": 1,
-                    "RETENTION_SOURCE": 2
-                  }
-                },
-                "OptionTargetType": {
-                  "values": {
-                    "TARGET_TYPE_UNKNOWN": 0,
-                    "TARGET_TYPE_FILE": 1,
-                    "TARGET_TYPE_EXTENSION_RANGE": 2,
-                    "TARGET_TYPE_MESSAGE": 3,
-                    "TARGET_TYPE_FIELD": 4,
-                    "TARGET_TYPE_ONEOF": 5,
-                    "TARGET_TYPE_ENUM": 6,
-                    "TARGET_TYPE_ENUM_ENTRY": 7,
-                    "TARGET_TYPE_SERVICE": 8,
-                    "TARGET_TYPE_METHOD": 9
-                  }
-                },
-                "EditionDefault": {
-                  "fields": {
-                    "edition": {
-                      "type": "Edition",
-                      "id": 3
-                    },
-                    "value": {
-                      "type": "string",
-                      "id": 2
-                    }
-                  }
-                },
-                "FeatureSupport": {
-                  "fields": {
-                    "editionIntroduced": {
-                      "type": "Edition",
-                      "id": 1
-                    },
-                    "editionDeprecated": {
-                      "type": "Edition",
-                      "id": 2
-                    },
-                    "deprecationWarning": {
-                      "type": "string",
-                      "id": 3
-                    },
-                    "editionRemoved": {
-                      "type": "Edition",
-                      "id": 4
-                    }
-                  }
-                }
-              }
-            },
-            "OneofOptions": {
-              "edition": "proto2",
-              "fields": {
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 1
-                },
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ]
-            },
-            "EnumOptions": {
-              "edition": "proto2",
-              "fields": {
-                "allowAlias": {
-                  "type": "bool",
-                  "id": 2
-                },
-                "deprecated": {
-                  "type": "bool",
-                  "id": 3
-                },
-                "deprecatedLegacyJsonFieldConflicts": {
-                  "type": "bool",
-                  "id": 6,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 7
-                },
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ],
-              "reserved": [
-                [
-                  5,
-                  5
-                ]
-              ]
-            },
-            "EnumValueOptions": {
-              "edition": "proto2",
-              "fields": {
-                "deprecated": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 2
-                },
-                "debugRedact": {
-                  "type": "bool",
-                  "id": 3
-                },
-                "featureSupport": {
-                  "type": "FieldOptions.FeatureSupport",
-                  "id": 4
-                },
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ]
-            },
-            "ServiceOptions": {
-              "edition": "proto2",
-              "fields": {
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 34
-                },
-                "deprecated": {
-                  "type": "bool",
-                  "id": 33
-                },
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ]
-            },
-            "MethodOptions": {
-              "edition": "proto2",
-              "fields": {
-                "deprecated": {
-                  "type": "bool",
-                  "id": 33
-                },
-                "idempotencyLevel": {
-                  "type": "IdempotencyLevel",
-                  "id": 34,
-                  "options": {
-                    "default": "IDEMPOTENCY_UNKNOWN"
-                  }
-                },
-                "features": {
-                  "type": "FeatureSet",
-                  "id": 35
-                },
-                "uninterpretedOption": {
-                  "rule": "repeated",
-                  "type": "UninterpretedOption",
-                  "id": 999
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  536870911
-                ]
-              ],
-              "nested": {
-                "IdempotencyLevel": {
-                  "values": {
-                    "IDEMPOTENCY_UNKNOWN": 0,
-                    "NO_SIDE_EFFECTS": 1,
-                    "IDEMPOTENT": 2
-                  }
-                }
-              }
-            },
-            "UninterpretedOption": {
-              "edition": "proto2",
-              "fields": {
-                "name": {
-                  "rule": "repeated",
-                  "type": "NamePart",
-                  "id": 2
-                },
-                "identifierValue": {
-                  "type": "string",
-                  "id": 3
-                },
-                "positiveIntValue": {
-                  "type": "uint64",
-                  "id": 4
-                },
-                "negativeIntValue": {
-                  "type": "int64",
-                  "id": 5
-                },
-                "doubleValue": {
-                  "type": "double",
-                  "id": 6
-                },
-                "stringValue": {
-                  "type": "bytes",
-                  "id": 7
-                },
-                "aggregateValue": {
-                  "type": "string",
-                  "id": 8
-                }
-              },
-              "nested": {
-                "NamePart": {
-                  "fields": {
-                    "namePart": {
-                      "rule": "required",
-                      "type": "string",
-                      "id": 1
-                    },
-                    "isExtension": {
-                      "rule": "required",
-                      "type": "bool",
-                      "id": 2
-                    }
-                  }
-                }
-              }
-            },
-            "FeatureSet": {
-              "edition": "proto2",
-              "fields": {
-                "fieldPresence": {
-                  "type": "FieldPresence",
-                  "id": 1,
-                  "options": {
-                    "retention": "RETENTION_RUNTIME",
-                    "targets": "TARGET_TYPE_FILE",
-                    "feature_support.edition_introduced": "EDITION_2023",
-                    "edition_defaults.edition": "EDITION_2023",
-                    "edition_defaults.value": "EXPLICIT"
-                  }
-                },
-                "enumType": {
-                  "type": "EnumType",
-                  "id": 2,
-                  "options": {
-                    "retention": "RETENTION_RUNTIME",
-                    "targets": "TARGET_TYPE_FILE",
-                    "feature_support.edition_introduced": "EDITION_2023",
-                    "edition_defaults.edition": "EDITION_PROTO3",
-                    "edition_defaults.value": "OPEN"
-                  }
-                },
-                "repeatedFieldEncoding": {
-                  "type": "RepeatedFieldEncoding",
-                  "id": 3,
-                  "options": {
-                    "retention": "RETENTION_RUNTIME",
-                    "targets": "TARGET_TYPE_FILE",
-                    "feature_support.edition_introduced": "EDITION_2023",
-                    "edition_defaults.edition": "EDITION_PROTO3",
-                    "edition_defaults.value": "PACKED"
-                  }
-                },
-                "utf8Validation": {
-                  "type": "Utf8Validation",
-                  "id": 4,
-                  "options": {
-                    "retention": "RETENTION_RUNTIME",
-                    "targets": "TARGET_TYPE_FILE",
-                    "feature_support.edition_introduced": "EDITION_2023",
-                    "edition_defaults.edition": "EDITION_PROTO3",
-                    "edition_defaults.value": "VERIFY"
-                  }
-                },
-                "messageEncoding": {
-                  "type": "MessageEncoding",
-                  "id": 5,
-                  "options": {
-                    "retention": "RETENTION_RUNTIME",
-                    "targets": "TARGET_TYPE_FILE",
-                    "feature_support.edition_introduced": "EDITION_2023",
-                    "edition_defaults.edition": "EDITION_LEGACY",
-                    "edition_defaults.value": "LENGTH_PREFIXED"
-                  }
-                },
-                "jsonFormat": {
-                  "type": "JsonFormat",
-                  "id": 6,
-                  "options": {
-                    "retention": "RETENTION_RUNTIME",
-                    "targets": "TARGET_TYPE_FILE",
-                    "feature_support.edition_introduced": "EDITION_2023",
-                    "edition_defaults.edition": "EDITION_PROTO3",
-                    "edition_defaults.value": "ALLOW"
-                  }
-                },
-                "enforceNamingStyle": {
-                  "type": "EnforceNamingStyle",
-                  "id": 7,
-                  "options": {
-                    "retention": "RETENTION_SOURCE",
-                    "targets": "TARGET_TYPE_METHOD",
-                    "feature_support.edition_introduced": "EDITION_2024",
-                    "edition_defaults.edition": "EDITION_2024",
-                    "edition_defaults.value": "STYLE2024"
-                  }
-                },
-                "defaultSymbolVisibility": {
-                  "type": "VisibilityFeature.DefaultSymbolVisibility",
-                  "id": 8,
-                  "options": {
-                    "retention": "RETENTION_SOURCE",
-                    "targets": "TARGET_TYPE_FILE",
-                    "feature_support.edition_introduced": "EDITION_2024",
-                    "edition_defaults.edition": "EDITION_2024",
-                    "edition_defaults.value": "EXPORT_TOP_LEVEL"
-                  }
-                }
-              },
-              "extensions": [
-                [
-                  1000,
-                  9994
-                ],
-                [
-                  9995,
-                  9999
-                ],
-                [
-                  10000,
-                  10000
-                ]
-              ],
-              "reserved": [
-                [
-                  999,
-                  999
-                ]
-              ],
-              "nested": {
-                "FieldPresence": {
-                  "values": {
-                    "FIELD_PRESENCE_UNKNOWN": 0,
-                    "EXPLICIT": 1,
-                    "IMPLICIT": 2,
-                    "LEGACY_REQUIRED": 3
-                  }
-                },
-                "EnumType": {
-                  "values": {
-                    "ENUM_TYPE_UNKNOWN": 0,
-                    "OPEN": 1,
-                    "CLOSED": 2
-                  }
-                },
-                "RepeatedFieldEncoding": {
-                  "values": {
-                    "REPEATED_FIELD_ENCODING_UNKNOWN": 0,
-                    "PACKED": 1,
-                    "EXPANDED": 2
-                  }
-                },
-                "Utf8Validation": {
-                  "values": {
-                    "UTF8_VALIDATION_UNKNOWN": 0,
-                    "VERIFY": 2,
-                    "NONE": 3
-                  }
-                },
-                "MessageEncoding": {
-                  "values": {
-                    "MESSAGE_ENCODING_UNKNOWN": 0,
-                    "LENGTH_PREFIXED": 1,
-                    "DELIMITED": 2
-                  }
-                },
-                "JsonFormat": {
-                  "values": {
-                    "JSON_FORMAT_UNKNOWN": 0,
-                    "ALLOW": 1,
-                    "LEGACY_BEST_EFFORT": 2
-                  }
-                },
-                "EnforceNamingStyle": {
-                  "values": {
-                    "ENFORCE_NAMING_STYLE_UNKNOWN": 0,
-                    "STYLE2024": 1,
-                    "STYLE_LEGACY": 2
-                  }
-                },
-                "VisibilityFeature": {
-                  "fields": {},
-                  "reserved": [
-                    [
-                      1,
-                      536870911
-                    ]
-                  ],
-                  "nested": {
-                    "DefaultSymbolVisibility": {
-                      "values": {
-                        "DEFAULT_SYMBOL_VISIBILITY_UNKNOWN": 0,
-                        "EXPORT_ALL": 1,
-                        "EXPORT_TOP_LEVEL": 2,
-                        "LOCAL_ALL": 3,
-                        "STRICT": 4
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "FeatureSetDefaults": {
-              "edition": "proto2",
-              "fields": {
-                "defaults": {
-                  "rule": "repeated",
-                  "type": "FeatureSetEditionDefault",
-                  "id": 1
-                },
-                "minimumEdition": {
-                  "type": "Edition",
-                  "id": 4
-                },
-                "maximumEdition": {
-                  "type": "Edition",
-                  "id": 5
-                }
-              },
-              "nested": {
-                "FeatureSetEditionDefault": {
-                  "fields": {
-                    "edition": {
-                      "type": "Edition",
-                      "id": 3
-                    },
-                    "overridableFeatures": {
-                      "type": "FeatureSet",
-                      "id": 4
-                    },
-                    "fixedFeatures": {
-                      "type": "FeatureSet",
-                      "id": 5
-                    }
-                  },
-                  "reserved": [
-                    [
-                      1,
-                      1
-                    ],
-                    [
-                      2,
-                      2
-                    ],
-                    "features"
-                  ]
-                }
-              }
-            },
-            "SourceCodeInfo": {
-              "edition": "proto2",
-              "fields": {
-                "location": {
-                  "rule": "repeated",
-                  "type": "Location",
-                  "id": 1
-                }
-              },
-              "extensions": [
-                [
-                  536000000,
-                  536000000
-                ]
-              ],
-              "nested": {
-                "Location": {
-                  "fields": {
-                    "path": {
-                      "rule": "repeated",
-                      "type": "int32",
-                      "id": 1,
-                      "options": {
-                        "packed": true
-                      }
-                    },
-                    "span": {
-                      "rule": "repeated",
-                      "type": "int32",
-                      "id": 2,
-                      "options": {
-                        "packed": true
-                      }
-                    },
-                    "leadingComments": {
-                      "type": "string",
-                      "id": 3
-                    },
-                    "trailingComments": {
-                      "type": "string",
-                      "id": 4
-                    },
-                    "leadingDetachedComments": {
-                      "rule": "repeated",
-                      "type": "string",
-                      "id": 6
-                    }
-                  }
-                }
-              }
-            },
-            "GeneratedCodeInfo": {
-              "edition": "proto2",
-              "fields": {
-                "annotation": {
-                  "rule": "repeated",
-                  "type": "Annotation",
-                  "id": 1
-                }
-              },
-              "nested": {
-                "Annotation": {
-                  "fields": {
-                    "path": {
-                      "rule": "repeated",
-                      "type": "int32",
-                      "id": 1,
-                      "options": {
-                        "packed": true
-                      }
-                    },
-                    "sourceFile": {
-                      "type": "string",
-                      "id": 2
-                    },
-                    "begin": {
-                      "type": "int32",
-                      "id": 3
-                    },
-                    "end": {
-                      "type": "int32",
-                      "id": 4
-                    },
-                    "semantic": {
-                      "type": "Semantic",
-                      "id": 5
-                    }
-                  },
-                  "nested": {
-                    "Semantic": {
-                      "values": {
-                        "NONE": 0,
-                        "SET": 1,
-                        "ALIAS": 2
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "SymbolVisibility": {
-              "edition": "proto2",
-              "values": {
-                "VISIBILITY_UNSET": 0,
-                "VISIBILITY_LOCAL": 1,
-                "VISIBILITY_EXPORT": 2
               }
             }
           }

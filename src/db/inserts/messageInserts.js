@@ -1,14 +1,20 @@
 // --- Misc Inserts ---
 import db from '../db.js';
+import { emitMessageUpdate } from '../../utils/sseEmitters.js';
+
 
 // --- Messages ---
 export const insertMessage = (msg) => {
-  
   db.prepare(`
     INSERT INTO messages (messageId, channelId, fromNodeNum, toNodeNum, 
                 message, wantAck, wantReply, replyId, timestamp)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(msg.messageid, msg.channelNum, msg.fromNodeNum, msg.toNodeNum, 
-         msg.payload, msg.wantAck = msg.wantAct ?  1 : 0, msg.wantReply = msg.wantReply ? 1 : 0, 
+  `).run(msg.messageId, msg.channelId, msg.fromNodeNum, msg.toNodeNum, 
+         msg.message, msg.wantAck = msg.wantAct ?  1 : 0, msg.wantReply = msg.wantReply ? 1 : 0, 
          msg.replyId, msg.timestamp);
+
+    emitMessageUpdate({
+      ...msg,
+      timestamp: msg.timestamp ?? Date.now()
+    });
 };

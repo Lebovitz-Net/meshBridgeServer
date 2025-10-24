@@ -1,4 +1,6 @@
 import db from '../db.js';
+import { emitChannelUpdate } from '../../utils/sseEmitters.js';
+
 
 export const insertChannel = (packet) => {
 
@@ -11,4 +13,9 @@ export const insertChannel = (packet) => {
   `).run({
     ...packet,
   });
+  emitChannelUpdate({
+  ...packet,
+  updatedAt: Date.now()
+});
+
 };
