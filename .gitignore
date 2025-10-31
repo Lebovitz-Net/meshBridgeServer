@@ -1,25 +1,27 @@
 # Logs
 logs
 *.log
+tmp.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-data
 node_modules
 dist
 dist-ssr
-*.local
+deprecated
+external
+keys
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-deprecated
+*.local
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

@@ -1,6 +1,6 @@
 // --- Misc Inserts ---
 import db from '../db.js';
-import { emitMessageUpdate } from '../../utils/sseEmitters.js';
+import { emitMessageUpdate } from '../../Meshtastic/utils/sseEmitters.js';
 
 
 // --- Messages ---

@@ -1,17 +1,9 @@
-import protobuf from 'protobufjs';
-import protoJson from '../assets/proto.json' with { type: 'json' };
-import fs from 'fs/promises';
 import queryHandlers from '../db/queryHandlers.js';
 import { insertHandlers } from '../db/insertHandlers.js';
-import { encodeTextMessage } from '../packets/decodePacket.js';
-import { send } from 'vite';
-import { sendToMeshNode } from '../handlers/meshServiceHandler.js';
-
+import { meshRequests } from '../handlers/meshtasticRequests.js';
 
 const { listExtendedMessagesForChannel, listMessagesForChannel } = queryHandlers;
 const { insertMessage } = insertHandlers;
-
-// Load proto.json once and reuse
 
 // Small helper to wrap sync handlers in try/catch
 const safe = (fn) => (req, res) => {
@@ -36,29 +28,17 @@ export const listExtendedMessagesForChannelHandler = safe((req, res) => {
 export async function sendMessageHandler(req, res) {
   try {
     const body = req.body || {};
-    const message = body.message || '';
 
     if (message == null || typeof message !== 'string') {
       console.warn('[sendMessageHandler] Invalid inputText');
       return res.status(400).json({ error: 'Missing or invalid payload' });
     }
 
-    const sendBuf = {
-      messageId: body.messageId || null,
-      channelId: body.channelNum,
-      fromNodeNum: body.fromNodeNum || null,
-      toNodeNum: body.toNodeNum || 4294967295, // Broadcast by default
-      message,
-      wantAck: true,
-      wantReply: false,
-      replyId: null,
-      timestamp: Date.now()
-    };
-    const encoded = encodeTextMessage(sendBuf);
-    sendToMeshNode(encoded);
+    // ✅ Send via request framework
+    meshRequests.sendMessage(body);
 
-    // // ✅ Insert outbound message into DB for threading and history
-    insertMessage (sendBuf);
+    // ✅ Insert outbound message into DB for threading and history
+    insertMessage(body);
 
     return res.status(200).json({
       ok: true,

@@ -1,6 +1,6 @@
 ﻿// --- Node Inserts ---
 import db from '../db.js';
-import { emitNodeUpdate } from '../../utils/sseEmitters.js';
+import { emitNodeUpdate } from '../../Meshtastic/utils/sseEmitters.js';
 
 
 // insertNode ===========================================

@@ -1,36 +1,41 @@
+// server.js
+
 import express from 'express';
 import { createServer } from 'http';
 import { config } from '../config/config.js';
-import runtimeConfigRoutes from '../routes/runtimeConfigRoutes.js';
-import createMQTTHandler from '../handlers/mqttHandler.js';
-import ingestionRouter from '../core/routePacket.js';
-import ingestionHandler from '../handlers/ingestionHandler.js';
-import { registerRoutes } from '../api/routes.js';
-import createMeshService from '../handlers/meshServiceHandler.js';
-import { initProtoTypes } from '../utils/protoUtils.js';
-import { shutdown } from '../utils/servicesManager.js';
 import cors from 'cors';
-import { sseRouter } from './sse.js';
-import websocketHandler from '../handlers/websocketHandler.js';
 import { WebSocketServer } from 'ws';
+
+import runtimeConfigRoutes from '../api/runtimeConfigRoutes.js';
+import createMQTTHandler from '../handlers/mqttHandler.js';
+import { initProtoTypes } from '../Meshtastic/utils/protoUtils.js';
+import { shutdown } from '../api/servicesManager.js';
+import { registerRoutes } from '../api/routes.js';
+import { sseRouter } from './sse.js';
 import { sseHandler } from './sseHandlers.js';
+import websocketHandler from '../handlers/websocketHandler.js';
+
+import { startMeshtastic } from './meshtasticStartup.js';
+import { startMeshcore } from './meshcoreStartup.js';
 
 export async function startServer() {
-  await initProtoTypes(); // sets up decode + encode logic
+  // --- Initialize protobufs for Meshtastic ---
+  await initProtoTypes();
+
   // --- Express API ---
   const app = express();
   app.use(cors({
-    origin: 'http://localhost:5173', // or use '*' for dev
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
     credentials: true
   }));
-
   app.use(express.json());
+
+  // Routes
   app.use('/sse', sseRouter);
   app.use('/api/v1/config', runtimeConfigRoutes);
   app.get('/', (req, res) => res.send('MeshManager v2 is running'));
   app.get('/sse/events', sseHandler);
-
   registerRoutes(app);
 
   // --- Unified HTTP Server ---
@@ -38,18 +43,14 @@ export async function startServer() {
   const apiServer = httpServer.listen(config.api.port, () => {
     console.log(`🛠 Express server listening on port ${config.api.port}`);
   });
-  
+
+  // --- WebSocket Server ---
   const wss = new WebSocketServer({ server: httpServer });
   wss.on('connection', websocketHandler);
 
-
-  // --- Mesh connection (outbound TCP client) ---
-  const mesh = await createMeshService(
-    'mesh-1',
-    process.env.NODE_IP_HOST || '192.168.1.52',
-    process.env.NODE_IP_PORT || 4403,
-    ingestionRouter.routePacket
-  );
+  // --- Start runtimes ---
+  const mesh = await startMeshtastic();   // Meshtastic runtime (with startup handshake)
+  const { meshcore, interval } = await startMeshcore(); // MeshCore runtime (placeholder handshake for now)
 
   // --- MQTT Bridge ---
   const mqttHandler = createMQTTHandler('mqtt-bridge', {
@@ -63,9 +64,18 @@ export async function startServer() {
   ['SIGINT', 'SIGTERM'].forEach(sig => {
     process.on(sig, () => {
       console.log(`🔻 Received ${sig}, shutting down...`);
-      ingestionHandler.stop();
+
+      // Disconnect MQTT
       mqttHandler.disconnect?.();
+
+      // End runtimes
+      meshcore?.tcp.close();
+      mesh?.end?.();
+
+      // Close HTTP server
       apiServer.close(() => console.log('🛑 HTTP server closed'));
+      if (interval) clearInterval(interval);
+      // Run any service shutdown hooks
       shutdown(sig);
     });
   });

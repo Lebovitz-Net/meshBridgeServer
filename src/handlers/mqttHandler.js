@@ -1,7 +1,7 @@
 // bridge/mqttHandler.js
 import mqtt from 'mqtt';
-import { decodePacket } from '../packets/decodePacket.js';
-import { routePacket } from '../core/routePacket.js';
+import { decodePacket } from '../Meshtastic/packets/packetDecode.js';
+import { routePacket } from '../Meshtastic/packets/PacketRouter.js';
 
 export default function createMQTTHandler(sourceId, {
   brokerUrl = 'mqtt://broker.hivemq.com',

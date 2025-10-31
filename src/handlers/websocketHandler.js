@@ -1,6 +1,6 @@
 // File: ../handlers/websocketHandler.js
 
-import { registerClient } from '../utils/websocketEmitter.js';
+import { registerClient } from '../events/webSocketEmitter.js';
 
 export default function websocketHandler(ws, req) {
   registerClient(ws);

@@ -1,5 +1,5 @@
 import db from '../db.js';
-import { setMapping, setChannelMapping } from '../../core/nodeMapping.js';
+import { setMapping, setChannelMapping } from '../../Meshtastic/routing/nodeMapping.js';
 
 // insertConfig ============================================================
 
