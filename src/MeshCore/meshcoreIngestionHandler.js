@@ -11,7 +11,6 @@ import { updateNodeState } from './sessionManager.js';
 // to hard connect this.
 export function ingest(type, data) {
   const { meta } = data;
-  console.log('ingest type', type);
   try {
     // Route + update session state
     dispatchPacket({type, data });

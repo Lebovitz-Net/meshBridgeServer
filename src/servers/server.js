@@ -7,16 +7,15 @@ import cors from 'cors';
 import { WebSocketServer } from 'ws';
 
 import runtimeConfigRoutes from '../api/runtimeConfigRoutes.js';
-import createMQTTHandler from '../handlers/mqttHandler.js';
 import { initProtoTypes } from '../Meshtastic/utils/protoUtils.js';
 import { shutdown } from '../api/servicesManager.js';
 import { registerRoutes } from '../api/routes.js';
 import { sseRouter } from './sse.js';
 import { sseHandler } from './sseHandlers.js';
 import websocketHandler from '../handlers/websocketHandler.js';
-
 import { startMeshtastic } from './meshtasticStartup.js';
 import { startMeshcore } from './meshcoreStartup.js';
+import { startMqttServer } from './mqttStartup.js';
 
 export async function startServer() {
   // --- Initialize protobufs for Meshtastic ---
@@ -49,16 +48,9 @@ export async function startServer() {
   wss.on('connection', websocketHandler);
 
   // --- Start runtimes ---
-  const mesh = await startMeshtastic();   // Meshtastic runtime (with startup handshake)
+  //const mesh = await startMeshtastic();   // Meshtastic runtime (with startup handshake)
   const { meshcore, interval } = await startMeshcore(); // MeshCore runtime (placeholder handshake for now)
-
-  // --- MQTT Bridge ---
-  const mqttHandler = createMQTTHandler('mqtt-bridge', {
-    brokerUrl: config.mqtt.brokerUrl,
-    subTopic: config.mqtt.subTopic,
-    pubOptions: config.mqtt.pubOptions
-  });
-  mqttHandler.connect();
+  //const mqttHandler = await startMqttServer();
 
   // --- Graceful Shutdown ---
   ['SIGINT', 'SIGTERM'].forEach(sig => {
@@ -74,7 +66,7 @@ export async function startServer() {
 
       // Close HTTP server
       apiServer.close(() => console.log('🛑 HTTP server closed'));
-      if (interval) clearInterval(interval);
+      if (stoploop) stoploop();
       // Run any service shutdown hooks
       shutdown(sig);
     });

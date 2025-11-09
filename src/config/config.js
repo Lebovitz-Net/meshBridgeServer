@@ -64,3 +64,8 @@ export const config = {
     port: currentIPPort
   }
 };
+
+export const NODE_TYPES = {
+  MESHTASTIC: 0,
+  MESHCORE: 1
+};

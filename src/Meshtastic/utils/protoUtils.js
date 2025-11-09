@@ -27,7 +27,6 @@ const meshProtoTypes = Object.keys(topLevelProtos)
                             .sort((a, b) => sortOrder(a) - sortOrder(b));
 
 
-
 export async function initProtoTypes () {
 
   meshProtoTypes.map((type) => {

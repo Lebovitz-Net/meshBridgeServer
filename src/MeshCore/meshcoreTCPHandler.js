@@ -2,7 +2,7 @@
 import { EventEmitter } from 'events';
 import { ingest } from './meshcoreIngestionHandler.js';
 import Constants from '../../external/meshcore.js/src/constants.js';
-import TCPConnection from '../../external/meshcore.js/src/connection/tcp_connection.js';
+import TCPConnection from './meshcore_connection.js';
 
 /**
  * MeshCore TCP Handler
@@ -25,6 +25,18 @@ export async function createMeshcoreTCPHandler(connId, host, port, opts = {}) {
   tcp.emit = (eventName, data) => {
     // if (Object.values(Constants.ResponseCodes).includes(eventName)) {
     if (Number(eventName) || Number(eventName) ===  0) {
+      switch (eventName) {
+        case 10: // noMoreMessages
+        case 5:  // selfInfo
+        case 0: 
+          emitter.emit('ok', {connId, data});
+          break;
+        case 1: 
+          emitter.emit('err', {connId, data});
+          break;
+        default:
+          break;
+      }
       ingest(eventName, {
         data,
         meta: {
@@ -34,22 +46,25 @@ export async function createMeshcoreTCPHandler(connId, host, port, opts = {}) {
         }
       });
     } else {
-      console.log(".../other event types", eventName);
+
+      switch (eventName) {
+        case 'rx':
+          console.log("got an rx");
+          break
+        case 'tx':
+          emitter.emit('tx', { connId, data });
+          break;
+        case 'connected':
+          console.log('.../meshcoretcpHandler got connected');
+          emitter.emit('connected', { connId, host, port });
+          break;
+        case 'disconnected':
+          emitter.emit('disconnected', { connId, host, port });
+          break;
+      }
     }
 
-    switch (eventName) {
-      case 'tx':
-        emitter.emit('tx', { connId, data });
-        break;
-      case 'connected':
-        emitter.emit('connected', { connId, host, port });
-        break;
-      case 'disconnected':
-        emitter.emit('disconnected', { connId, host, port });
-        break;
-    }
-
-    return baseEmitter(eventName, data);
+    baseEmitter(eventName, data);
   };
 
   // Connect immediately

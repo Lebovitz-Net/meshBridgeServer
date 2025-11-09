@@ -1,9 +1,28 @@
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import { dbNodes } from './db_nodes.js';
+import { dbMetrics } from './db_metrics.js';
+import { dbMessages } from './db_messages.js';
+import { dbMaps } from  './db_maps.js';
+import { dbDiagnostics } from './db_diagnostics.js';
+import { dbConnections } from './db_connections.js';
+import { dbConfigs } from './db_configs.js';
+
+const tables = [
+  ...dbConfigs,
+  ...dbConnections,
+  ...dbDiagnostics,
+  ...dbMaps,
+  ...dbMessages,
+  ...dbMetrics,
+  ...dbNodes,
+];
+
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = resolve(__dirname, 'meshmanager.db');
+const dbPath = resolve(__dirname, '../../data/meshmanager.db');
 console.log('[db] Opening DB at:', dbPath);
 
 const TRUE = 1;
@@ -12,336 +31,36 @@ export const dbBoolean = (val) => val ? TRUE : FALSE;
 
 const db = new Database(dbPath);
 
-export const buildUserInfoTables = () => {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS my_info (
-      myNodeNum INTEGER PRIMARY KEY,
-      deviceId TEXT,
-      rebootCount INTEGER,
-      minAppVersion INTEGER,
-      pioEnv TEXT,
-      currentIP TEXT,
-      connId TEXT,
-      timestamp INTEGER
-    );
-
-    CREATE TABLE IF NOT EXISTS nodes (
-      num INTEGER PRIMARY KEY,
-      label TEXT,
-      device_id TEXT,
-      last_seen INTEGER,
-      viaMqtt BOOLEAN,
-      hopsAway INTEGER,
-      lastHeard INTEGER
-    );
-
-    CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY,
-      nodeNum INTEGER,
-      longName TEXT,
-      shortName TEXT,
-      macaddr TEXT,
-      hwModel INTEGER,
-      publicKey TEXT,
-      isUnmessagable BOOLEAN,
-      updatedAt INTEGER,
-      FOREIGN KEY (nodeNum) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS positions (
-      id INTEGER PRIMARY KEY,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      latitude REAL,
-      longitude REAL,
-      altitude REAL,
-      timestamp INTEGER
-    );
-
-    CREATE TABLE IF NOT EXISTS channels (
-      channel_num INTEGER PRIMARY KEY,
-      num INTEGER,
-      "index" INTEGER,
-      name TEXT,
-      role TEXT,
-      psk TEXT,
-      uplink_enabled BOOLEAN,
-      downlink_enabled BOOLEAN,
-      module_settings_json TEXT,
-      timestamp INTEGER DEFAULT (strftime('%s','now')),
-      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
-    );
-
-    CREATE TABLE IF NOT EXISTS messages (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      messageId INTEGER,
-      fromNodeNum INTEGER,
-      toNodeNum INTEGER,
-      channelId INTEGER,
-      sender TEXT,
-      message TEXT,
-      replyId INTEGER,
-      wantReply BOOLEAN,
-      wantAck BOOLEAN,
-      viaMqtt BOOLEAN,
-      timestamp INTEGER
-    );
-
-    CREATE TABLE IF NOT EXISTS connections (
-      connection_id TEXT PRIMARY KEY,
-      num INTEGER,
-      transport TEXT,
-      status TEXT,
-      FOREIGN KEY (num) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS device_ip_map (
-      source_ip TEXT PRIMARY KEY,
-      num INTEGER NOT NULL,
-      device_id TEXT,
-      last_seen INTEGER NOT NULL
-    );
-  `);
-  console.log('[db] User info tables created');
+export const buildDatabase = (db) => {
+  tables.forEach((sql, i) => {
+    try {
+      db.exec(sql);
+      const tableName = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)?.[1] ?? `Table ${i + 1}`;
+      console.log(`[DB] Created: ${tableName}`);
+    } catch (err) {
+      console.error(`[DB] Error creating table ${i + 1}: ${err.message}`);
+    }
+  });
 };
 
-export const buildMetricsTables = () => {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS device_metrics (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      batteryLevel REAL,
-      txPower INTEGER,
-      uptime INTEGER,
-      cpuTemp REAL,
-      memoryUsage REAL,
-      timestamp INTEGER,
-      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
-    );
+export const applyMigrations = (db) => {
+  const currentVersion = db.prepare(`SELECT value FROM schema_meta WHERE key = 'schemaVersion'`).get()?.value ?? 0;
 
-    CREATE TABLE IF NOT EXISTS telemetry (
-      telemetryId INTEGER PRIMARY KEY AUTOINCREMENT,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      metric TEXT,
-      value REAL,
-      timestamp INTEGER,
-      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS event_emissions (
-      event_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER,
-      event_type TEXT,
-      details TEXT,
-      timestamp INTEGER,
-      FOREIGN KEY (num) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS queue_status (
-      status_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER,
-      res INTEGER,
-      free INTEGER,
-      maxlen INTEGER,
-      meshPacketId INTEGER,
-      timestamp INTEGER DEFAULT (strftime('%s','now')),
-      connId TEXT,
-      FOREIGN KEY (num) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS environment_metrics (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      temperature REAL,
-      humidity REAL,
-      pressure REAL,
-      lightLevel REAL,
-      timestamp INTEGER,
-      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS air_quality_metrics (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      pm25 REAL,
-      pm10 REAL,
-      co2 REAL,
-      voc REAL,
-      ozone REAL,
-      timestamp INTEGER,
-      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS power_metrics (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      voltage REAL,
-      current REAL,
-      power REAL,
-      energy REAL,
-      frequency REAL,
-      timestamp INTEGER,
-      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS local_stats (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      snr REAL,
-      rssi REAL,
-      hopCount INTEGER,
-      linkQuality REAL,
-      packetLoss REAL,
-      timestamp INTEGER,
-      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS health_metrics (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      cpuTemp REAL,
-      diskUsage REAL,
-      memoryUsage REAL,
-      uptime INTEGER,
-      loadAvg REAL,
-      timestamp INTEGER,
-      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
-    );
-
-    CREATE TABLE IF NOT EXISTS host_metrics (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      fromNodeNum INTEGER NOT NULL,
-      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
-      hostname TEXT,
-      uptime INTEGER,
-      loadAvg REAL,
-      osVersion TEXT,
-      bootTime INTEGER,
-      timestamp INTEGER,
-      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
-    );
-  `);
-  console.log('[db] Metrics tables created');
-};
-
-export const buildDiagnosticTables = () => {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS log_records (
-      num INTEGER PRIMARY KEY,
-      packetType TEXT NOT NULL DEFAULT 'logRecord',
-      message TEXT NOT NULL,
-      timestamp INTEGER NOT NULL,
-      connId TEXT,
-      decodeStatus TEXT DEFAULT 'pending'
-    );
-
-    CREATE TABLE IF NOT EXISTS packet_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER,
-      packet_type TEXT NOT NULL,
-      timestamp INTEGER NOT NULL,
-      raw_payload TEXT
-    );
-
-    CREATE TABLE IF NOT EXISTS metadata (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER,
-      firmwareVersion TEXT,
-      deviceStateVersion INTEGER,
-      canShutdown BOOLEAN,
-      hasWifi BOOLEAN,
-      hasBluetooth BOOLEAN,
-      hwModel INTEGER,
-      hasPKC BOOLEAN,
-      excludedModules INTEGER,
-      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
-    );
-
-    CREATE TABLE IF NOT EXISTS config (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER NOT NULL,
-      timestamp INTEGER,
-      type TEXT NOT NULL,
-      payload TEXT NOT NULL,
-      device_id TEXT,
-      conn_Id TEXT,
-      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
-    );
-
-    CREATE TABLE IF NOT EXISTS module_config (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER NOT NULL,
-      timestamp INTEGER,
-      type TEXT NOT NULL,
-      payload TEXT NOT NULL,
-      device_id TEXT,
-      conn_Id TEXT,
-      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
-    );
-
-    CREATE TABLE IF NOT EXISTS file_info (
-      file_info_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      num INTEGER,
-      filename TEXT,
-      size INTEGER,
-      mime_type TEXT,
-      description TEXT,
-      timestamp INTEGER DEFAULT (strftime('%s','now')),
-      conn_id TEXT,
-      FOREIGN KEY (num) REFERENCES nodes(num)
-    );
-  `);
-  console.log('[db] Diagnostic tables created');
-};
-
-export const buildDeviceConfigTables = () => {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS devices (
-      device_id TEXT PRIMARY KEY,
-      num INTEGER,
-      conn_id TEXT,
-      device_type TEXT DEFAULT 'meshtastic',
-      last_seen INTEGER DEFAULT (strftime('%s','now'))
-    );
-
-    CREATE TABLE IF NOT EXISTS device_settings (
-      device_id TEXT NOT NULL,
-      num INTEGER,
-      config_type TEXT NOT NULL,
-      config_json TEXT NOT NULL,
-      conn_id TEXT,
-      updated_at INTEGER NOT NULL,
-      PRIMARY KEY (device_id, config_type)
-    );
-
-   CREATE TABLE IF NOT EXISTS device_meta (
-      device_id TEXT REFERENCES devices(device_id),
-      reboot_count INTEGER,
-      min_app_version INTEGER,
-      pio_env TEXT,
-      firmware_version TEXT,
-      hw_model INTEGER,
-      conn_id TEXT,
-      updated_at INTEGER DEFAULT (strftime('%s','now')),
-      timestamp INTEGER DEFAULT (strftime('%s','now'))
-    );
-  `);
-    console.log('[db] build device configuration tables complete');
-};
-
-
-export const buildDatabase = () => {
-  buildUserInfoTables();
-  buildMetricsTables();
-  buildDiagonsticTables();
-  buildDeviceConfigTables();
+  for (const { version, tables } of dbSchemas) {
+    if (version > currentVersion) {
+      console.log(`[DB] Applying schema version ${version}`);
+      for (const sql of tables) {
+        try {
+          db.exec(sql);
+          console.log(`[DB] Executed: ${sql.split('\n')[0].trim()}`);
+        } catch (err) {
+          console.error(`[DB] Error: ${err.message}`);
+        }
+      }
+      db.prepare(`REPLACE INTO schema_meta (key, value) VALUES ('schemaVersion', ?)`).run(version);
+      console.log(`[DB] Updated schema version to ${version}`);
+    }
+  }
 };
 
 export default db;

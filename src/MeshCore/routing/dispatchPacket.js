@@ -5,6 +5,7 @@ import { dispatchMetrics } from './dispatchMetrics.js';
 import { dispatchChannels } from './dispatchChannels.js';
 import { dispatchMeshPacket } from './dispatchMeshPacket.js';
 import { dispatchMqtt } from './dispatchMqtt.js';
+import { portNums } from '../portNums.js';
 import { dispatchDiagnostics } from './dispatchDiagnostics.js';
 import Constants from '../../../external/meshcore.js/src/constants.js';
 import { TypeFormatFlags } from 'typescript';
@@ -17,8 +18,11 @@ const responseMap = new Map(
   Object.entries(allCodes).map(([key, value]) => [value, key])
 );
 
-export const getEventName = (num) => {
-   return responseMap.get(num);
+export const getTypeName = (type) => {
+  if (Number(type) || Number(type) === 0) {
+    return responseMap.get(type);
+  }
+  else return type;
 }
 
 const dispatchRegistry = {
@@ -40,7 +44,7 @@ const dispatchRegistry = {
 export function dispatchPacket(subPacket) {
   if (!subPacket) return;
   const {type, data, meta} = subPacket;
-  const key = getEventName(type);
+  const key = getTypeName(type);
   const handler = dispatchRegistry[key];
   if (handler) {
     handler(subPacket);

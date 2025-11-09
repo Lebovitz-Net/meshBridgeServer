@@ -30,7 +30,8 @@ export default async function createMeshcoreHandler(connId, host, port, opts = {
   tcpRuntime.on('connected', (info) => emitter.emit('connected', info));
   tcpRuntime.on('disconnected', (info) => emitter.emit('disconnected', info));
   tcpRuntime.on('tx', (info) => emitter.emit('tx', info));
-  tcpRuntime.on('error', (err) => emitter.emit('error', err));
+  tcpRuntime.on('ok', (info) => emitter.emit('ok', info));
+  tcpRuntime.on('err', (err) => emitter.emit('err', err));
 
   // Await the "connected" event
   async function awaitConnected(timeoutMs = 5000) {
@@ -59,6 +60,7 @@ export default async function createMeshcoreHandler(connId, host, port, opts = {
     type: 'meshcore',
     on: emitter.on.bind(emitter),
     off: emitter.off.bind(emitter),
+    once: emitter.once.bind(emitter),
     awaitConnected,
     tcp, // expose the full TCPConnection instance
   };
