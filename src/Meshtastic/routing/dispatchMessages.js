@@ -16,13 +16,16 @@ export const dispatchMessages = {
       messageId: data.id,
       fromNodeNum,
       toNodeNum,
-      device_id,
-      connId,
       timestamp,
       channelId: meta.channel ?? 0,
-      replyId: data.replyId ?? 0,
-      wantReply: data.wantReply ? 1 : 0,
-      wantAck: data.wantAck ? 1 : 0,
+      nodeId: connId,
+      protocol: 'Meshtastic',
+      sender: data.replyId ?? null,
+      options: { 
+        replyId: data.replyId ?? 0,
+        wantReply: data.wantReply ? 1 : 0,
+        wantAck: data.wantAck ? 1 : 0
+      }
     });
 
     emitOverlay('message', subPacket);

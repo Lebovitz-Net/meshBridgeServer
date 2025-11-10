@@ -28,7 +28,7 @@ export async function createMeshcoreTCPHandler(connId, host, port, opts = {}) {
       switch (eventName) {
         case 10: // noMoreMessages
         case 5:  // selfInfo
-        case 0: 
+        case 0:  // Ok
           emitter.emit('ok', {connId, data});
           break;
         case 1: 
@@ -49,7 +49,6 @@ export async function createMeshcoreTCPHandler(connId, host, port, opts = {}) {
 
       switch (eventName) {
         case 'rx':
-          console.log("got an rx");
           break
         case 'tx':
           emitter.emit('tx', { connId, data });

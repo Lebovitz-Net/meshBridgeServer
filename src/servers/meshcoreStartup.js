@@ -6,6 +6,8 @@ import { getHexKey, repeaterContacts } from '../MeshCore/repeaterContacts.js';
 import { ingest as meshcoreIngest } from '../MeshCore/meshcoreIngestionHandler.js';
 import Constants from '../../external/meshcore.js/src/constants.js';
 import { MeshcoreCommandQueue } from '../MeshCore/meshcoreCommandQueue.js';
+import { dispatchPacket } from '../MeshCore/routing/dispatchPacket.js';
+import { dispatch } from '../MeshCore/packetRouter.js';
 
 export async function startMeshcore() {
   const host = process.env.MESHCORE_HOST || '192.168.2.79';
@@ -44,6 +46,7 @@ export async function startMeshcore() {
   await queue.send(() => meshcore.tcp.setAdvertName('KD1MU') );
   await queue.send(() => meshcore.tcp.setAdvertLatLong(42345096,-71121411) );
   await queue.send(() => meshcore.tcp.getWaitingMessages());
+
   // await queue.send(() => meshcore.tcp.sendChannelTextMessage(0, "yeah the connection seems pretty stable. I have the device and antenna on the GMRS repeater mast."));
     // await queue.send(() => meshcore.tcp.getNeighbours(bos4_repeaterPubKey) );
     // await queue.send(() => meshcore.tcp.tracePath([getHexKey('bos4')]) );

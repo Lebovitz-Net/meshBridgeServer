@@ -20,14 +20,15 @@ export const generateMessageId = (packet) => {
 };
 
 // --- Utility: Extract sender and mentions from message string ---
-const extractSenderAndMentions = (message) => {
-  const senderMatch = message.match(/^@(\w+)/); // e.g. "@gregg hello world"
-  const mentionMatches = [...message.matchAll(/@(\w+)/g)].map(m => m[1]);
+const extractSenderAndMentions = (raw) => {
+  const splitIndex = raw.indexOf(':');
+  const sender = splitIndex !== -1 ? raw.slice(0, splitIndex).trim().toLowerCase() : null;
+  const message = splitIndex !== -1 ? raw.slice(splitIndex + 1).trim() : raw;
 
-  return {
-    sender: senderMatch ? senderMatch[1] : null,
-    mentions: mentionMatches.length > 0 ? mentionMatches : []
-  };
+  const mentionMatches = [...message.matchAll(/@(\w+)/g)].map(m => m[1].toLowerCase());
+  const mentions = [...new Set(mentionMatches)];
+
+  return { sender, message, mentions };
 };
 
 export const dispatchMessages = {
@@ -43,11 +44,12 @@ export const dispatchMessages = {
         console.log('.../dispatchMessages Advert key is', getTextFromKey(key));
     },
     ChannelMsgRecv: (packet) => {
-        console.log('.../dispatchMessages Channel Message is', packet);
 
-        const { date, meta } = packet.data
+        const { data, meta } = packet.data
         const rawText = data.text ?? '';
         const { sender, mentions } = extractSenderAndMentions(rawText);
+        console.log('.../dispatchMessages Channel Message is', rawText);
+
 
         const shaped = {
             messageId: generateMessageId(packet),
@@ -55,16 +57,12 @@ export const dispatchMessages = {
             fromNodeNum: data.from ?? 0,
             toNodeNum: data.to ?? null,
             message: rawText,
-            wantAck: 0,
-            wantReply: 0,
-            replyId: sender,
             recvTimestamp: meta.timestamp ?? Date.now(),
-            sendTimestamp: data.senderTimestamp,
+            sentTimestamp: data.senderTimestamp,
             protocol: 'meshcore',
             sender,
             mentions,
-            flags: { type: data.txtType, pathLen: data.pathLen },
-            routing: data.routing ?? {}
+            options: { type: data.txtType, pathLen: data.pathLen },
         };
 
         insertMessage(shaped);
