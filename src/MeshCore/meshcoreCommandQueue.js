@@ -4,64 +4,64 @@ export class MeshcoreCommandQueue {
   isProcessing = false;
   loops = new Map();
 
-  constructor(meshcore, timeoutMs = 5000) {
+  constructor(handler, timeoutMs = 5000) {
     this.timeoutMs = timeoutMs;
-    this.meshcore = meshcore;
 
-    meshcore.on('ok', () => {
+    handler.on('ok', () => {
       if (this.waiting) {
         this.waiting('ok');
-        this.waiting = null;
       }
     });
 
-    meshcore.on('err', () => {
+    handler.on('err', () => {
       if (this.waiting) {
         this.waiting('err');
-        this.waiting = null;
       }
     });
-
   }
 
   send(commandFn) {
-    return new Promise((resolve) => {
-      const task = () => {
-        const startTime = Date.now();
-        console.log(`[MeshcoreQueue] Dispatching command at ${new Date(startTime).toISOString()}`);
+  return new Promise((resolve) => {
+    const task = () => {
+      const startTime = Date.now();
+      console.log(`[MeshcoreQueue] Dispatching command at ${new Date(startTime).toISOString()}`, commandFn.toString());
 
-        const timer = setTimeout(() => {
-          this.waiting = null;
-          console.warn(`[MeshcoreQueue] Command timed out after ${this.timeoutMs}ms`);
-          resolve('timeout');
-          this.processNext();
-        }, this.timeoutMs);
-
-        this.waiting = (status) => {
-          clearTimeout(timer);
-          const duration = Date.now() - startTime;
-          console.log(`[MeshcoreQueue] Command result: ${status} (${duration}ms)`);
-          resolve(status === 'ok' ? 'ok' : 'failed');
-          this.processNext();
-        };
-
-        try {
-          commandFn();
-        } catch (err) {
-          clearTimeout(timer);
-          this.waiting = null;
-          console.error(`[MeshcoreQueue] Command dispatch error: ${err.message}`);
-          resolve('error');
-          this.processNext();
+      const timer = setTimeout(() => {
+        if (this.waiting) {
+          console.warn(`[MeshcoreQueue] Command timed out after ${this.timeoutMs}ms`, commandFn.toString());
+          this.waiting('timeout');
         }
+      }, this.timeoutMs);
+
+      // Reserve waiting callback
+      this.waiting = (status) => {
+        clearTimeout(timer);
+        const duration = Date.now() - startTime;
+        console.log(`[MeshcoreQueue] Command result: ${status} (${duration}ms)`);
+        resolve(status === 'ok' ? 'ok' : status);
+        this.waiting = null;   // <-- clear here, after consumption
+        this.processNext();
       };
 
-      this.queue.push(task);
-      if (!this.isProcessing && !this.waiting) {
-        this.processNext();
+      try {
+        commandFn();
+      } catch (err) {
+        clearTimeout(timer);
+        console.error(`[MeshcoreQueue] Command dispatch error: ${err.message}`);
+        if (this.waiting) {
+          this.waiting('error');
+        }
       }
-    });
-  }
+    };
+
+    this.queue.push(task);
+
+    if (!this.isProcessing && !this.waiting) {
+      this.processNext();
+    }
+  });
+}
+
 
 
   processNext() {
@@ -97,7 +97,8 @@ export class MeshcoreCommandQueue {
       if (isRunning) return;
       isRunning = true;
 
-      const result = await this.send(commandFn);
+      const result = await commandFn(); // we assume the command will be setup to timeout.
+      console.log('start loop command', commandFn.toString())
       switch (result) {
         case 'ok':
           console.log(`[MeshcoreQueue] Loop "${label}" command succeeded`);

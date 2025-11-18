@@ -1,9 +1,10 @@
 export const dispatchConfigs = {
     DeviceInfo: (data) => {
-        console.log('.../DeviceFinfo data', data);
+        console.log('.../dispatchConfigs DeviceFinfo');
     },
     Err: (packet) => {
-        console.log('.../Error', packet);
+        const { data, meta } = packet.data;
+        console.log('.../dispatchConfigs Error Code: ', data.errCode);
     },
     
 }

@@ -7,25 +7,23 @@ export const dispatchMessages = {
   message: (subPacket) => {
   
     const { packet, meta } = subPacket;
-    const { fromNodeNum, toNodeNum, device_id, timestamp, connId } = meta;
+    const { fromNodeNum, toNodeNum, channel, timestamp, connId } = meta;
     const data = packet.data;
-    const message = data.decoded?.payload;
+    const { id, decoded, replyId, wantReply, wantAck } = data;
+    const message = decoded?.payload;
 
     insertHandlers.insertMessage({
+      contactId: fromNodeNum.toString(),
+      messageId: id,
+      channelId: channel ?? 0,
       message,
-      messageId: data.id,
       fromNodeNum,
       toNodeNum,
       timestamp,
-      channelId: meta.channel ?? 0,
-      nodeId: connId,
       protocol: 'Meshtastic',
-      sender: data.replyId ?? null,
-      options: { 
-        replyId: data.replyId ?? 0,
-        wantReply: data.wantReply ? 1 : 0,
-        wantAck: data.wantAck ? 1 : 0
-      }
+      sender: replyId ?? null,
+      options: JSON.stringify({ replyId, wantReply, wantAck }),
+      connId
     });
 
     emitOverlay('message', subPacket);

@@ -64,7 +64,7 @@ export const getEvents = safe((req, res) => {
 
 // --- My Info Handler ---
 export const listMyInfoHandler = safe(async (req, res) => {
-  const rows = await getMyInfo();
+  const rows = getMyInfo();
   res.json(rows);
   console.log("...listMyInfoHandler nodes",  rows)
 });

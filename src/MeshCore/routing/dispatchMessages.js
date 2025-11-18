@@ -1,4 +1,4 @@
-import { getTextFromKey } from '../repeaterContacts.js';
+import { getTextFromKey } from '../packetUtils.js';
 import { insertMessage } from '../../db/inserts/messageInserts.js';
 import { getTypeName } from './dispatchPacket.js';
 import crypto from 'crypto';
@@ -20,10 +20,14 @@ export const generateMessageId = (packet) => {
 };
 
 // --- Utility: Extract sender and mentions from message string ---
-const extractSenderAndMentions = (raw) => {
-  const splitIndex = raw.indexOf(':');
-  const sender = splitIndex !== -1 ? raw.slice(0, splitIndex).trim().toLowerCase() : null;
-  const message = splitIndex !== -1 ? raw.slice(splitIndex + 1).trim() : raw;
+const extractSenderAndMentions = (msg) => {
+  const splitIndex = msg.indexOf(':');
+  if (splitIndex === -1) {
+    return { sender:null, message: msg, mentions: null};
+  }
+
+  const sender  = msg.slice(0, splitIndex).trim().toLowerCase();
+  const message = msg.slice(splitIndex + 1).trim();
 
   const mentionMatches = [...message.matchAll(/@(\w+)/g)].map(m => m[1].toLowerCase());
   const mentions = [...new Set(mentionMatches)];
@@ -46,23 +50,29 @@ export const dispatchMessages = {
     ChannelMsgRecv: (packet) => {
 
         const { data, meta } = packet.data
-        const rawText = data.text ?? '';
-        const { sender, mentions } = extractSenderAndMentions(rawText);
-        console.log('.../dispatchMessages Channel Message is', rawText);
+        const { text, txtType, pathLen } = data;
+        const { sender, mentions } = extractSenderAndMentions(text);
 
+        if (sender == null) {
+            console.warn ('[dispatchMessage] skipping Message cannot extract sender', msg);
+            return;
+        }
+
+        console.log('.../dispatchMessages Channel Message is', text, sender);
 
         const shaped = {
+            contactId: sender,
             messageId: generateMessageId(packet),
             channelId: data.channelIdx ?? 'default',
             fromNodeNum: data.from ?? 0,
             toNodeNum: data.to ?? null,
-            message: rawText,
-            recvTimestamp: meta.timestamp ?? Date.now(),
+            message: text,
+            recvTimestamp: meta.timestamp,
             sentTimestamp: data.senderTimestamp,
             protocol: 'meshcore',
             sender,
-            mentions,
-            options: { type: data.txtType, pathLen: data.pathLen },
+            mentions: JSON.stringify(mentions),
+            options:  JSON.stringify({ txtType, pathLen }),
         };
 
         insertMessage(shaped);

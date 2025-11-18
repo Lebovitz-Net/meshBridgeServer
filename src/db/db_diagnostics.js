@@ -68,5 +68,6 @@ export const dbDiagnostics = [
       description TEXT,
       timestamp INTEGER DEFAULT (strftime('%s','now')),
       conn_id TEXT,
-      FOREIGN KEY (num) REFERENCES nodes(num)`
+      FOREIGN KEY (num) REFERENCES nodes(num)
+    );`
 ];

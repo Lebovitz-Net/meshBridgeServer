@@ -1,37 +1,73 @@
 // meshcoreHandler.js
 
 import { EventEmitter } from 'events';
-import { createMeshcoreTCPHandler } from '../MeshCore/meshcoreTCPHandler.js';
-import Packet from '../../external/meshcore.js/src/packet.js';
-import { dispatch } from '../MeshCore/packetRouter.js';
-import { updateNodeState } from '../MeshCore/sessionManager.js';
+import { ingest } from '../MeshCore/meshcoreIngestionHandler.js';
+import TCPConnection from '../MeshCore/meshcore_connection.js';
+import { MeshcoreRequests } from './meshcoreRequests.js';
 
-export default async function createMeshcoreHandler(connId, host, port, opts = {}) {
+export default async function createMeshcoreHandler(netParams,  opts = {}) {
   const emitter = new EventEmitter();
+  const { host, port, connId } = netParams;
+  const tcp = new TCPConnection(host, port);
+  const tcpHandler = {
+    on: emitter.on.bind(emitter),
+    connection: tcp,
+  }
+  const request = new MeshcoreRequests(tcpHandler, 10000);
 
-  // Create TCP handler (returns { on, tcp, ... })
-  const tcpRuntime = await createMeshcoreTCPHandler(connId, host, port, opts);
-  const { tcp } = tcpRuntime; // actual TCPConnection instance
-
-  // Decode inbound frames and emit normalized packets
-  tcpRuntime.on('frame', (data) => {
-    const { frame } = data;
-      emitter.emit('packet', {
+  const baseEmitter = tcp.emit.bind(tcp);
+  // pick up all events from the connection layer and process the ones we care about
+  // We should process connect, disconnect, response codes and push codes. Make sure
+  // to pass on the baseEmitters in case the meshcore.js uses events internally.
+  tcp.emit = (eventName, data) => {
+    // if (Object.values(Constants.ResponseCodes).includes(eventName)) {
+    if (Number(eventName) || Number(eventName) ===  0) {
+      switch (eventName) {
+        case 10: // noMoreMessages
+        case 5:  // selfInfo
+        case 4:  // EndOfContacts
+        case 0:  // Ok
+          console.log(`.../createMeshcoreTCPHandler got Ok event ${eventName}`);
+          emitter.emit('ok', {connId, data});
+          break;
+        case 1: 
+          emitter.emit('err', {connId, data});
+          break;
+        default:
+          break;
+      }
+      ingest(eventName, {
+        data,
         meta: {
+          currentIP: tcp.getCurrentIPAddress(),
           connId,
           source: 'meshcore',
           timestamp: Date.now(),
-        },
-        packet: frame,
+        }
       });
-  });
+    } else {
 
-  // Pass through lifecycle events
-  tcpRuntime.on('connected', (info) => emitter.emit('connected', info));
-  tcpRuntime.on('disconnected', (info) => emitter.emit('disconnected', info));
-  tcpRuntime.on('tx', (info) => emitter.emit('tx', info));
-  tcpRuntime.on('ok', (info) => emitter.emit('ok', info));
-  tcpRuntime.on('err', (err) => emitter.emit('err', err));
+      switch (eventName) {
+        case 'rx':
+          break
+        case 'tx':
+          emitter.emit('tx', { connId, data });
+          break;
+        case 'connected':
+          console.log('.../meshcoretcpHandler got connected');
+          emitter.emit('connected', { connId, host, port });
+          break;
+        case 'disconnected':
+          emitter.emit('disconnected', { connId, host, port });
+          break;
+      }
+    }
+
+    baseEmitter(eventName, data);
+  };
+
+  // Connect immediately
+  await tcp.connect();
 
   // Await the "connected" event
   async function awaitConnected(timeoutMs = 5000) {
@@ -56,12 +92,11 @@ export default async function createMeshcoreHandler(connId, host, port, opts = {
   }
 
   return {
-    id: connId,
-    type: 'meshcore',
+    type: tcpHandler.type,
     on: emitter.on.bind(emitter),
     off: emitter.off.bind(emitter),
     once: emitter.once.bind(emitter),
     awaitConnected,
-    tcp, // expose the full TCPConnection instance
+    request,
   };
 }

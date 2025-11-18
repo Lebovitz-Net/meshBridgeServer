@@ -8,8 +8,12 @@ import { dbMaps } from  './db_maps.js';
 import { dbDiagnostics } from './db_diagnostics.js';
 import { dbConnections } from './db_connections.js';
 import { dbConfigs } from './db_configs.js';
+import { dbContacts } from './db_contacts.js';
+import { dbChannels } from './db_channels.js';
 
 const tables = [
+  ...dbContacts,
+  ...dbChannels,
   ...dbConfigs,
   ...dbConnections,
   ...dbDiagnostics,
@@ -18,8 +22,6 @@ const tables = [
   ...dbMetrics,
   ...dbNodes,
 ];
-
-
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPath = resolve(__dirname, '../../data/meshmanager.db');

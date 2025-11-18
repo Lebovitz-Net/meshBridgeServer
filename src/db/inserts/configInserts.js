@@ -26,37 +26,43 @@ export function insertModuleConfig(subPacket) {
 }
 
 // InsertMyInfo ==============================================================
+// move this to nodes.
 
 export async function insertMyInfo(packet) {
   
   const { myNodeNum, deviceId, currentIP, channel} = packet;
 
-  if (!myNodeNum || !deviceId) {
-    console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, deviceId }, packet);
+  if (!myNodeNum || !currentIP) {
+    console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, currentIP }, packet);
     return;
   }
 
   setMapping(currentIP, myNodeNum, currentIP);
   setChannelMapping(channel ?? 0, myNodeNum);
-
+/*
+      myNodeNum INTEGER PRIMARY KEY,  -- hash from primaryKey in meshcore
+      type INTEGER DEFAULT 0,         -- type
+      options TEXT,                   -- deviceId, RebootCount, minAppVersion, pioEnv, 
+                                      -- radioFreq, radioBw, radioSf, radioCr, txPower, maxTxPower
+                                      -- advLat, advLon manualAddContact       
+      publicKey TEXT,
+      protocol INTEGER,               -- 0 Meshtastic, 1 Meshcore
+      currentIP TEXT,
+      connId TEXT,
+      timestamp INTEGER
+*/
   try {
-    await db.prepare(
+    db.prepare(
       `INSERT INTO my_info (
-        myNodeNum, deviceId, rebootCount, minAppVersion, pioEnv, currentIP, connId, timestamp
-      ) VALUES (@myNodeNum, @deviceId, @rebootCount, @minAppVersion, @pioEnv, @currentIP, @connId, @timestamp)
+        myNodeNum, name, type, options, publicKey, protocol, currentIP, connId, timestamp
+      ) VALUES (@myNodeNum, @name, @type, @options, @publicKey, @protocol, @currentIP, @connId, @timestamp)
       ON CONFLICT(myNodeNum) DO UPDATE SET
-        deviceId = excluded.deviceId,
-        rebootCount = excluded.rebootCount,
-        minAppVersion = excluded.minAppVersion,
-        pioEnv = excluded.pioEnv,
+        publicKey = excluded.publicKey,
         currentIP = excluded.currentIP,
         connId = excluded.connId,
         timestamp = excluded.timestamp`
     ).run({
         ...packet,
-        deviceId: deviceId | currentIP,
-        connId: packet.connId ?? null,
-        timestamp: Date.now(),
     })
   } catch (err) {
     console.error('[insertMyInfo] DB insert failed:', err);

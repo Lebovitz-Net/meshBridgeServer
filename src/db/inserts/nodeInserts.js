@@ -21,7 +21,7 @@ export const insertNode = (node, timestamp = Date.now()) => {
       lastHeard = excluded.lastHeard,
       device_id = excluded.device_id
   `).run({
-    num: node.num,
+    fromNodeNum: node.num,
     label: node.label ?? null,
     last_seen: node.last_seen ?? timestamp,
     viaMqtt: node.viaMqtt ? 1 : 0,
@@ -31,41 +31,8 @@ export const insertNode = (node, timestamp = Date.now()) => {
   });
 };
 
-// insertNodeUsers ===========================================
-export function insertNodeUsers(user, nodeNum) {
-  const longName = Buffer.isBuffer(user.longName) ? Buffer.toString(user.longName) : user.longName;
-  const shortName = Buffer.isBuffer(user.shortName) ? Buffer.toString(user.shortname) : user.shortName;
-  const macaddr = Buffer.isBuffer(user.macaddr) ? Buffer.toString(user.macaddr) : user.macaddr;
 
-  db.prepare(`
-    INSERT INTO node_users (
-      nodeNum, userId, longName, shortName, macaddr,
-      hwModel, publicKey, isUnmessagable, updatedAt
-    ) VALUES (
-      @nodeNum, @userId, @longName, @shortName, @macaddr,
-      @hwModel, @publicKey, @isUnmessagable, @updatedAt
-    )
-    ON CONFLICT(nodeNum) DO UPDATE SET
-      userId = excluded.userId,
-      longName = excluded.longName,
-      shortName = excluded.shortName,
-      macaddr = excluded.macaddr,
-      hwModel = excluded.hwModel,
-      publicKey = excluded.publicKey,
-      isUnmessagable = excluded.isUnmessagable,
-      updatedAt = excluded.updatedAt
-  `).run({
-    nodeNum,
-    userId: user?.id ?? null,
-    longName: longName ?? `Meshtastic Node ${nodeNum}`,
-    shortName: shortName ?? null,
-    macaddr: macaddr ?? null,
-    hwModel: user?.hwModel ?? null,
-    publicKey: user?.publicKey ?? null,
-    isUnmessagable: user?.isUnmessagable ? 1 : 0,
-    updatedAt: Date.now()
-  });
-}
+
 
 // insertNodeMetrics ===========================================
 export function insertNodeMetrics(deviceMetrics, { num, lastHeard = Date.now() }) {
@@ -95,10 +62,9 @@ export function insertPosition(decoded) {
 
   db.prepare(`
     INSERT INTO positions (fromNodeNum, toNodeNum, latitude, longitude, altitude, timestamp)
-    VALUES (@fromNodeNum, @toNodeNum, @latitude, @longitude, @altitude, @ts)
+    VALUES (@fromNodeNum, @latitude, @longitude, @altitude, @ts)
   `).run({
     fromNodeNum,
-    toNodeNum,
     latitude: Number(latitude),
     longitude: Number(longitude),
     altitude: altitude != null ? Number(altitude) : null,
@@ -107,7 +73,8 @@ export function insertPosition(decoded) {
 }
 
 // UpsertNodeInfo ===========================================
-export const upsertNodeInfo = (nodeInfo) => {
+export const upsertNodeInfo = (packet) => {
+  const { nodeInfo, user, position, deviceMetrics } = packet;
   const num = nodeInfo?.num;
 
   if (!num) {
@@ -116,88 +83,33 @@ export const upsertNodeInfo = (nodeInfo) => {
   }
 
   const tx = db.transaction(() => {
-    const user = nodeInfo.user ? nodeInfo.user : nodeInfo;
     insertNode({
-      num,
-      label: user?.longName ??  null,
-      last_seen: nodeInfo.lastHeard ?? Date.now(),
-      viaMqtt: nodeInfo.viaMqtt,
-      hopsAway: nodeInfo.hopsAway,
-      lastHeard: nodeInfo.lastHeard ?? null
+       ...nodeInfo,
     });
 
     if (user.id) {
-      insertNodeUsers(user, num);
-    } else {
-      // console.log('No user info to insert for node', nodeInfo, num);
+      insertUsers(user, num);
     }
 
-    if (nodeInfo.deviceMetrics != null) {
+    if (deviceMetrics != null) {
       insertNodeMetrics(nodeInfo, {
-        num,
-        lastHeard: nodeInfo.lastHeard
+        ...deviceMetrics
       });
     }
 
-    if (nodeInfo.postion) {
-       const data = node.position;
+    if (position) {on;
        console.log('.../nodesInsert upsertNodes position');
        insertPosition({
-        fromNodeNum: num,
-        toNodeNum: 0xffffffff,
-        latitude: data.latitude,
-        longitude: data.longitude,
-        altitude: data.altitude || null,
-        sats_in_view: data.satsInView || null,
-        batteryLevel: data.batteryLevel || null,
-        device_id: nodeInfo.device_d,
-        conn_id: nodeInfo.connId,
-        timestamp: nodeInfo.timestamp,
+         ...position,
        })
     }
-  });
 
-  tx();
-
-  // 🔥 Emit SSE update after successful insert/update
-  emitNodeUpdate({
-    num,
-    label: nodeInfo.user?.longName ?? nodeInfo.longName ?? null,
-    longName: nodeInfo.user?.longName ?? nodeInfo.longName ??  null,
-    shortName: nodeInfo.user?.shortName ?? nodeInfo.shortname ?? null,
-    lastheard: nodeInfo.lastHeard ?? Date.now(),
-    viaMqtt: nodeInfo.viaMqtt,
-    hopsAway: nodeInfo.hopsAway,
-    lastHeard: nodeInfo.lastHeard,
-    device_id: nodeInfo.device_id ?? null
-  });
+      // 🔥 Emit SSE update after successful insert/update
+    emitNodeUpdate({
+      ...nodeInfo
+    });
 
   return { num };
-};
-
-// insertUser ===========================================
-export const insertUser = (user) => {
-  const stmt = db.prepare(`
-    INSERT INTO users (id, longName, shortName, macaddr, hwModel, publicKey, isUnmessagable, nodeNum)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET
-      longName = excluded.longName,
-      shortName = excluded.shortName,
-      macaddr = excluded.macaddr,
-      hwModel = excluded.hwModel,
-      publicKey = excluded.publicKey,
-      isUnmessagable = excluded.isUnmessagable,
-      nodeNum = excluded.nodeNum
-  `);
-
-  stmt.run(
-    user.id,
-    user.longName,
-    user.shortName,
-    user.macaddr,
-    user.hwModel,
-    user.publicKey,
-    user.isUnmessagable ? 1 : 0,
-    user.nodeNum
-  );
-};
+  });
+  tx();
+}

@@ -15,3 +15,9 @@ export function emit(eventType, payload) {
     }
   }
 }
+
+export function shutdown() {
+  for (const ws of clients) {
+    ws.close();
+  }
+}

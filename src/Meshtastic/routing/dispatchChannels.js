@@ -8,21 +8,24 @@ export const dispatchChannels = {
         const { type, data, meta } = subPacket;
         const channel = data.channel;
         const settings = channel.settings;
+        const { channelNum, name, psk, uplinkEnabled, downlinkEnabled, moduleSettings } = settings;
 
         if (channel?.role) {
         insertHandlers.insertChannel({
-            channel_num: settings?.channelNum || 0,
-            num: meta.fromNodeNum,
-            device_id: meta.device_id,
-            index: channel.index || 0,
-            name: settings.name || 'default',
+            channelNum: channelNum || 0,
+            channelIdx: channel.index || 0,
+            nodeNum: meta.fromNodeNum,
+            protocol: 0,
+            name: name || 'default',
             role: channel.role,
-            psk: settings.psk || null,
-            uplink_enabled: settings.uplinkEnabled ? 1: 0,
-            downlink_enabled: settings.downlinkEnabled ? 1 : 0,
-            module_settings_json: settings.moduleSettings ? JSON.stringify(settings.moduleSettings) : null,
-            conn_id: meta.connId,
-            timestamp: Date.now(),
+            psk: psk || null,
+            options: { 
+                moduleSettings: moduleSettings ? JSON.stringify(moduleSettings) : null,
+                uplinkEnabled,
+                downlinkEnabled
+            },
+            connId: meta.connId,
+            timestamp: meta.timestamp,
         });
         }
   },

@@ -1,4 +1,3 @@
-// routes.js
 import api from './handlers.js';
 import { restartServices } from './servicesManager.js';
 import { getNodeIP, setNodeIP } from '../config/config.js';
@@ -12,8 +11,8 @@ const {
   getNodeHandler,
   deleteNodeHandler,
   listChannels,
-  listMessagesForChannelHandler,
-  listExtendedMessagesForChannelHandler,
+  listMessagesHandler,              // ✅ new unified handler
+  listMessagesForChannelHandler,    // ✅ channel-scoped handler
   sendMessageHandler,
   listConnections,
   listPacketsHandler,
@@ -37,7 +36,8 @@ const {
   listAllModuleConfigsHandler,
   getMetadataByKeyHandler,
   listAllMetadataHandler,
-  listFileInfoHandler
+  listFileInfoHandler,
+  listContactsHandler
 } = api;
 
 export function registerRoutes(app) {
@@ -66,10 +66,20 @@ export function registerRoutes(app) {
   app.get('/api/v1/nodes/:id', getNodeHandler);
   app.delete('/api/v1/nodes/:id', deleteNodeHandler);
   app.get('/api/v1/nodes', listNodesHandler);
-  app.get('/api/v1/channels/:id/messages', listExtendedMessagesForChannelHandler);  
+
+  // --- Channels ---
+  app.get('/api/v1/channels/:id/messages', listMessagesForChannelHandler); // ✅ channel-scoped
   app.get('/api/v1/channels/:id', listChannels);
 
+  // --- Messages ---
+  app.get('/api/v1/messages', listMessagesHandler);       // ✅ unified
+  app.post('/api/v1/messages', sendMessageHandler);       // ✅ standardized
+
+  // --- My Info ---
   app.get('/api/v1/myinfo', listMyInfoHandler);
+
+  // --- Contacts ---
+    app.get('/api/v1/contacts', listContactsHandler);
 
   // --- Packets ---
   app.get('/api/v1/packets', listPacketsHandler);
@@ -80,8 +90,6 @@ export function registerRoutes(app) {
   app.get('/api/v1/nodes/:id/packet-logs', getPacketLogs);
   app.get('/api/v1/nodes/:id/telemetry', getTelemetry);
   app.get('/api/v1/nodes/:id/events', getEvents);
-  app.post('/api/v1/sendMessage', sendMessageHandler);
-
 
   // --- Metrics (Global) ---
   app.get('/api/v1/metrics', getMetrics);

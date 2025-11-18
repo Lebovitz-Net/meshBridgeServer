@@ -55,7 +55,7 @@ export default class MeshcoreConnection extends TcpConnection {
 
     this.socket.on('close', (hadError) => {
       console.warn(`Socket closed${hadError ? ' due to error' : ''}`);
-      this.attemptReconnect();
+      if (hadError) this.attemptReconnect();
     });
 
     // this.socket.setTimeout(30000);
@@ -70,7 +70,9 @@ export default class MeshcoreConnection extends TcpConnection {
     });
   }
 
-
+  getCurrentIPAddress() {
+    return this.socket.remoteAddress;
+  }
 
   onSocketDataReceived(data) {
     this.readBuffer = [...this.readBuffer, ...data];

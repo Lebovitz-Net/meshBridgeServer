@@ -3,8 +3,11 @@ export const dbMessages = [
     `CREATE TABLE IF NOT EXISTS messages (
       -- Core
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      contactId TEXT NOT NULL,
       channelId INTEGER NOT NULL,
       message TEXT NOT NULL,
+
+      -- Meshcore Specific 
       sender TEXT,                         -- e.g. "Nick D"
       mentions TEXT,              -- JSON array: '["KD1MU", "W1AW"]'
 
@@ -23,6 +26,9 @@ export const dbMessages = [
 
       -- Protocol metadata
       protocol TEXT NOT NULL,             -- 'meshcore' | 'meshtastic'
-      nodeId TEXT                         -- e.g. 'meshcore-1'
-    );`,
+      connId TEXT                         -- e.g. 'meshcore-1'
+    );
+    CREATE INDEX idx_messages_contact ON messages(contactId);
+    CREATE INDEX idx_messages_channel ON messages(channelId);
+    `,
 ];

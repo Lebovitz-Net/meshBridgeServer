@@ -4,6 +4,7 @@ import * as devices from './queries/devicesQuery.js';
 import * as metrics from './queries/metricsQuery.js';
 import * as diagnostics from './queries/diagnosticsQuery.js';
 import * as messages from './queries/messageQuery.js';
+import * as contacts from './queries/contactQuery.js';
 
 const queryHandlers = {
   ...nodes,
@@ -11,7 +12,8 @@ const queryHandlers = {
   ...devices,
   ...metrics,
   ...messages,
-  ...diagnostics
+  ...diagnostics,
+  ...contacts
 };
 
 export default queryHandlers;

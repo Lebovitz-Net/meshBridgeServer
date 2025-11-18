@@ -1,54 +1,28 @@
 import db from '../db.js';
 
 // --- Message Queries ---
+
+// Channel-scoped messages
 export const listMessagesForChannel = (channelId, limit = 100) => {
   return db.prepare(`
-    SELECT messageId, channelId, fromNodeNum, toNodeNum, 
-           message, wantAck, wantReply, replyId, timestamp
+    SELECT messageId, channelId, fromNodeNum, toNodeNum,
+      message, recvTimestamp,
+      sentTimestamp, protocol, sender, mentions, options
     FROM messages
     WHERE channelId = ?
-    ORDER BY timestamp DESC
+    ORDER BY sentTimestamp DESC
     LIMIT ?
   `).all(channelId, limit);
 };
 
-export const listExtendedMessagesForChannel = (channelId, limit = 100) => {
-
-  const selected = db.prepare(
-    `SELECT
-      -- messages table
-      m.messageId,
-      m.fromNodeNum,
-      m.toNodeNum,
-      m.channelId,
-      m.sender,
-      m.message,
-      m.replyId,
-      m.wantReply,
-      m.wantAck,
-      m.viaMqtt,
-      m.timestamp,
-
-      -- node_users table
-      nu.nodeNum       AS userNodeNum,
-      nu.userId,
-      nu.longName,
-      nu.shortName,
-      nu.macaddr,
-      nu.hwModel,
-      nu.publicKey,
-      nu.isUnmessagable,
-      nu.updatedAt
-    FROM
-      messages m
-    LEFT JOIN
-      node_users nu ON m.fromNodeNum = nu.nodeNum
-    WHERE
-      m.channelId = ?
-    ORDER BY
-      m.timestamp DESC
-    LIMIT ?`
-  ).all(channelId, limit);
-
-  return selected;
+// Unified messages across all channels
+export const listAllMessages = (limit = 500) => {
+  return db.prepare(`
+    SELECT messageId, channelId, fromNodeNum, toNodeNum,
+      message, recvTimestamp,
+      sentTimestamp, protocol, sender, mentions, options
+    FROM messages
+    ORDER BY sentTimestamp DESC
+    LIMIT ?
+  `).all(limit);
 };

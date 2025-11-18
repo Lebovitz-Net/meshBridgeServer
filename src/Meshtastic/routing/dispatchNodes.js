@@ -4,6 +4,7 @@ import { emitEvent } from '../../events/eventEmitter.js';
 import { validateUserPacket }  from '../utils/validators.js';
 import { decodeNodeInfo } from '../utils/stringUtils.js';
 import { currentIPHost } from '../../config/config.js';
+import Database from 'better-sqlite3';
 
 const dissectString = (str) => {
   const buffer = Buffer.from(str);
@@ -45,19 +46,63 @@ export const dispatchNodes = {
   nodeInfo: (subPacket) => {
     const { data, meta } = subPacket;
     const { connId, timestamp, device_id } = meta;
-    const { nodeInfo } = data;
+    const { num, user, position, snr, lastHeard, deviceMetrics, channel, 
+            viaMqtt, hopsAway, isFavorite, isIgnored, isKeyManuallyVerified } = data;
+
+    // get packet shape and fix me.
+    const nodeInfo = {
+      fromNodeNum: num,
+      last_seen: last_seen ?? timestamp,
+      viaMqtt: viaMqtt ? 1 : 0,
+      hopsAway: hopsAway ?? null,
+      channel,
+      viaMqtt,
+      hopsAway,
+      isFavorite,
+      isIgnored,
+      isKeyManuallyVerified,
+      lastHeard: lastHeard ?? null,
+      ...meta,
+    }
+    const userShape = {
+      contactId: num.toString(),
+      nodeNum: num,
+      name: longName,
+      shortName: shortname,
+      publiKey: publicKey ?? null,
+      times: JSON.stringify({ last_seen, lastHeard}),
+      options: JSON.stringify({ viaMqtt, hopsAway, label}),
+      position: JSON.stringify({ latitude, longitude, altitude }),
+      ...meta,
+    }
+
+    const deviceMetricsShape = {
+      fromNodeNum: num,
+      metrics: JSON.stringify({ ...deviceMetrics }),
+      ...meta
+    }
+
+    const positionShape = {
+      fromNodeNum: num,
+      toNodeNum: 0xffffffff,
+      latitude: position.latitude,
+      longitude: position.longitude,
+      altitude: position.altitude || null,
+      sats_in_view: position.satsInView || null,
+      batteryLevel: position.batteryLevel || null,
+      ...meta,
+  }
 
     const result = insertHandlers.upsertNodeInfo({
-      ...meta,
-      ...nodeInfo,
-      num: nodeInfo?.num || nodeInfo?.fromNodeNum || meta?.fromNodeNum,
-      connId,
-      timestamp,
-      device_id: device_id || meta.device_id || null,
+        data: {
+          nodeInfo: nodeInfoShape, 
+          user: userShape, 
+          position: positionShape 
+        }
     });
 
-    if (result?.num) subPacket.fromNodeNum = result.num;
-    if (result?.device_id) subPacket.device_id = result.device_id;
+    // if (result?.num) subPacket.fromNodeNum = result.num;
+    // if (result?.device_id) subPacket.device_id = result.device_id;
 
     emitOverlay('lineage', subPacket);
     emitEvent('configComplete', subPacket);
@@ -102,3 +147,5 @@ export const dispatchNodes = {
     console.log('[dispatchNodes] ... Position');
   }
 };
+
+

@@ -117,3 +117,4 @@ export function buildTextMessage(packet, opts = {}) {
     };
     return encodeTextMessage(sendBuf);
 }
+

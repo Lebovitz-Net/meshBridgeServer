@@ -1,6 +1,6 @@
 // meshGateway.js
-import { meshRequests } from '../handlers/meshtasticRequests.js';
-import { meshcoreRequests } from '../handlers/meshcoreRequests.js';
+// import { meshRequests } from '../handlers/meshtasticRequests.js';
+// import { meshcoreRequests } from '../handlers/meshcoreRequests.js';
 
 // connId → { type, handler }
 const runtimes = new Map();
@@ -31,26 +31,26 @@ export function registerMeshRuntime(connId, type, handler) {
  * @param {string} requestType - Request name (e.g. 'sendMessage')
  * @param {object} payload - Request payload
  */
-export async function dispatchRequest(connId, requestType, payload) {
-  const runtime = runtimes.get(connId);
-  if (!runtime) throw new Error(`No runtime registered for ${connId}`);
+// export async function dispatchRequest(connId, requestType, payload) {
+//   const runtime = runtimes.get(connId);
+//   if (!runtime) throw new Error(`No runtime registered for ${connId}`);
 
-  const { type, handler } = runtime;
-  const registry = type === 'meshcore' ? meshcoreRequests : meshRequests;
-  const builder = registry[requestType];
-  if (!builder) throw new Error(`Unknown request type: ${requestType}`);
+//   const { type, handler } = runtime;
+//   const registry = type === 'meshcore' ? meshcoreRequests : meshRequests;
+//   const builder = registry[requestType];
+//   if (!builder) throw new Error(`Unknown request type: ${requestType}`);
 
-  const packet = builder(payload);
+//   const packet = builder(payload);
 
-  if (dryRun) {
-    logBridgeEvent('dry-run', connId, type, { requestType, packet });
-    return packet;
-  }
+//   if (dryRun) {
+//     logBridgeEvent('dry-run', connId, type, { requestType, packet });
+//     return packet;
+//   }
 
-  logBridgeEvent('out', connId, type, { requestType, packet });
-  handler.send(packet);
-  return packet;
-}
+//   logBridgeEvent('out', connId, type, { requestType, packet });
+//   handler.send(packet);
+//   return packet;
+// }
 
 /**
  * Subscribe to inbound packets from a runtime

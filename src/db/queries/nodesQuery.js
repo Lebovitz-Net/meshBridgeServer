@@ -1,6 +1,8 @@
 ﻿import db from '../db.js';
 
 // --- Node Queries ---
+
+// Lightweight list of nodes
 export const listNodesOnly = () => {
   return db.prepare(`
     SELECT num, label, last_seen, viaMqtt, hopsAway, lastHeard
@@ -9,9 +11,10 @@ export const listNodesOnly = () => {
   `).all();
 };
 
+// Single node lookup
 export const getNode = (num) => {
   return db.prepare(`
-    SELECT num, label, last_seen, viaMqtt, hopsAway, lastHeard
+    SELECT num, label, last_seen, viaMqtt, hopsAway, lastHeard, device_id
     FROM nodes
     WHERE num = ?
   `).get(num);
@@ -19,9 +22,8 @@ export const getNode = (num) => {
 
 /**
  * List all enriched nodes with metadata and position info.
- * Joins node_users, node_metrics, and positions using schema-defined keys.
+ * Joins users, device_metrics, and positions using schema-defined keys.
  * Returns flat row objects for overlay sync or diagnostics.
- * @returns {Object[]}
  */
 export function listNodes() {
   const query = `
@@ -34,18 +36,21 @@ export function listNodes() {
       n.hopsAway,
       n.lastHeard,
 
-      u.userId,
-      u.longName AS userLongName,
+      u.contactId,
+      u.name AS userName,
       u.shortName AS userShortName,
-      u.macaddr,
-      u.hwModel AS userHwModel,
       u.publicKey,
-      u.isUnmessagable,
-      u.updatedAt AS userUpdatedAt,
+      u.timestamp AS userTimestamp,
+      u.protocol AS userProtocol,
+      u.options AS userOptions,
+      u.position AS userPosition,
 
-      m.lastHeard AS metricsLastHeard,
-      m.metrics AS metricsJson,
-      m.updatedAt AS metricsUpdatedAt,
+      m.timestamp AS metricsTimestamp,
+      m.batteryLevel,
+      m.txPower,
+      m.uptime,
+      m.cpuTemp,
+      m.memoryUsage,
 
       p.latitude AS positionLat,
       p.longitude AS positionLon,
@@ -55,13 +60,13 @@ export function listNodes() {
 
     FROM nodes n
 
-    LEFT JOIN node_users u ON u.nodeNum = n.num
+    LEFT JOIN users u ON u.nodeNum = n.num
 
-    LEFT JOIN node_metrics m ON m.nodeNum = n.num
-      AND m.updatedAt = (
-        SELECT MAX(updatedAt)
-        FROM node_metrics
-        WHERE nodeNum = n.num
+    LEFT JOIN device_metrics m ON m.fromNodeNum = n.num
+      AND m.timestamp = (
+        SELECT MAX(timestamp)
+        FROM device_metrics
+        WHERE fromNodeNum = n.num
       )
 
     LEFT JOIN positions p ON p.fromNodeNum = n.num
@@ -74,15 +79,30 @@ export function listNodes() {
   return db.prepare(query).all();
 }
 
+// --- Channels ---
+
+// Channels scoped to a node
 export const listChannelsForNode = (num) => {
   return db.prepare(`
-    SELECT channel_num, num, name, role
+    SELECT channelNum, nodeNum, name, role
     FROM channels
-    WHERE num = ?
+    WHERE nodeNum = ?
     ORDER BY name ASC
   `).all(num);
 };
 
+// Unified channels list
+export const listChannels = () => {
+  return db.prepare(`
+    SELECT channelNum, nodeNum, name, role
+    FROM channels
+    ORDER BY name ASC
+  `).all();
+};
+
+// --- Connections ---
+
+// Connections scoped to a node
 export const listConnectionsForNode = (num) => {
   return db.prepare(`
     SELECT connection_id, transport, status
@@ -92,20 +112,40 @@ export const listConnectionsForNode = (num) => {
   `).all(num);
 };
 
-// Placeholder for future expansion
-export const getNodeDetails = (num) => {
-  throw new Error('getNodeDetails not yet implemented');
+// Unified connections list
+export const listConnections = () => {
+  return db.prepare(`
+    SELECT connection_id, transport, status
+    FROM connections
+    ORDER BY connection_id ASC
+  `).all();
 };
 
+// --- Node Details ---
 
-export async function getMyInfo() {
-  return await db.prepare(`
+export const getNodeDetails = (num) => {
+  const node = getNode(num);
+  const channels = listChannelsForNode(num);
+  const connections = listConnectionsForNode(num);
+  return { ...node, channels, connections };
+};
+
+// --- My Info ---
+
+/**
+ * Get information about the current node/device.
+ * Values like deviceId, rebootCount, minAppVersion, pioEnv are stored in options JSON.
+ */
+export function getMyInfo() {
+  return db.prepare(`
     SELECT 
       myNodeNum,
-      deviceId,
-      rebootCount,
-      minAppVersion,
-      pioEnv,
+      name,
+      shortname,
+      type,
+      options,
+      publicKey,
+      protocol,
       currentIP,
       connId,
       timestamp

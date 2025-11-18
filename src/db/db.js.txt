@@ -1,0 +1,369 @@
+export const dbChannels = [
+    `CREATE TABLE IF NOT EXISTS channels (
+        channelIdx INTEGER PRIMARY KEY,
+        channelNum INTEGER,
+        nodeNum INTEGER,
+        protocol INTEGER DEFAULT 0,
+        name TEXT,
+        role TEXT,
+        psk TEXT,
+        options TEXT,
+        timestamp INTEGER,
+        connId TEXT
+    );`,
+]
+export const dbConfigs = [
+    `CREATE TABLE IF NOT EXISTS devices (
+      device_id TEXT PRIMARY KEY,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      conn_id TEXT,
+      device_type TEXT DEFAULT 'meshtastic',
+      last_seen INTEGER DEFAULT (strftime('%s','now'))
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS device_settings (
+      device_id TEXT NOT NULL,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      config_type TEXT NOT NULL,
+      config_json TEXT NOT NULL,
+      conn_id TEXT,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (device_id, config_type)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS device_meta (
+      device_id TEXT REFERENCES devices(device_id),
+      reboot_count INTEGER,
+      min_app_version INTEGER,
+      pio_env TEXT,
+      firmware_version TEXT,
+      hw_model INTEGER,
+      conn_id TEXT,
+      updated_at INTEGER DEFAULT (strftime('%s','now')),
+      timestamp INTEGER DEFAULT (strftime('%s','now'))
+    );`
+];
+export const dbConnections = [
+        `CREATE TABLE IF NOT EXISTS connections (
+      connection_id TEXT PRIMARY KEY,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      transport TEXT,
+      status TEXT,
+      FOREIGN KEY (num) REFERENCES nodes(num)
+    );`,
+];
+export const dbContacts = [
+`CREATE TABLE IF NOT EXISTS users (
+    contactId TEXT PRIMARY KEY, -- advName or String nodeNum
+    type INTEGER DEFAULT 0,     -- type
+    name TEXT,                  -- advName, longname
+    publicKey TEXT,             -- publicKey
+    timestamp INTEGER,
+    protocol INTEGER,
+
+    -- Meshtastic
+    nodeNum INTEGER,            -- nodeNum, or publicKey Hash
+    shortName TEXT,             -- shortName Meshtastic
+
+    times TEXT,                 -- lastHeard, lastMod, updateAt
+    options TEXT,               -- hwModel, macaddr, ismessageable, outPath, outPathLen, flags
+    position TEXT,              -- advlat, advlon or latitude, longitude from position
+    connId TEXT
+    );`,
+
+`CREATE TABLE IF NOT EXISTS positions (
+    contactid INTEGER PRIMARY KEY,
+    fromNodeNum INTEGER NOT NULL,
+    fromNodeType INTEGER DEFAULT 0,
+    toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+    toNodeType INTEGER DEFAULT 0,
+    latitude REAL,
+    longitude REAL,
+    altitude REAL,
+    timestamp INTEGER
+    );`,
+]export const dbDiagnostics = [
+    `CREATE TABLE IF NOT EXISTS log_records (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      packetType TEXT NOT NULL DEFAULT 'logRecord',
+      message TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      connId TEXT,
+      decodeStatus TEXT DEFAULT 'pending'
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS packet_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      packet_type TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      raw_payload TEXT
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS metadata (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      firmwareVersion TEXT,
+      deviceStateVersion INTEGER,
+      canShutdown BOOLEAN,
+      hasWifi BOOLEAN,
+      hasBluetooth BOOLEAN,
+      hwModel INTEGER,
+      hasPKC BOOLEAN,
+      excludedModules INTEGER,
+      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS config (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER NOT NULL,
+      nodeType INTEGER DEFAULT 0,
+      timestamp INTEGER,
+      type TEXT NOT NULL,
+      payload TEXT NOT NULL,
+      device_id TEXT,
+      conn_Id TEXT,
+      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS module_config (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER NOT NULL,
+      nodeType INTEGER DEFAULT 0,
+      timestamp INTEGER,
+      type TEXT NOT NULL,
+      payload TEXT NOT NULL,
+      device_id TEXT,
+      conn_Id TEXT,
+      FOREIGN KEY (num) REFERENCES my_info(myNodeNum)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS file_info (
+      file_info_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      filename TEXT,
+      size INTEGER,
+      mime_type TEXT,
+      description TEXT,
+      timestamp INTEGER DEFAULT (strftime('%s','now')),
+      conn_id TEXT,
+      FOREIGN KEY (num) REFERENCES nodes(num)
+    );`
+];
+export const dbMaps =[
+    
+    `CREATE TABLE IF NOT EXISTS device_ip_map (
+      source_ip TEXT PRIMARY KEY,
+      num INTEGER NOT NULL,
+      nodeType INTEGER DEFAULT 0,
+      device_id TEXT,
+      last_seen INTEGER NOT NULL
+    );`,
+];
+export const dbMessages = [
+    
+    `CREATE TABLE IF NOT EXISTS messages (
+      -- Core
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      contactId TEXT NOT NULL,
+      channelId INTEGER NOT NULL,
+      message TEXT NOT NULL,
+
+      -- Meshcore Specific 
+      sender TEXT,                         -- e.g. "Nick D"
+      mentions TEXT,              -- JSON array: '["KD1MU", "W1AW"]'
+
+      -- Meshtastic-specific
+      fromNodeNum INTEGER,
+      toNodeNum INTEGER,
+      toNodeType INTEGER DEFAULT 0,
+      messageId INTEGER,
+
+      -- options (flags and options)
+      options TEXT,
+
+      -- Timestamps
+      sentTimestamp INTEGER,              -- senderTimestamp
+      recvTimestamp INTEGER,              -- meta.timestamp
+
+      -- Protocol metadata
+      protocol TEXT NOT NULL,             -- 'meshcore' | 'meshtastic'
+      connId TEXT                         -- e.g. 'meshcore-1'
+    );
+    CREATE INDEX idx_messages_contact ON messages(contactId);
+    CREATE INDEX idx_messages_channel ON messages(channelId);
+    `,
+];
+export const dbMetrics = [
+   `CREATE TABLE IF NOT EXISTS device_metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      fromNodeNum INTEGER NOT NULL,
+      fromNodeType INTEGER DEFAULT 0,
+      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+      toNodeType INTEGER DEFAULT 0,
+      batteryLevel REAL,
+      txPower INTEGER,
+      uptime INTEGER,
+      cpuTemp REAL,
+      memoryUsage REAL,
+      timestamp INTEGER,
+      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS telemetry (
+      telemetryId INTEGER PRIMARY KEY AUTOINCREMENT,
+      fromNodeNum INTEGER NOT NULL,
+      fromNodeType INTEGER DEFAULT 0,
+      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+      toNodeType INTEGER DEFAULT 0,
+      metric TEXT,
+      value REAL,
+      timestamp INTEGER,
+      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS event_emissions (
+      event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      event_type TEXT,
+      details TEXT,
+      timestamp INTEGER,
+      FOREIGN KEY (num) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS queue_status (
+      status_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      num INTEGER,
+      nodeType INTEGER DEFAULT 0,
+      res INTEGER,
+      free INTEGER,
+      maxlen INTEGER,
+      meshPacketId INTEGER,
+      timestamp INTEGER DEFAULT (strftime('%s','now')),
+      connId TEXT,
+      FOREIGN KEY (num) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS environment_metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      fromNodeNum INTEGER NOT NULL,
+      fromNodeType INTEGER DEFAULT 0,
+      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+      toNodeType INTEGER DEFAULT 0,
+      temperature REAL,
+      humidity REAL,
+      pressure REAL,
+      lightLevel REAL,
+      timestamp INTEGER,
+      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS air_quality_metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      fromNodeNum INTEGER NOT NULL,
+      fromNodeType INTEGER DEFAULT 0,
+      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+      toNodeType INTEGER DEFAULT 0,
+      pm25 REAL,
+      pm10 REAL,
+      co2 REAL,
+      voc REAL,
+      ozone REAL,
+      timestamp INTEGER,
+      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS power_metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      fromNodeNum INTEGER NOT NULL,
+      fromNodeType INTEGER DEFAULT 0,
+      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+      toNodeType INTEGER DEFAULT 0,
+      voltage REAL,
+      current REAL,
+      power REAL,
+      energy REAL,
+      frequency REAL,
+      timestamp INTEGER,
+      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS local_stats (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      fromNodeNum INTEGER NOT NULL,
+      fromNodeType INTEGER DEFAULT 0,
+      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+      toNodeType INTEGER DEFAULT 0,
+      snr REAL,
+      rssi REAL,
+      hopCount INTEGER,
+      linkQuality REAL,
+      packetLoss REAL,
+      timestamp INTEGER,
+      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS health_metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      fromNodeNum INTEGER NOT NULL,
+      fromNodeType INTEGER DEFAULT 0,
+      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+      toNodeType INTEGER DEFAULT 0,
+      cpuTemp REAL,
+      diskUsage REAL,
+      memoryUsage REAL,
+      uptime INTEGER,
+      loadAvg REAL,
+      timestamp INTEGER,
+      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS host_metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      fromNodeNum INTEGER NOT NULL,
+      fromNodeType INTEGER DEFAULT 0,
+      toNodeNum INTEGER NOT NULL DEFAULT 4294967295,
+      toNodeType INTEGER DEFAULT 0,
+      hostname TEXT,
+      uptime INTEGER,
+      loadAvg REAL,
+      osVersion TEXT,
+      bootTime INTEGER,
+      timestamp INTEGER,
+      FOREIGN KEY (fromNodeNum) REFERENCES nodes(num)
+    );`,
+];
+export const dbNodes = [
+    `CREATE TABLE IF NOT EXISTS my_info (
+      myNodeNum INTEGER PRIMARY KEY,  -- hash from primaryKey in meshcore
+      type INTEGER DEFAULT 0,         -- type
+      options TEXT,                   -- deviceId, RebootCount, minAppVersion, pioEnv, 
+                                      -- radioFreq, radioBw, radioSf, radioCr, txPower, maxTxPower
+                                      -- advLat, advLon manualAddContact       
+      publicKey TEXT,
+      protocol INTEGER,               -- 0 Meshtastic, 1 Meshcore
+      currentIP TEXT,
+      connId TEXT,
+      timestamp INTEGER
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS nodes ( -- not used in meshcore
+      num INTEGER PRIMARY KEY,
+      nodeType INTEGER DEFAULT 0,
+      label TEXT,
+      device_id TEXT,
+      last_seen INTEGER,
+      viaMqtt BOOLEAN,
+      hopsAway INTEGER,
+      lastHeard INTEGER
+    );`,
+];

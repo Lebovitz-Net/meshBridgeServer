@@ -1,5 +1,6 @@
 import { dispatchMessages } from './dispatchMessages.js';
 import { dispatchConfigs } from './dispatchConfigs.js';
+import { dispatchContacts } from './dispatchContacts.js';
 import { dispatchNodes } from './dispatchNodes.js';
 import { dispatchMetrics } from './dispatchMetrics.js';
 import { dispatchChannels } from './dispatchChannels.js';
@@ -28,6 +29,7 @@ export const getTypeName = (type) => {
 const dispatchRegistry = {
   ...dispatchMeshPacket,
   ...dispatchMessages,
+  ...dispatchContacts,
   ...dispatchConfigs,
   ...dispatchNodes,
   ...dispatchMetrics,
