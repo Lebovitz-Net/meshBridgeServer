@@ -69,5 +69,18 @@ export const dbDiagnostics = [
       timestamp INTEGER DEFAULT (strftime('%s','now')),
       conn_id TEXT,
       FOREIGN KEY (num) REFERENCES nodes(num)
-    );`
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS trace_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      connId TEXT,
+      nodeNum INTEGER,
+      packetType INTEGER,
+      tag INTEGER,
+      pathLen INTEGER,
+      lastSnr REAL,
+      pathHashes TEXT,
+      pathSnrs TEXT,
+      timestamp INTEGER
+    );`,
 ];

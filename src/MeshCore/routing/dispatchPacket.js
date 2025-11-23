@@ -6,10 +6,8 @@ import { dispatchMetrics } from './dispatchMetrics.js';
 import { dispatchChannels } from './dispatchChannels.js';
 import { dispatchMeshPacket } from './dispatchMeshPacket.js';
 import { dispatchMqtt } from './dispatchMqtt.js';
-import { portNums } from '../portNums.js';
 import { dispatchDiagnostics } from './dispatchDiagnostics.js';
 import Constants from '../../../external/meshcore.js/src/constants.js';
-import { TypeFormatFlags } from 'typescript';
 
 
 const responseCodes = Constants.ResponseCodes;

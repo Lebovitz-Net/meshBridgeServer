@@ -1,5 +1,4 @@
 import db from '../db.js';
-import { setMapping, setChannelMapping } from '../../Meshtastic/routing/nodeMapping.js';
 
 // insertConfig ============================================================
 
@@ -23,50 +22,6 @@ export function insertModuleConfig(subPacket) {
       num, type, payload, timestamp, device_id, conn_id
     ) VALUES ( ?, ?, ?, ?, ?, ? )
   `).run( fromNodeNum, key, data, timestamp, device_id, connId );
-}
-
-// InsertMyInfo ==============================================================
-// move this to nodes.
-
-export async function insertMyInfo(packet) {
-  
-  const { myNodeNum, deviceId, currentIP, channel} = packet;
-
-  if (!myNodeNum || !currentIP) {
-    console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, currentIP }, packet);
-    return;
-  }
-
-  setMapping(currentIP, myNodeNum, currentIP);
-  setChannelMapping(channel ?? 0, myNodeNum);
-/*
-      myNodeNum INTEGER PRIMARY KEY,  -- hash from primaryKey in meshcore
-      type INTEGER DEFAULT 0,         -- type
-      options TEXT,                   -- deviceId, RebootCount, minAppVersion, pioEnv, 
-                                      -- radioFreq, radioBw, radioSf, radioCr, txPower, maxTxPower
-                                      -- advLat, advLon manualAddContact       
-      publicKey TEXT,
-      protocol INTEGER,               -- 0 Meshtastic, 1 Meshcore
-      currentIP TEXT,
-      connId TEXT,
-      timestamp INTEGER
-*/
-  try {
-    db.prepare(
-      `INSERT INTO my_info (
-        myNodeNum, name, type, options, publicKey, protocol, currentIP, connId, timestamp
-      ) VALUES (@myNodeNum, @name, @type, @options, @publicKey, @protocol, @currentIP, @connId, @timestamp)
-      ON CONFLICT(myNodeNum) DO UPDATE SET
-        publicKey = excluded.publicKey,
-        currentIP = excluded.currentIP,
-        connId = excluded.connId,
-        timestamp = excluded.timestamp`
-    ).run({
-        ...packet,
-    })
-  } catch (err) {
-    console.error('[insertMyInfo] DB insert failed:', err);
-  }
 }
 
 // insertConnection ============================================================================

@@ -6,7 +6,7 @@ import { EventEmitter } from 'events';
 import { encode } from '../MeshCore/packetEncoder.js';
 
 let meshcoreRuntime = null;
-
+``
 /**
  * Bind the active MeshCore transport runtime
  * @param {object} runtime - MeshCore handler with .send(packet)
@@ -16,13 +16,21 @@ export function bindMeshRuntime(runtime) {
 }
 
 export const getMeshRuntime = () => meshcoreRuntime;
-// meshcoreRequests.js
 
+// meshcoreRequests.js
 export class MeshcoreRequests extends EventEmitter {
   constructor(handler, interval) {
     super();
     this.connection = handler.connection;
     this.queue = new MeshcoreCommandQueue(handler, interval);
+
+    if (!MeshcoreRequests.instance) {
+      MeshcoreRequests.instance = this;
+    }
+  }
+  
+  static getInstance() {
+    return MeshcoreRequests.instance;
   }
   // --- High-level API calls mirrored from connection.js ---
 
@@ -66,6 +74,11 @@ export class MeshcoreRequests extends EventEmitter {
       this.connection.sendChannelMessage(txtType, channelIdx, senderTimestamp, text)
     );
   }
+
+  async sendChannelTextMessage(channelIdx, text) {
+    return this.queue.send(() => this.connection.sendChannelTextMessage(channelIdx, text));
+  }
+
   async syncNextMessage() {
     return this.queue.send(() => this.connection.syncNextMessage());
   }

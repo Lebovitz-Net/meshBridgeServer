@@ -1,5 +1,6 @@
 import { hashPublicKey, getTextFromKey } from "../packetUtils.js";
-import { insertMyInfo } from "../../db/inserts/configInserts.js";
+import { insertHandlers } from "../../db/insertHandlers.js";
+const { insertMyInfo } =  insertHandlers;
 
 export const dispatchNodes = {
     SelfInfo: (packet) => {

@@ -1,112 +1,94 @@
 import net from 'net';
+import { EventEmitter } from 'events';
 import { extractFrames } from './routing/frameParser.js';
 
-/**
- * Creates a TCP handler instance for a given connection.
- * @param {string} connId - Unique ID for this TCP connection (assigned by WS handler)
- * @param {string} host - Target host
- * @param {number} port - Target port
- * @param {object} handlers - Event callbacks
- */
-export default function createTCPSocket(connId, host, port, handlers = {}) {
-  const {
-    onConnect = () => {},
-    onFrame = () => {},
-    onError = () => {},
-    onClose = () => {},
-    onTimeout = () => {},
-    onDrain = () => {},
-    onEnd = () => {}
-  } = handlers;
+export default class TcpSocket extends EventEmitter {
+  constructor(connId, host, port) {
+    super();
+    this.connId = connId;
+    this.host = host;
+    this.port = port;
+    this.socket = new net.Socket();
+    this.buffer = Buffer.alloc(0);
+    this.connected = false;
 
-  const socket = new net.Socket();
-  let buffer = Buffer.alloc(0);
-  let connected = false;
+    this.connectedPromise = new Promise((resolve, reject) => {
+      this.socket.connect(this.port, this.host, () => {
+        this.connected = true;
+        this.emit('connect', this._meta());
+        resolve(this._meta());
+      });
 
-  // Promise that resolves when socket connects
-  const connectedPromise = new Promise((resolve, reject) => {
-    socket.connect(port, host, () => {
-      connected = true;
-
-      const meta = {
-        connId,
-        sourceIp: socket.remoteAddress,
-        sourcePort: socket.remotePort,
-        transport: 'tcp',
-        host,
-        port
-      };
-
-      onConnect(meta);
-      resolve(meta); // ✅ resolve when connected
+      this.socket.on('error', (err) => {
+        this.connected = false;
+        this.emit('error', this._meta(), err);
+        reject(err);
+      });
     });
 
-    socket.on('error', (err) => {
-      connected = false;
-      onError({ connId, sourceIp: socket.remoteAddress, transport: 'tcp' }, err);
-      reject(err); // ❌ reject if connection fails
+    this._setupListeners();
+  }
+
+  _meta() {
+    return {
+      connId: this.connId,
+      sourceIp: this.socket.remoteAddress,
+      sourcePort: this.socket.remotePort,
+      transport: 'tcp',
+      host: this.host,
+      port: this.port,
+    };
+  }
+
+  _setupListeners() {
+    this.socket.on('data', (chunk) => {
+      this.buffer = Buffer.concat([this.buffer, chunk]);
+      const { frames, remainder } = extractFrames(this.buffer);
+      this.buffer = remainder;
+
+      frames.forEach((frame) => {
+        this.emit('frame', { ...this._meta(), timestamp: Date.now() }, frame);
+      });
     });
-  });
 
-  // Frame parser
-  socket.on('data', (chunk) => {
-    buffer = Buffer.concat([buffer, chunk]);
-
-    const { frames, remainder } = extractFrames(buffer);
-    buffer = remainder;
-
-    frames.forEach((frame) => {
-      try {
-        const meta = {
-          connId,
-          sourceIp: socket.remoteAddress,
-          sourcePort: socket.remotePort,
-          transport: 'tcp',
-          host,
-          port,
-          timestamp: Date.now(),
-        };
-        onFrame(meta, frame);
-      } catch (err) {
-        console.warn(`❌ [TCP ${connId}] Frame handler error:`, err);
-      }
+    this.socket.on('close', (hadError) => {
+      this.connected = false;
+      this.emit('close', this._meta(), hadError);
     });
-  });
 
-  // Lifecycle events
-  socket.on('close', (hadError) => {
-    connected = false;
-    onClose({ connId, sourceIp: socket.remoteAddress, transport: 'tcp' }, hadError);
-  });
+    this.socket.on('timeout', () => {
+      this.connected = false;
+      this.emit('timeout', this._meta());
+    });
 
-  socket.on('timeout', () => {
-    connected = false;
-    onTimeout({ connId, sourceIp: socket.remoteAddress, transport: 'tcp' });
-  });
+    this.socket.on('drain', () => {
+      this.emit('drain', this._meta());
+    });
 
-  socket.on('drain', () => onDrain({ connId, sourceIp: socket.remoteAddress, transport: 'tcp' }));
+    this.socket.on('end', () => {
+      this.connected = false;
+      this.emit('end', this._meta());
+    });
+  }
 
-  socket.on('end', () => {
-    connected = false;
-    onEnd({ connId, sourceIp: socket.remoteAddress, transport: 'tcp' });
-  });
+  write(data) {
+    const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
+    if (!this.connected) {
+      console.warn(`[TcpSocket ${this.connId}] Write attempted with no active connection`);
+      return false;
+    }
+    console.log(`[TcpSocket ${this.connId}] SEND ${buf.length} bytes`, buf);
+    const ok = this.socket.write(buf);
+    if (!ok) console.warn(`[TcpSocket ${this.connId}] Write buffer full`);
+    return ok;
+  }
 
-  return {
-    connId,
-    write: (data) => {
-      const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
-      if (!connected) {
-        console.warn(`[TCP ${connId}] Write attempted with no active connection`);
-        return false;
-      }
-      console.log(`[TCP ${connId}] SEND ${buf.length} bytes`, buf);
-      const ok = socket.write(buf);
-      if (!ok) console.warn(`[TCP ${connId}] Write buffer full`);
-      return ok;
-    },
-    end: () => socket.end(),
-    isConnected: () => connected,
-    socket,
-    connected: connectedPromise // ✅ expose for await
-  };
+  end() {
+    this.socket.end();
+    console.log(`[TcpSocket ${this.connId}] Connection terminated`);
+  }
+
+  isConnected() {
+    return this.connected;
+  }
 }

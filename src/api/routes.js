@@ -12,7 +12,6 @@ const {
   deleteNodeHandler,
   listChannels,
   listMessagesHandler,              // ✅ new unified handler
-  listMessagesForChannelHandler,    // ✅ channel-scoped handler
   sendMessageHandler,
   listConnections,
   listPacketsHandler,
@@ -68,7 +67,6 @@ export function registerRoutes(app) {
   app.get('/api/v1/nodes', listNodesHandler);
 
   // --- Channels ---
-  app.get('/api/v1/channels/:id/messages', listMessagesForChannelHandler); // ✅ channel-scoped
   app.get('/api/v1/channels/:id', listChannels);
 
   // --- Messages ---

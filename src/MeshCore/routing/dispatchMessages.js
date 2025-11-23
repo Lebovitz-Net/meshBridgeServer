@@ -1,47 +1,20 @@
 import { getTextFromKey } from '../packetUtils.js';
-import { insertMessage } from '../../db/inserts/messageInserts.js';
-import { getTypeName } from './dispatchPacket.js';
-import crypto from 'crypto';
+import { insertHandlers } from '../../db/insertHandlers.js';
+import { MeshcoreRequests } from '../../handlers/meshcoreRequests.js';
+import { normalizeIn } from '../../utils.js';
+import { generateMessageId, extractSenderAndMentions } from '../../api/apiUtils.js';
 
-/**
- * Generates a unique message ID based on key packet fields.
- * Ensures reproducibility and avoids collisions across protocols.
- */
-export const generateMessageId = (packet) => {
-  const base = [
-    packet.protocol ?? 'meshcore',
-    packet.from ?? 0,
-    packet.channel ?? 'default',
-    packet.timestamp ?? Date.now(),
-    packet.payload?.text ?? ''
-  ].join('|');
-
-  return crypto.createHash('sha256').update(base).digest('hex').slice(0, 16); // 16-char ID
-};
-
-// --- Utility: Extract sender and mentions from message string ---
-const extractSenderAndMentions = (msg) => {
-  const splitIndex = msg.indexOf(':');
-  if (splitIndex === -1) {
-    return { sender:null, message: msg, mentions: null};
-  }
-
-  const sender  = msg.slice(0, splitIndex).trim().toLowerCase();
-  const message = msg.slice(splitIndex + 1).trim();
-
-  const mentionMatches = [...message.matchAll(/@(\w+)/g)].map(m => m[1].toLowerCase());
-  const mentions = [...new Set(mentionMatches)];
-
-  return { sender, message, mentions };
-};
+const { insertMessage } = insertHandlers;
 
 export const dispatchMessages = {
 
     Sent: (packet) => {
         console.log('.../dispatchMessages sent', packet);
     },
-    MsgWaiting: (packet) => {
+    MsgWaiting: (packet)  => {
         console.log('.../dispatchMessages MsgWaiting', packet);
+        const request = MeshcoreRequests.getInstance();
+        request.getWaitingMessages();
     },
     Advert: (packet) => {
         const key = packet.data?.data?.publicKey;
@@ -68,7 +41,7 @@ export const dispatchMessages = {
             toNodeNum: data.to ?? null,
             message: text,
             recvTimestamp: meta.timestamp,
-            sentTimestamp: data.senderTimestamp,
+            sentTimestamp: normalizeIn(data.senderTimestamp),
             protocol: 'meshcore',
             sender,
             mentions: JSON.stringify(mentions),

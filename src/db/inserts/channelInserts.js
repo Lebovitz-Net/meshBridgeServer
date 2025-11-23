@@ -1,5 +1,5 @@
 import db from '../db.js';
-import { emitChannelUpdate } from '../../Meshtastic/utils/sseEmitters.js';
+import { emitChannelUpdate } from '../../servers/sseEmitters.js';
 
 
 export const insertChannel = (packet) => {

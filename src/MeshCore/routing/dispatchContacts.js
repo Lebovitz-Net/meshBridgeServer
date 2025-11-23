@@ -20,11 +20,17 @@ export const dispatchContacts = {
             position: JSON.stringify({ lat:advLat, lon:advLon }),
             ...meta,
         }
-        console.log ('.../dispatchContacts Contact');
 
         insertHandlers.insertUsers(shaped);
         
-    }
+    },
+    ContactsStart: (packet) => {
+        console.log('.../ContactsStart');
+    },
+
+    EndOfContacts: (packet) => {
+        console.log('.../EndOfContacts');
+    },
 }
 
 /*

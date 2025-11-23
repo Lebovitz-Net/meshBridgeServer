@@ -1,4 +1,4 @@
-import { broadcastEvent } from '../../servers/sse.js'; // or wherever your sseRouter lives
+import { broadcastEvent } from './sse.js'; // or wherever your sseRouter lives
 
 export function emitNodeUpdate(node) {
   const nodeId = node.num || node.device_id || 'unknown';

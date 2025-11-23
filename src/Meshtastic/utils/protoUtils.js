@@ -18,12 +18,11 @@ const sortOrder = (val) => {
     case 'MeshPacket': return 3;
     case 'Config': return 4;
     case 'ModuleConfig': return 5;
-    case 'Data' : return 20;
-    default: return topLevelProtos[val].oneofs?.payloadVariant ? 30 : 100;
+    default: return 30;
   }
 }
 const meshProtoTypes = Object.keys(topLevelProtos)
-                            .filter((value) => topLevelProtos[value]?.fields)
+                            .filter((value) => topLevelProtos[value]?.oneofs?.payloadVariant)
                             .sort((a, b) => sortOrder(a) - sortOrder(b));
 
 

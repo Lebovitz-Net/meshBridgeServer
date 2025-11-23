@@ -1,8 +1,6 @@
 // src/handlers/meshHandler.js
-
-import { EventEmitter } from 'events';
-import createConnection from '../Meshtastic/tcpConnection.js';
-import routePacket from '../Meshtastic/packets/packetRouter.js';
+import TcpConnection from '../Meshtastic/TcpConnection.js';
+import SerialConnection from '../Meshtastic/SerialConnection.js';
 
 export default async function createMeshHandler(connId, host, port, opts = {}) {
   const {
@@ -11,15 +9,28 @@ export default async function createMeshHandler(connId, host, port, opts = {}) {
   } = opts;
 
   // Just create an EventEmitter directly
-  const emitter = new EventEmitter();
 
-  const connection =  createConnection({
+  const connection =  new TcpConnection({
     connId,
     host,
     port,
     reconnectPolicy: reconnect.enabled,
-    emitter
   });
+
+  
+    // Instantiate transports
+    // this need to be integrated with the current TcpCOnnection
+    const tcpConn = new TcpConnection({ connId, host, port });
+    const serialConn = new SerialConnection({ devicePath: '/dev/ttyUSB0', baudRate: 115200, connId: 'serial-1' });
+  
+    // Subscribe router to packet events
+    [tcpConn, serialConn].forEach(conn => {
+      conn.on('packet', (meta, buffer) => {
+        routePacket(meta, buffer);
+      });
+      conn.on('connect', (meta) => console.log(`[Bridge] Connected:`, meta));
+      conn.on('error', (meta, err) => console.error(`[Bridge] Error:`, meta, err));
+    });
 
   return {
     send: (packet) => {
@@ -30,7 +41,7 @@ export default async function createMeshHandler(connId, host, port, opts = {}) {
       }
     },
     end: connection.stop,
-    on: emitter.on.bind(emitter),
-    off: emitter.off.bind(emitter)
+    on: connection.on.bind(connection),
+    off: connection.off.bind(connection)
   };
 }

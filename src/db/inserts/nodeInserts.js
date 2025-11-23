@@ -1,9 +1,11 @@
 ﻿// --- Node Inserts ---
 import db from '../db.js';
-import { emitNodeUpdate } from '../../Meshtastic/utils/sseEmitters.js';
+import { emitNodeUpdate } from '../../servers/sseEmitters.js';
+import { setMapping, setChannelMapping } from '../../Meshtastic/routing/nodeMapping.js';
 
 
 // insertNode ===========================================
+
 export const insertNode = (node, timestamp = Date.now()) => {
   if (!node?.num) {
     console.warn('[insertNode] Skipping insert: node.num is missing');
@@ -30,9 +32,6 @@ export const insertNode = (node, timestamp = Date.now()) => {
     device_id: node.device_id ?? null
   });
 };
-
-
-
 
 // insertNodeMetrics ===========================================
 export function insertNodeMetrics(deviceMetrics, { num, lastHeard = Date.now() }) {
@@ -113,3 +112,58 @@ export const upsertNodeInfo = (packet) => {
   });
   tx();
 }
+
+// InsertMyInfo ==============================================================
+// move this to nodes.
+
+export async function insertMyInfo(packet) {
+  
+  const { myNodeNum, deviceId, currentIP, channel} = packet;
+
+  if (!myNodeNum || !currentIP) {
+    console.warn('[insertMyInfo] Missing required fields:', { myNodeNum, currentIP }, packet);
+    return;
+  }
+
+  setMapping(currentIP, myNodeNum, currentIP);
+  setChannelMapping(channel ?? 0, myNodeNum);
+/*
+      myNodeNum INTEGER PRIMARY KEY,  -- hash from primaryKey in meshcore
+      type INTEGER DEFAULT 0,         -- type
+      options TEXT,                   -- deviceId, RebootCount, minAppVersion, pioEnv, 
+                                      -- radioFreq, radioBw, radioSf, radioCr, txPower, maxTxPower
+                                      -- advLat, advLon manualAddContact       
+      publicKey TEXT,
+      protocol TEXT,               -- Meshtastic, Meshcore
+      currentIP TEXT,
+      connId TEXT,
+      timestamp INTEGER
+*/
+  try {
+    db.prepare(
+      `INSERT INTO my_info (
+        myNodeNum, name, type, options, publicKey, protocol, currentIP, connId, timestamp
+      ) VALUES (@myNodeNum, @name, @type, @options, @publicKey, @protocol, @currentIP, @connId, @timestamp)
+      ON CONFLICT(myNodeNum) DO UPDATE SET
+        publicKey = excluded.publicKey,
+        currentIP = excluded.currentIP,
+        connId = excluded.connId,
+        timestamp = excluded.timestamp`
+    ).run({
+        ...packet,
+    })
+  } catch (err) {
+    console.error('[insertMyInfo] DB insert failed:', err);
+  }
+}
+// position info
+//         fromNodeNum: num,
+//         toNodeNum: 0xffffffff,
+//         latitude: data.latitude,
+//         longitude: data.longitude,
+//         altitude: data.altitude || null,
+//         sats_in_view: data.satsInView || null,
+//         batteryLevel: data.batteryLevel || null,
+//         device_id: nodeInfo.device_d,
+//         conn_id: nodeInfo.connId,
+//         timestamp: nodeInfo.timestamp,

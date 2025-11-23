@@ -1,9 +1,12 @@
 // --- Misc Inserts ---
 import db from '../db.js';
-import { emitMessageUpdate } from '../../Meshtastic/utils/sseEmitters.js';
+import { emitMessageUpdate } from '../../servers/sseEmitters.js';
+import { normalizeIn } from '../../utils.js';
 
 // --- Messages ---
 export const insertMessage = (msg) => {
+  const { recvTimestamp, sentTimestamp } = msg;
+
   db.prepare(`
     INSERT INTO messages (
       contactId, messageId, channelId, fromNodeNum, toNodeNum,
@@ -17,6 +20,8 @@ export const insertMessage = (msg) => {
     )
   `).run({
     ...msg,
+    recvTimestamp: normalizeIn(recvTimestamp),
+    sentTimestamp: normalizeIn(sentTimestamp), 
   });
 
   emitMessageUpdate({

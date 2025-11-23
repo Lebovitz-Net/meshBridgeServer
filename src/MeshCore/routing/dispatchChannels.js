@@ -5,7 +5,7 @@ export const dispatchChannels = {
     ChannelInfo: (packet) => {
         const {data, meta} = packet.data;
         const { channelIdx, name, secret } = data;
-        
+
         const shaped = {
             channelIdx,
             channelNum: channelIdx,
@@ -17,17 +17,9 @@ export const dispatchChannels = {
             options: JSON.stringify({}),
             ...meta,
         }
-        if (name && name !== '' && getPublicKeyValue(secret))
+        if (name && name !== '' && getPublicKeyValue(secret)) {
             insertHandlers.insertChannel(shaped);
-        else console.log(`.../ChannelInfo idx ${data.channelIdx} name ${data.name} key ${getPublicKeyValue(secret)}`);
-    },
-
-    ContactsStart: (packet) => {
-        console.log('.../ContactsStart', packet);
-    },
-
-    EndOfContacts: (packet) => {
-        console.log('.../EndOfContacts', packet);
+        }
     },
 }
 

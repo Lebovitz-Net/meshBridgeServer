@@ -21,6 +21,7 @@ export function insertLogRecord(data) {
 }
 
 // Insert Packet Log ==========================================================
+
 export function insertPacketLog({ num, packet_type, timestamp, raw_payload }) {
   if (!num) {
     console.warn(`[insertPacketLog] Skipping log: no num provided`);
@@ -50,6 +51,7 @@ export function insertPacketLog({ num, packet_type, timestamp, raw_payload }) {
 }
 
 // Inject Packet Log ==========================================================
+
 export const injectPacketLog = (packet) => {
   const { num, packet_type, raw_payload, timestamp = Math.floor(Date.now() / 1000) } = packet;
 
@@ -68,7 +70,41 @@ export const injectPacketLog = (packet) => {
   return { inserted: true, log_id: id };
 };
 
+// TraceData Records
+export function insertTraceData(trace) {
+  const { data, meta } = trace;
+  const { reserved, pathLen, flags, tag, authCode, pathHashes, pathSnrs, lastSnr } = data.data;
+  const { currentIP, connId, source, timestamp } = data.meta;
+
+  const payloadHashes = JSON.stringify(pathHashes);
+  const payloadSnrs = JSON.stringify(pathSnrs);
+
+  db.prepare(`
+    INSERT INTO trace_logs (
+      connId,
+      nodeNum,
+      tag,
+      pathLen,
+      lastSnr,
+      pathHashes,
+      pathSnrs,
+      timestamp
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    connId,
+    null,            // nodeNum if you can resolve it
+    tag,
+    pathLen,
+    lastSnr,
+    payloadHashes,
+    payloadSnrs,
+    timestamp
+  );
+}
+
+
 // Optional placeholders (new in current) =====================================
+
 export const insertDiagnosticOverlay = (overlay) => {
   throw new Error('insertDiagnosticOverlay not yet implemented');
 };
