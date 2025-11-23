@@ -63,8 +63,8 @@ function killApiSockets() {
 
   // --- Start runtimes ---
   //const mesh = await startMeshtastic();   // Meshtastic runtime (with startup handshake)
-  const { meshcore, request, stoploop } = await startMeshcore(); // MeshCore runtime (placeholder handshake for now)
-  //const mqttHandler = await startMqttServer();
+  const { request, stoploop } = await startMeshcore(); // MeshCore runtime (placeholder handshake for now)
+  const mqttCLient = await startMqttServer();
 
   // --- Graceful Shutdown ---
   ['SIGINT', 'SIGTERM'].forEach(sig => {
@@ -72,8 +72,8 @@ function killApiSockets() {
       console.log(`🔻 Received ${sig}, shutting down...`);
 
       // Disconnect MQTT
-      if (typeof mqttHandler !== "undefined")
-        mqttHandler.disconnect?.();
+      if (typeof mqttCLient !== "undefined")
+        mqttCLient.disconnect?.();
       if (typeof request !== "undefined") {
         console.log("stopping MeshCore");
         request.close();

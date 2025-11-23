@@ -1,13 +1,19 @@
-  import createMQTTHandler from '../handlers/mqttHandler.js';
-  import { config } from '../config/config.js';
+// --- MQTT Bridge ---
+import MqttClient from '../handlers/MqttClient.js';
+import { config } from '../config/config.js';
 
-//   --- MQTT Bridge ---
 export async function startMqttServer() {
-  const mqttHandler = createMQTTHandler('mqtt-bridge', {
-    brokerUrl: config.mqtt.brokerUrl,
-    subTopic: config.mqtt.subTopic,
-    pubOptions: config.mqtt.pubOptions
+  const client = new MqttClient(config.mqtt.brokerUrl, {
+    clientId: "mqtt-bridge-" + Date.now(),
+    protocolVersion: 4,   // MQTT v3.1.1
+    clean: true,          // start fresh session
+    keepalive: 60,         // send PINGREQ every 60s
   });
-  mqttHandler.connect();
-  return mqttHandler;
+
+  client.connect();
+
+  // Subscribe to the configured topic
+  client.subscribe(config.mqtt.subTopic);
+
+  return client;
 }
